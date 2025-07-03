@@ -4,15 +4,22 @@ document.addEventListener('DOMContentLoaded', function () {
   const navItems = [
     { id: 'dashboard-link', url: '/dashboard/' },
     { id: 'lecturer-link', url: '/lecturer/' },
-    ];
+  ];
 
-    navItems.forEach(item => {
+  navItems.forEach(item => {
     const el = document.getElementById(item.id);
     if (el) {
       const pageUrl = el.dataset.pageUrl || item.url;
+      
+      el.addEventListener('click', function(e) {
+        if (path === pageUrl) {
+          e.preventDefault();
+        }
+      });
+      
       if (path === pageUrl) {
         const div = el.querySelector('div');
-        if (div) {
+        if (div) { 
           div.classList.add(
             'bg-sky-300/20',
             'text-blue-700',
@@ -24,7 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
   });
-  
+
+
   const hamburger = document.getElementById('hamburger');
   const sidebar = document.getElementById('sidebar');
   const mainContent = document.getElementById('main-content');
