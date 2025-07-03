@@ -5,6 +5,13 @@ from .models import profile
 
 def dashboard(request):
     return render(request, 'dashboard.html')
+def lecturer(request):
+    return render(request, 'lecturer.html')
+def addLecturer(request):
+    return render(request, 'addLecturer.html')
+def editLecturer(request):
+    return render(request, 'editLecturer.html')
+
 
 def signin(request):
     users = profile.objects.all()

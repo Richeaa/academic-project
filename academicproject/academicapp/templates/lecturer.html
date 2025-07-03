@@ -1,0 +1,93 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div id="main-content" class="w-full transition-all duration-300 p-12 select-none">
+
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Lecturer Information</h1>
+      <a href="{% url 'addLecturer' %}" class="bg-blue-700 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
+        <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
+      </a>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-4 mb-8">
+      <div class="relative w-60">
+        <i data-lucide="search"
+          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
+        <select
+          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
+          <option value="" disabled selected hidden>Enter lecturer name...</option>
+          <option>Siti</option>
+          <option>Eko</option>
+          <option>Rosdianti</option>
+        </select>
+      </div>
+
+      <div class="relative w-60">
+        <i data-lucide="search"
+          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
+        <select
+          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
+          <option value="" disabled selected hidden>Enter lecturer job...</option>
+          <option>Dosen</option>
+          <option>Kaprodi</option>
+          <option>Dekan</option>
+        </select>
+      </div>
+
+      <button class="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg transition-colors">
+        <img src="{% static 'svg/search.svg' %}" alt="Search Icon" class="w-5 h-5">
+      </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-200 border-b border-gray-300">
+            <tr>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Name</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Study Program</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Job</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Current Working Days</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-900">Dr. Ahmad Wijaya</td>
+              <td class="px-6 py-4 text-sm text-gray-600">Information System</td>
+              <td class="px-6 py-4 text-sm text-gray-600">Full</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">Kaprodi</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">5</td>
+              <td class="px-6 py-4 text-center">
+                <div class="flex justify-center gap-2">
+                  <a href="{% url 'editLecturer' %}" class="p-2 bg-blue-100 rounded hover:bg-blue-200 transition-colors">
+                    <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4" alt="Edit">
+                  </a>
+                  <a href="#" class="p-2 bg-red-100 rounded hover:bg-red-200 transition-colors">
+                    <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4" alt="Delete">
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+    </div>
+    <div class="mt-4 flex justify-between text-sm text-gray-600 p-4">
+        <span>Showing 1 lecturer</span>
+        <span>Page 1 of 1</span>
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script src="https://unpkg.com/lucide-static@latest/dist/lucide.min.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+{% endblock %}
