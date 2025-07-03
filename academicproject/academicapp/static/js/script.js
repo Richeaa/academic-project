@@ -75,6 +75,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   hamburger.addEventListener('click', function () {
     const isHidden = sidebar.classList.contains('-translate-x-full');
+
+    mainContent.classList.add('transition-all', 'duration-300', 'ease-in-out');
     
     sidebar.classList.toggle('-translate-x-full');
 
