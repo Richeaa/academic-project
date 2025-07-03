@@ -7,6 +7,7 @@ def dashboard(request):
     return render(request, 'dashboard.html')
 
 def signin(request):
+    users = profile.objects.all()
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -18,11 +19,16 @@ def signin(request):
                 request.session['username'] = user.username
                 return redirect('dashboard')
             else:
-                return render(request, 'signin.html', {'error': 'Incorrect password'})
+                return render(request, 'signin.html', {
+                    'error': 'Incorrect password',
+                    'users': users
+                })
         except profile.DoesNotExist:
-            return render(request, 'signin.html', {'error': 'User does not exist'})
+            return render(request, 'signin.html', {
+                'error': 'User does not exist',
+                'users': users
+            })
 
-    users = profile.objects.all()
     return render(request, 'signin.html', {'users': users})
 
 def logout(request):

@@ -22,6 +22,11 @@
                 <p class="text-gray-600">Please sign in to your account</p>
             </div>
 
+            {% if error %}
+            <div class="mb-4 text-sm text-red-600 bg-red-100 border border-red-300 px-4 py-2 rounded">
+                {{ error }}
+            </div>
+            {% endif %}
             <form class="space-y-6" method="POST" action="">
                 {% csrf_token %}
                 <div>
