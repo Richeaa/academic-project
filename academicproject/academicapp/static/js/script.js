@@ -1,8 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const dashboardLink = document.querySelector('a[href="#"]');
-  if (dashboardLink) {
-    dashboardLink.querySelector('div').classList.add('bg-sky-300/20', 'text-blue-700', 'transition', 'duration-100', 'ease-in-out');
-  }
+  const path = window.location.pathname;
+  
+  const navItems = [
+    { id: 'dashboard-link', url: '/dashboard/' },
+    { id: 'lecturer-link', url: '/lecturer/' },
+    ];
+
+    navItems.forEach(item => {
+    const el = document.getElementById(item.id);
+    if (el) {
+      const pageUrl = el.dataset.pageUrl || item.url;
+      if (path === pageUrl) {
+        const div = el.querySelector('div');
+        if (div) {
+          div.classList.add(
+            'bg-sky-300/20',
+            'text-blue-700',
+            'transition',
+            'duration-100',
+            'ease-in-out'
+          );
+        }
+      }
+    }
+  });
   
   const hamburger = document.getElementById('hamburger');
   const sidebar = document.getElementById('sidebar');
