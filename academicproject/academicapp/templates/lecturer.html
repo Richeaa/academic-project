@@ -1,12 +1,14 @@
 {% extends 'dashboard.html' %}
 {% load static %}
 
+{% block title %}Lecturer{% endblock %}
+
 {% block content %}
-<div id="main-content" class="w-full transition-all duration-300 p-12 select-none">
+<div id="main-content" class="w-full p-12 select-none">
 
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-red-500">Lecturer Information</h1>
-      <a href="{% url 'addLecturer' %}" class="bg-blue-700 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
+      <a href="{% url 'addLecturer' %}" class="bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
         <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
       </a>
     </div>
@@ -16,7 +18,7 @@
         <i data-lucide="search"
           class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
         <select
-          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
+          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
           <option value="" disabled selected hidden>Enter lecturer name...</option>
           <option>Siti</option>
           <option>Eko</option>
@@ -28,7 +30,7 @@
         <i data-lucide="search"
           class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
         <select
-          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500">
+          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
           <option value="" disabled selected hidden>Enter lecturer job...</option>
           <option>Dosen</option>
           <option>Kaprodi</option>
