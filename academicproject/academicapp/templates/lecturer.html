@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block content %}
-<div id="main-content" class="w-full transition-all duration-300 ease-in-out p-12 select-none">
+<div id="main-content" class="w-full transition-all duration-300 p-12 select-none">
 
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Lecturer Information</h1>
+      <h1 class="text-3xl font-bold text-red-500">Lecturer Information</h1>
       <a href="{% url 'addLecturer' %}" class="bg-blue-700 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
         <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
       </a>
@@ -46,12 +46,12 @@
         <table class="w-full">
           <thead class="bg-gray-200 border-b border-gray-300">
             <tr>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Name</th>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Study Program</th>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Type</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Job</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Current Working Days</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-900">Action</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Name</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Study Program</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Type</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Job</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Current Working Days</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -63,7 +63,7 @@
               <td class="px-6 py-4 text-center text-sm text-gray-600">5</td>
               <td class="px-6 py-4 text-center">
                 <div class="flex justify-center gap-2">
-                  <a href="{% url 'editLecturer' %}" class="p-2 bg-blue-100 rounded hover:bg-blue-200 transition-colors">
+                  <a href="{% url 'editLecturer' %}" class="p-2 bg-green-100 rounded hover:bg-blue-200 transition-colors">
                     <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4" alt="Edit">
                   </a>
                   <a href="#" class="p-2 bg-red-100 rounded hover:bg-red-200 transition-colors">
@@ -77,11 +77,24 @@
       </div>
       
     </div>
-    <div class="mt-4 flex justify-between text-sm text-gray-600 p-4">
-        <span>Showing 1 lecturer</span>
-        <span>Page 1 of 1</span>
-      </div>
+   <div class="mt-4 flex justify-between text-sm text-gray-600 p-4">
+  <span>Showing 1 lecturer</span>
+  <span>Page 1 of 1</span>
+</div>
+
+
+<div class="flex justify-end p-4">
+  <button onclick="window.print()" class="flex items-center gap-1 bg-red-400 text-white px-3 py-2 rounded hover:bg-red-400 transition">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v7H6v-7zm0 0V9h12v5" />
+    </svg>
+    <span class="text-sm">Print</span>
+  </button>
+</div>
+
+
   </div>
+
 </div>
 {% endblock %}
 
