@@ -88,7 +88,6 @@
                     const isHidden = passwordInput.type === "password";
                     passwordInput.type = isHidden ? "text" : "password";
 
-                    // Switch icon
                     eyeIcon.src = isHidden 
                     ? "{% static 'svg/eye-on.svg' %}" 
                     : "{% static 'svg/eye-off.svg' %}";

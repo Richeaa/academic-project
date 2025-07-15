@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   
   const navItems = [
     { id: 'dashboard-link', url: '/dashboard/' },
-    { id: 'lecturer-link', url: '/lecturer/' },
+    { id: 'studyprogram-link' },
   ];
 
   navItems.forEach(item => {
