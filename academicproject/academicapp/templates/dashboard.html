@@ -88,18 +88,6 @@
                     <h3 class="text-xs font-normal pl-6">Features</h3>
                 </div>
 
-                <a href="#"><div class="group w-full h-14 mt-4 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
-                    <div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Schedule</p>
-                    </div>
-                </div>
-                </a>
-
                 <a href="{% url 'lecturer' %}" id="lecturer-link" ><div class="group w-full h-14 mt-4 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -116,9 +104,9 @@
                 <button onclick="toggleDropdown()" class=" w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center justify-between hover:text-blue-700 transition-all duration-100 ease-in-out">
                     <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
                     </svg>
-                    <p class="ml-4 text-sm font-normal">Authentication</p>
+                    <p class="ml-4 text-sm font-normal">Schedule</p>
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform duration-200" id="dropdown-arrow" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.585l3.71-4.355a.75.75 0 011.14.976l-4.25 5a.75.75 0 01-1.14 0l-4.25-5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
@@ -126,18 +114,25 @@
                 </button>
 
                 <div id="dropdown-content" class="ml-10 mt-2 hidden text-sm text-gray-700 space-y-4 transition-all duration-300 ease-in-out">
-                    <a href="{% url 'signin' %}" class="group flex items-center space-x-2 px-3 py-2 rounded-md  hover:text-blue-500 transition group">
+                    <a href="{% url 'semester20251' %}"  class="group flex items-center space-x-2 px-3 py-2 rounded-md  hover:text-blue-500 transition group">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
-                        <span>Login</span>
+                        <span>Semester 20251</span>
                     </a>
                                     
                     <a href="#" class="flex items-center space-x-2 px-3 py-2 rounded-md hover:text-blue-500 transition group">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
-                        <span>Register</span>
+                        <span>Semester 20252</span>
+                    </a>
+
+                    <a href="#" class="flex items-center space-x-2 px-3 py-2 rounded-md hover:text-blue-500 transition group">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <span>Semester 20253</span>
                     </a>
                 </div>
 

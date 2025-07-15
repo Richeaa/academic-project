@@ -12,7 +12,6 @@ def addLecturer(request):
 def editLecturer(request):
     return render(request, 'editLecturer.html')
 
-
 def signin(request):
     users = profile.objects.all()
     if request.method == 'POST':
@@ -22,8 +21,6 @@ def signin(request):
         try:
             user = profile.objects.get(username=username)
             if user.password == password:
-                request.session['user_id'] = user.profile_id 
-                request.session['username'] = user.username
                 return redirect('dashboard')
             else:
                 return render(request, 'signin.html', {
@@ -39,7 +36,5 @@ def signin(request):
     return render(request, 'signin.html', {'users': users})
 
 def logout(request):
-    if 'user_id' in request.session:
-        del request.session['user_id']
-        del request.session['username']
     return redirect('signin')
+

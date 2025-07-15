@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 function toggleDropdown() {
+  
     const content = document.getElementById('dropdown-content');
     const arrow = document.getElementById('dropdown-arrow');
     content.classList.toggle('hidden');
