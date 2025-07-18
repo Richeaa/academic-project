@@ -51,3 +51,33 @@ class semester20252(models.Model):
     class Meta:
         db_table = 'semester_20252'
         managed = False
+
+class assignlecturer20251(models.Model):
+    assign_id = models.AutoField(primary_key=True)
+    semester = models.ForeignKey(semester20251, on_delete=models.CASCADE)
+    lecturer_day = models.CharField(max_length=10)
+    room = models.CharField(max_length=50)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"Assignment {self.assign_id} for {self.semester_id} on {self.lecturer_day} from {self.start_time} to {self.end_time} in {self.room}"
+
+    class Meta:
+        db_table = 'assignlecturer20251'
+        managed = True
+
+class assignlecturer20252(models.Model):
+    assign_id = models.AutoField(primary_key=True)
+    semester = models.ForeignKey(semester20252, on_delete=models.CASCADE)
+    lecturer_day = models.CharField(max_length=10)
+    room = models.CharField(max_length=50)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"Assignment {self.assign_id} for {self.semester_id} on {self.lecturer_day} from {self.start_time} to {self.end_time} in {self.room}"
+
+    class Meta:
+        db_table = 'assignlecturer20252'
+        managed = True

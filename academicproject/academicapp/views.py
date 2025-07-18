@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
-from .models import profile, semester20251, semester20252
+from django.shortcuts import redirect, get_object_or_404
+from .models import profile, semester20251, semester20252, assignlecturer20251, assignlecturer20252
 from django.http import HttpResponse
 from django.core.paginator import Paginator
+from django.contrib import messages
 
 
 def dashboard(request):
@@ -45,12 +47,27 @@ semester_title = {
     '20252': semester20252,
 }
 
+assign_model_title = {
+    '20251': assignlecturer20251,
+    '20252': assignlecturer20252,
+}
+
+
 def studyprogram(request, semester_url='20251'):
     semester_model = semester_title.get(semester_url)
     if not semester_model:
         return HttpResponse("Semester not found", status=404)
 
     semester_data = semester_model.objects.all()
+
+    assign_model = assign_model_title.get(semester_url)
+    assignments = assign_model.objects.select_related('semester').all()
+    assignment_map = {a.semester.semester_id: a for a in assignments}
+
+    for item in semester_data:
+        assignment = assignment_map.get(item.semester_id)
+        item.is_assigned = bool(assignment)
+        item.assign_id = assignment.assign_id if assignment else None
 
     paginator = Paginator(semester_data, 10)  
     page_number = int(request.GET.get('page', 1))
@@ -81,3 +98,50 @@ def studyprogram(request, semester_url='20251'):
         'rooms4': rooms4,
     }
     return render(request, 'studyprogram.html', context)
+
+
+def assignlecturer_create(request):
+    if request.method == 'POST':
+        semester_id = request.POST.get('semester_id')
+        entry_id = request.POST.get('entry_id')
+
+        try:
+            semester_instance = semester20251.objects.get(semester_id=semester_id)
+        except semester20251.DoesNotExist:
+            return redirect('studyprogram', semester_url='20251')
+        
+        if entry_id: 
+            try:
+                assign_obj = assignlecturer20251.objects.get(assign_id=entry_id)
+                assign_obj.semester = semester_instance
+                assign_obj.lecturer_day = request.POST.get('day')
+                assign_obj.room = request.POST.get('room')
+                assign_obj.start_time = request.POST.get('time')
+                assign_obj.end_time = request.POST.get('time2')
+                assign_obj.save()
+                messages.success(request, 'Assignment updated successfully!')
+            except assignlecturer20251.DoesNotExist:
+                messages.error(request, 'Assignment record not found.')
+        else:
+            assignlecturer20251.objects.create(
+                semester=semester_instance, 
+                lecturer_day=request.POST.get('day'),
+                room=request.POST.get('room'),
+                start_time=request.POST.get('time'),
+                end_time=request.POST.get('time2')
+            )
+        messages.success(request, 'Lecturer assignment saved successfully!')
+        return redirect('studyprogram', semester_url='20251')
+    
+def assignlecturer_delete(request):
+    if request.method == 'POST':
+        semester_id = request.POST.get('semester_id')
+
+        obj = get_object_or_404(semester20251, semester_id=semester_id)
+        obj.delete()
+
+        messages.success(request, "Data has been deleted.")
+        return redirect('studyprogram', semester_id)
+    else:
+        messages.error(request, "Method Unallowed.")
+        return redirect('studyprogram', '20251')  

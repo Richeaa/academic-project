@@ -4,7 +4,45 @@
 
 {% block content %}
 
-<div id="main-content" class="w-full p-4 ">
+<main id="main-content" class="w-full p-8">
+
+    {% if messages %}
+<div id="toast-container" class="fixed top-18 right-4 z-50 transition-opacity duration-500 ease-in-out opacity-100">
+    {% for message in messages %}
+    <div class="flex items-center gap-2 mb-2 px-4 py-3 rounded-lg shadow-lg text-white 
+                {% if message.tags == 'success' %}bg-emerald-500
+                {% elif message.tags == 'error' %}bg-rose-500
+                {% else %}bg-gray-800{% endif %}"
+        role="alert"
+        id="toast-message">
+        
+        <!-- Icon -->
+        {% if message.tags == 'success' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4 -4" />
+        </svg>
+        {% elif message.tags == 'error' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        {% endif %}
+
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    setTimeout(() => {
+        const toast = document.getElementById('toast-container');
+        if (toast) {
+            toast.classList.add('opacity-0'); 
+            setTimeout(() => toast.remove(), 500); 
+        }
+    }, 3000);
+</script>
+{% endif %}
+
 
     <div class="bg-white rounded-lg shadow-md mb-4 p-4">
         <div class="flex items-center justify-between">
@@ -41,7 +79,7 @@
 
         <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
             <h2 class="text-2xl font-bold text-gray-800">Semester {{semester_title}}</h2>
-            <p class="text-gray-600 mt-1">Information: Assign Lecturer</p>
+            <p class="text-gray-600 mt-1">Information: Study Program</p>
         </div>
 
         <div class="w-full overflow-x-auto rounded-md border border-gray-200">
@@ -76,29 +114,56 @@
                     <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_1 }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_2 }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_3 }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">
-                        {% if item.credit %}
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                            {% if item.credit >= 3 %}
-                                bg-green-100 text-green-800
-                            {% elif item.credit >= 2 %}
-                                bg-yellow-100 text-yellow-800
-                            {% else %}
-                                bg-red-100 text-red-800
-                            {% endif %}
-                        ">
-                            {{ item.credit }}
-                        </span>
+                    <td class="px-6 py-4 text-sm">
+                         {% if item.is_assigned %}
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                Completed
+                            </span>
                         {% else %}
-                            <span class="text-gray-400 text-xs">-</span>
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-600">
+                                Pending
+                            </span>
                         {% endif %}
                     </td>
                         <td class="px-6 py-4  text-sm font-medium">
                         <div class="flex space-x-2">
-                            <button onclick="openAssign()"
-                               class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 px-3 py-1 rounded-md text-xs font-medium transition-colors">
-                                Assign
-                            </button>
+                            {% if item.is_assigned %}
+                                <button onclick="openAssign(this)"
+                                    data-semester-id="{{ item.semester_id }}"
+                                    data-entry-id="{{ item.assign_id }}"
+                                    class="text-sky-600 hover:text-sky-900 bg-sky-100 hover:bg-sky-200 px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75a4.5 4.5 0 0 1-4.884 4.484c-1.076-.091-2.264.071-2.95.904l-7.152 8.684a2.548 2.548 0 1 1-3.586-3.586l8.684-7.152c.833-.686.995-1.874.904-2.95a4.5 4.5 0 0 1 6.336-4.486l-3.276 3.276a3.004 3.004 0 0 0 2.25 2.25l3.276-3.276c.256.565.398 1.192.398 1.852Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.867 19.125h.008v.008h-.008v-.008Z" />
+                                    </svg>
+                                </button>
+                                <form method="POST" action="{% url 'assignlecturer_delete' %}" onsubmit="return confirm('Are you sure you want to delete this?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="semester_id" value="{{ item.semester_id }}">
+                                    <button type="submit"
+                                        class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <button onclick="openAssign(this)"
+                                    data-semester-id="{{ item.semester_id }}"
+                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer">
+                                    Assign
+                                </button>
+                                <form method="POST" action="{% url 'assignlecturer_delete' %}" onsubmit="return confirm('Are you sure you want to delete this?');">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="semester_id" value="{{ item.semester_id }}">
+                                    <button type="submit"
+                                        class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            {% endif %}
                         </div>
                     </td>
                     {% endfor %}
@@ -106,22 +171,25 @@
             </table>
         </div>
 
-            <div id="assignModal" class="fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50 hidden">
+            <div id="assignMorning" class="fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50 hidden">
             <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg">
                 <div class="flex justify-between items-center">
                 <h2 class="text-lg font-semibold mt-3 mb-4">Assign Lecturer</h2>
                 <button type="button" onclick="closeAssign()" class="group">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 group-hover:text-red-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 group-hover:text-red-600 cursor-pointer">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
 
                 </button>
                 </div>
 
-                <form id="assignForm">
+                <form id="assignForm" method="POST" action="{% url 'assignlecturer_create' %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="assignSemesterId" name="semester_id">
+                    <input type="hidden" id="assignEntryId" name="entry_id">
                 <div class="mb-8">
                     <label for="day" class="block text-sm font-medium text-gray-700">Day</label>
-                    <select id="day" name="day" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
+                    <select id="day" name="day" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 cursor-pointer" required>
                     <option>Mon</option>
                     <option>Tue</option>
                     <option>Wed</option>
@@ -131,13 +199,8 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="time" class="block text-sm font-medium text-gray-700">Waktu</label>
-                    <input type="time" id="time" name="time" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
-                </div>
-
-                <div class="mb-4">
                     <label for="room" class="block text-sm font-medium text-gray-700">Room</label>
-                    <select id="room" name="room" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
+                    <select id="room" name="room" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 cursor-pointer" required>
                         <option>A420</option>
                         <option>A421</option>
                         <option>A423</option>
@@ -177,17 +240,63 @@
                     </select>
                 </div>
 
+                <div class="flex gap-4">
+                <div class="w-1/2 mb-4">
+                    <label for="time" class="block text-sm font-medium text-gray-700">Start Time</label>
+                     <select id="time" name="time" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 cursor-pointer" required>
+                        <option>7:00</option>
+                        <option>7:50</option>
+                        <option>8:40</option>
+                        <option>9:30</option>
+                        <option>10:20</option>
+                        <option>11:10</option>
+                        <option>12:00</option>
+                        <option>12:50</option>
+                        <option>13:40</option>
+                        <option>14:30</option>
+                        <option>15:20</option>
+                        <option>16:10</option>
+                        <option>17:00</option>
+                        <option>17:50</option>
+                        <option>18:40</option>
+                    </select>
+                </div>
+
+                <div class="w-1/2 mb-4">
+                    <label for="time" class="block text-sm font-medium text-gray-700">End Time</label>
+                     <select id="time2" name="time2" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 cursor-pointer" required>
+                        <option>7:45</option>
+                        <option>8:35</option>
+                        <option>9:25</option>
+                        <option>10:15</option>
+                        <option>11:05</option>
+                        <option>11:55</option>
+                        <option>12:45</option>
+                        <option>13:35</option>
+                        <option>14:25</option>
+                        <option>15:15</option>
+                        <option>16:05</option>
+                        <option>16:55</option>
+                        <option>17:45</option>
+                        <option>18:35</option>
+                        <option>19:25</option>
+                    </select>
+                </div>
+                </div>
+
                 <div class="flex justify-end space-x-2">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Save</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm cursor-pointer">Save</button>
                 </div>
                 </form>
+
             </div>
             </div>
 
+
         <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
                 <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <div class="text-sm text-gray-700">
+                    <div class="flex items-center md:justify-between justify-start">
+                        <div class="hidden md:block text-sm text-gray-700">
                             Page {{ semester_data.number }} from {{ semester_data.paginator.num_pages }}
                             (Total {{ semester_data.paginator.count }} data)
                         </div>
@@ -219,31 +328,23 @@
                     </div>
                 </div>
     
-</div>
+</main>
 
 
 <script>
-function openAssign() {
-  document.getElementById('assignModal').classList.remove('hidden');
+function openAssign(button) {
+    const semesterId = button.getAttribute('data-semester-id');
+    const entryId = button.getAttribute('data-entry-id');
+
+    document.getElementById('assignSemesterId').value = semesterId;
+    document.getElementById('assignEntryId').value = entryId || '';
+    document.getElementById('assignMorning').classList.remove('hidden');
 }
 
 function closeAssign() {
-  document.getElementById('assignModal').classList.add('hidden');
+  document.getElementById('assignMorning').classList.add('hidden');
 }
 
-document.getElementById('assignForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  // Ambil nilai form
-  const day = document.getElementById('day').value;
-  const room = document.getElementById('room').value;
-  const time = document.getElementById('time').value;
-
-  console.log({ day, room, time });
-
-  alert("Data berhasil disimpan (simulasi)");
-  closeAssignModal();
-});
 </script>
 
 {% endblock %}

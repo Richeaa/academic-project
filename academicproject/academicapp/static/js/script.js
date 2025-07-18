@@ -2,22 +2,23 @@ document.addEventListener('DOMContentLoaded', function () {
   const path = window.location.pathname;
   
   const navItems = [
-    { id: 'dashboard-link', url: '/dashboard/' },
-    { id: 'studyprogram-link' },
+   {
+      id: 'dashboard-link',
+      match: (p) => p.startsWith('/dashboard/'),
+    },
+    {
+      id: 'studyprogram-link',
+      match: (p) => p.startsWith('/studyprogram/'), 
+    },
   ];
 
   navItems.forEach(item => {
     const el = document.getElementById(item.id);
-    if (el) {
-      const pageUrl = el.dataset.pageUrl || item.url;
-      
-      el.addEventListener('click', function(e) {
-        if (path === pageUrl) {
-          e.preventDefault();
-        }
+    if (el && item.match(path)) {
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
       });
       
-      if (path === pageUrl) {
         const div = el.querySelector('div');
         if (div) { 
           div.classList.add(
@@ -27,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
             'duration-100',
             'ease-in-out'
           );
-        }
       }
     }
   });
@@ -57,14 +57,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (isMobile) {
       sidebar.classList.add('-translate-x-full', 'z-50'); 
       sidebar.classList.remove('z-20');
-      mainContent.classList.remove('ml-72');
+      mainContent.classList.remove('ml-64');
     } else {
       sidebar.classList.remove('z-50');
       sidebar.classList.add('z-20');
       if (!sidebar.classList.contains('-translate-x-full')) {
-        mainContent.classList.add('ml-72');
+        mainContent.classList.add('ml-64');
       } else {
-        mainContent.classList.remove('ml-72');
+        mainContent.classList.remove('ml-64');
       }
     }
   }
@@ -82,9 +82,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (window.innerWidth >= 1024) {
       if (isHidden) {
-        mainContent.classList.add('ml-72');
+        mainContent.classList.add('ml-64');
       } else {
-        mainContent.classList.remove('ml-72');
+        mainContent.classList.remove('ml-64');
       }
     }
   });
@@ -98,3 +98,54 @@ function toggleDropdown() {
     content.classList.toggle('hidden');
     arrow.classList.toggle('rotate-180');
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const ctx = document.getElementById('myChart').getContext('2d');
+
+  const myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'August'],
+      datasets: [{
+        data: [100, 150, 60, 140, 90, 200, 130, 160],
+        fill: true,
+        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false 
+        },
+        title: {
+          display: true,
+          text: 'Active Lecturer'
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            display: true
+          },
+          grid: {
+            display: true
+          }
+        },
+        y: {
+          ticks: {
+            display: true
+          },
+          grid: {
+            display: true 
+          }
+        }
+      }
+    }
+  })
+});
