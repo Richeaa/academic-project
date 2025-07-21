@@ -1,0 +1,75 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% load get_item %}
+{% block title %}Schedule 20251{% endblock %}
+
+{% block content %}
+<main id="main-content" class="w-full p-8">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Schedule per Room</h2>
+
+    {% for room, day_schedule in room_schedule.items %}
+    <div class="mb-10 p-8">
+        <h3 class="text-xl font-semibold mb-4 text-gray-700 bg-blue-100 px-4 py-2 rounded-lg inline-block">Room {{ room }}</h3>
+        
+        <div class="overflow-x-auto shadow-sm rounded-xl">
+            <table class="w-full text-sm border-collapse">
+                <thead class="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+                    <tr>
+                        {% for day in days %}
+                            <th class="px-4 py-3 text-left font-medium">{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <tr>
+                        {% for day in days %}
+                            <td class="px-4 py-3 align-top min-w-[200px] h-48 ">
+                                <div class="space-y-2 h-full">
+                                    {% for item in day_schedule|get_item:day %}
+                                        <div class="p-3 rounded-lg border border-gray-200 shadow-xs hover:shadow-md transition-shadow duration-200 bg-white">
+                                            <div class="flex justify-between items-start">
+                                                <div class="w-2/4">
+                                                    <h4 class="font-semibold text-blue-700">{{ item.semester.subject }}</h4>
+                                                    <span class="text-xs text-gray-500 block mt-1">{{ item.semester.major_class }}</span>
+                                                </div>
+                                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full ">
+                                                    {{ item.start_time|time:"H:i" }}-{{ item.end_time|time:"H:i" }}
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="mt-2 text-xs text-gray-600">
+                                                <p class="truncate">{{ item.semester.program_session }} • {{ item.semester.major }}</p>
+                                                <p class="mt-1 font-medium">
+                                                    {{ item.semester.lecturer_1 }}
+                                                    {% if item.semester.lecturer_2 %}, {{ item.semester.lecturer_2 }}{% endif %}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <div class="h-full flex items-center justify-center">
+                                            <span class="text-gray-400 text-sm italic">No classes scheduled</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</main>
+
+<style>
+    .shadow-xs {
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+    table {
+        min-width: 100%;
+    }
+    td {
+        vertical-align: top;
+    }
+</style>
+{% endblock %}

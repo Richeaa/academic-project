@@ -5,6 +5,8 @@ from .models import profile, semester20251, semester20252, assignlecturer20251, 
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
+from collections import defaultdict
+from django.http import JsonResponse
 
 
 def dashboard(request):
@@ -96,6 +98,7 @@ def studyprogram(request, semester_url='20251'):
         'rooms2': rooms2,
         'rooms3': rooms3,
         'rooms4': rooms4,
+        'current_page': page_number,
     }
     return render(request, 'studyprogram.html', context)
 
@@ -108,10 +111,10 @@ def assignlecturer_create(request):
         try:
             semester_instance = semester20251.objects.get(semester_id=semester_id)
         except semester20251.DoesNotExist:
-            return redirect('studyprogram', semester_url='20251')
-        
-        if entry_id: 
-            try:
+            return JsonResponse({'success': False, 'error': 'Semester not found.'}, status=404)
+
+        try:
+            if entry_id:
                 assign_obj = assignlecturer20251.objects.get(assign_id=entry_id)
                 assign_obj.semester = semester_instance
                 assign_obj.lecturer_day = request.POST.get('day')
@@ -119,20 +122,22 @@ def assignlecturer_create(request):
                 assign_obj.start_time = request.POST.get('time')
                 assign_obj.end_time = request.POST.get('time2')
                 assign_obj.save()
-                messages.success(request, 'Assignment updated successfully!')
-            except assignlecturer20251.DoesNotExist:
-                messages.error(request, 'Assignment record not found.')
-        else:
-            assignlecturer20251.objects.create(
-                semester=semester_instance, 
-                lecturer_day=request.POST.get('day'),
-                room=request.POST.get('room'),
-                start_time=request.POST.get('time'),
-                end_time=request.POST.get('time2')
-            )
-        messages.success(request, 'Lecturer assignment saved successfully!')
-        return redirect('studyprogram', semester_url='20251')
+                return JsonResponse({'success': True, 'message': 'Assignment updated successfully'})
+            else:
+                assignlecturer20251.objects.create(
+                    semester=semester_instance,
+                    lecturer_day=request.POST.get('day'),
+                    room=request.POST.get('room'),
+                    start_time=request.POST.get('time'),
+                    end_time=request.POST.get('time2')
+                )
+                return JsonResponse({'success': True, 'message': 'Assignment created successfully'})
+        except assignlecturer20251.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Assignment not found.'}, status=404)
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
     
+
 def assignlecturer_delete(request):
     if request.method == 'POST':
         semester_id = request.POST.get('semester_id')
@@ -145,3 +150,23 @@ def assignlecturer_delete(request):
     else:
         messages.error(request, "Method Unallowed.")
         return redirect('studyprogram', '20251')  
+    
+
+def schedule20251(request):
+    schedule = assignlecturer20251.objects.select_related('semester')
+
+    room_schedule = defaultdict(lambda: defaultdict(list))
+    for entry in schedule:
+        room = entry.room
+        day = entry.lecturer_day
+        room_schedule[room][day].append(entry)
+
+    for room in room_schedule:
+        for day in room_schedule[room]:
+            room_schedule[room][day].sort(key=lambda x: x.start_time)
+
+    context = {
+        'room_schedule': dict(room_schedule),
+        'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+    }
+    return render(request, 'schedule20251.html', context)

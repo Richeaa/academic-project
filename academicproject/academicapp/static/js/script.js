@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
       match: (p) => p.startsWith('/dashboard/'),
     },
     {
+      id: 'schedule20251-link',
+      match: (p) => p.startsWith('/schedule20251/'), 
+    },
+    {
       id: 'studyprogram-link',
       match: (p) => p.startsWith('/studyprogram/'), 
     },
@@ -167,4 +171,62 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
   })
+});
+
+
+document.getElementById('assignForm').addEventListener('submit', function(event) {
+    event.preventDefault(); 
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const submitBtn = form.querySelector('[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Saving...';
+    submitBtn.disabled = true;
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+        },
+        body: formData,
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Assign Lecturer has been saved",
+                showConfirmButton: false,
+                timer: 1500
+            }).then((result) => {
+                closeAssign();
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.error || 'Unknown error occurred',
+                confirmButtonText: 'Try Again',
+                confirmButtonColor: '#EF4444'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Submit error:', error);
+        alert('Network error occurred. Please try again.');
+    })
+    .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    });
 });

@@ -1,6 +1,6 @@
 {% extends 'dashboard.html' %}
 {% load static %}
-{% block title %}Semester 20251{% endblock %}
+{% block title %}Study Programs{% endblock %}
 
 {% block content %}
 
@@ -16,7 +16,6 @@
         role="alert"
         id="toast-message">
         
-        <!-- Icon -->
         {% if message.tags == 'success' %}
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2l4 -4" />
@@ -174,7 +173,7 @@
             <div id="assignMorning" class="fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50 hidden">
             <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg">
                 <div class="flex justify-between items-center">
-                <h2 class="text-lg font-semibold mt-3 mb-4">Assign Lecturer</h2>
+                <h2 class="text-lg font-semibold mt-3 mb-4">Assign Schedule</h2>
                 <button type="button" onclick="closeAssign()" class="group">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 group-hover:text-red-600 cursor-pointer">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -193,7 +192,7 @@
                     <option>Mon</option>
                     <option>Tue</option>
                     <option>Wed</option>
-                    <option>Thur</option>
+                    <option>Thu</option>
                     <option>Fri</option>
                     </select>
                 </div>
