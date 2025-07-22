@@ -188,7 +188,7 @@ def lecturer(request):
 
     job_choices = Lecturer.objects.exclude(job__isnull=True).exclude(job__exact='').values_list('job', flat=True).distinct()
     
-    paginator = Paginator(lecturers, 30)  
+    paginator = Paginator(lecturers, 50)  
     page_number = int(request.GET.get('page', 1))
     page_obj = paginator.get_page(page_number)
 
