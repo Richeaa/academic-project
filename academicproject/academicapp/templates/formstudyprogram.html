@@ -1,0 +1,438 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block title %}Semester 20251{% endblock %}
+
+{% block content %}
+
+<div id="main-content" class="w-full p-4 ">
+
+    <div class="bg-white rounded-lg shadow-md mb-4 p-4">
+        <div class="flex items-center justify-between">
+
+            <div class="relative w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input type="text" 
+                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                       placeholder="Filter...">
+            </div>
+
+            <div class="flex items-center space-x-1">
+                <a href="{% url 'formstudyprogram' '20251' %}" 
+                   class="px-4 py-2 text-sm font-medium {% if active_semester == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300{% endif %}">
+                    20251
+                </a>
+                <a href="{% url 'formstudyprogram' '20252' %}" 
+                   class="px-4 py-2 text-sm font-medium {% if active_semester == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300{% endif %}">
+                    20252
+                </a>
+                <a href="{% url 'formstudyprogram' '20253' %}" 
+                   class="px-4 py-2 text-sm font-medium {% if active_semester == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300{% endif %}">
+                    20253
+                </a>
+                <a href="{% url 'formstudyprogram' '20261' %}" 
+                   class="px-4 py-2 text-sm font-medium {% if active_semester == '20261' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300{% endif %}">
+                    20261
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+  <div class="flex justify-between items-center">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800">Semester {{semester_title}}</h2>
+      <p class="text-gray-600 mt-1">Information: Assign Academic Module</p>
+    </div>
+    <button onclick="openAddModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors">
+  <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5">
+  Academic Module
+</button>
+  </div>
+</div>
+
+        <div class="w-full overflow-x-auto rounded-md border border-gray-200">
+            <table class="w-full divide-y divide-gray-200 min-w-[1000px]">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">No</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Program Session</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Major</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Curriculum</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Class</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Subject</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Credit</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer1</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer2</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer3</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Action</th>
+                    </tr>
+                </thead>
+                
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in semester_data %}
+                    <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.semester_id}}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.program_session }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.major }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.curriculum }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.major_class }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.subject }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.credit }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_1 }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_2 }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_3 }}</td>
+                        <td class="px-6 py-4  text-sm font-medium">
+                        <div class="flex space-x-2">
+                            <button onclick="openEdit(this)"
+      class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 px-3 py-1 rounded-md text-xs font-medium transition-colors"
+      data-id="{{ item.semester_id }}"
+      data-session="{{ item.program_session }}"
+      data-major="{{ item.major }}"
+      data-curriculum="{{ item.curriculum }}"
+      data-major_class="{{ item.major_class }}"
+      data-subject="{{ item.subject }}"
+      data-credit="{{ item.credit }}"
+      data-lecturer1="{{ item.lecturer_1 }}"
+      data-lecturer2="{{ item.lecturer_2 }}"
+      data-lecturer3="{{ item.lecturer_3 }}">
+      Edit
+    </button>
+    <button onclick="deleteRecord('{{ item.semester_id }}')" 
+  class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-md text-xs font-medium transition-colors">
+  Delete
+</button>
+
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="addModal" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-8">
+    
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Academic Module</h2>
+      <button type="button" onclick="closeAddModal()" class="group hover:text-red-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form id="addForm">
+      {% csrf_token %}
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Program Session</label>
+          <input type="text" name="program_session" placeholder="Enter program session" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Major</label>
+          <input type="text" name="major" placeholder="Enter major" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
+          <input type="text" name="curriculum" placeholder="Enter curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+          <input type="text" name="major_class" placeholder="Enter class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+          <input type="text" name="subject" placeholder="Enter subject" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Credit</label>
+          <input type="number" name="credit" placeholder="Enter credit" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 1</label>
+          <input type="text" name="lecturer_1" placeholder="Enter lecturer 1" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 2</label>
+          <input type="text" name="lecturer_2" placeholder="Enter lecturer 2" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 3</label>
+          <input type="text" name="lecturer_3" placeholder="Enter lecturer 3" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
+          Add
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+            <div id="editModal" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-8">
+    
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Edit Academic Module</h2>
+      <button type="button" onclick="closeEdit()" class="group hover:text-red-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+ 
+    <form id="editForm">
+      <input type="hidden" id="record-id" name="record_id">
+
+      <div class="space-y-4">
+        <div>
+          <label for="edit-session" class="block text-sm font-medium text-gray-700 mb-1">Program Session</label>
+          <input type="text" id="edit-session" name="program_session" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label for="edit-major" class="block text-sm font-medium text-gray-700 mb-1">Major</label>
+          <input type="text" id="edit-major" name="major" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label for="edit-curriculum" class="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
+          <input type="text" id="edit-curriculum" name="curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label for="edit-major_class" class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+          <input type="text" id="edit-major_class" name="major_class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label for="edit-subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+          <input type="text" id="edit-subject" name="subject" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label for="edit-credit" class="block text-sm font-medium text-gray-700 mb-1">Credit</label>
+          <input type="number" id="edit-credit" name="credit" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        </div>
+
+        <div>
+          <label for="edit-lecturer1" class="block text-sm font-medium text-gray-700 mb-1">Lecturer 1</label>
+          <input type="text" id="edit-lecturer1" name="lecturer_1" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        </div>
+
+        <div>
+          <label for="edit-lecturer2" class="block text-sm font-medium text-gray-700 mb-1">Lecturer 2</label>
+          <input type="text" id="edit-lecturer2" name="lecturer_2" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        </div>
+
+        <div>
+          <label for="edit-lecturer3" class="block text-sm font-medium text-gray-700 mb-1">Lecturer 3</label>
+          <input type="text" id="edit-lecturer3" name="lecturer_3" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+            </div>
+
+        <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-700">
+                            Page {{ semester_data.number }} from {{ semester_data.paginator.num_pages }}
+                            (Total {{ semester_data.paginator.count }} data)
+                        </div>
+
+                        <div class="flex space-x-1">
+                            {% if page_range.0 > 1 %}
+                                <a href="?page={{ page_range.0|add:"-1" }}"
+                                class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Previous</a>
+                            {% else %}
+                                <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Previous</span>
+                            {% endif %}
+
+                            {% for num in page_range %}
+                                {% if num == semester_data.number %}
+                                    <span class="px-3 py-1 rounded bg-blue-500 text-white font-semibold">{{ num }}</span>
+                                {% else %}
+                                    <a href="?page={{ num }}"
+                                    class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_range|last < semester_data.paginator.num_pages %}
+                                <a href="?page={{ page_range|last|add:1 }}"
+                                class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Next</a>
+                            {% else %}
+                                <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Next</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+    
+</div>
+
+
+<script>
+
+function openAddModal() {
+  document.getElementById('addModal').classList.remove('hidden');
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.add('hidden');
+  document.getElementById('addForm').reset();
+}
+
+
+document.getElementById('addForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  const semester = '{{ active_semester }}'; 
+
+
+  fetch(`/add-academic-module/${semester}/`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+      closeAddModal();
+     
+      window.location.reload();
+    } else {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Terjadi kesalahan saat menambah data');
+  });
+});
+
+function openEdit(button) {
+  const id = button.getAttribute('data-id');
+  const session = button.getAttribute('data-session');
+  const major = button.getAttribute('data-major');
+  const curriculum = button.getAttribute('data-curriculum');
+  const major_class = button.getAttribute('data-major_class');
+  const subject = button.getAttribute('data-subject');
+  const credit = button.getAttribute('data-credit');
+  const lecturer1 = button.getAttribute('data-lecturer1');
+  const lecturer2 = button.getAttribute('data-lecturer2');
+  const lecturer3 = button.getAttribute('data-lecturer3');
+
+  document.getElementById('record-id').value = id;
+  document.getElementById('edit-session').value = session || '';
+  document.getElementById('edit-major').value = major || '';
+  document.getElementById('edit-curriculum').value = curriculum || '';
+  document.getElementById('edit-major_class').value = major_class || '';
+  document.getElementById('edit-subject').value = subject || '';
+  document.getElementById('edit-credit').value = credit || '';
+  document.getElementById('edit-lecturer1').value = lecturer1 || '';
+  document.getElementById('edit-lecturer2').value = lecturer2 || '';
+  document.getElementById('edit-lecturer3').value = lecturer3 || '';
+
+  document.getElementById('editModal').classList.remove('hidden');
+}
+
+function closeEdit() {
+  document.getElementById('editModal').classList.add('hidden');
+}
+
+
+document.getElementById('editForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  const semester = '{{ active_semester }}'; 
+
+  
+  fetch(`/edit-academic-module/${semester}/`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.message);
+      closeEdit();
+      
+      window.location.reload();
+    } else {
+      alert('Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Terjadi kesalahan saat menyimpan data');
+  });
+});
+
+function deleteRecord(semesterId) {
+  if (confirm("Are you sure you want to delete this record?")) {
+    const semester = '{{ active_semester }}';
+
+    fetch(`/delete-academic-module/${semester}/${semesterId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.message);
+        window.location.reload();
+      } else {
+        alert('Error: ' + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Terjadi kesalahan saat menghapus data');
+    });
+  }
+}
+
+</script>
+
+
+{% endblock %}

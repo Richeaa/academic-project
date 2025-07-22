@@ -81,3 +81,99 @@ class assignlecturer20252(models.Model):
     class Meta:
         db_table = 'assignlecturer20252'
         managed = True
+        
+class Lecturer(models.Model):
+    lecturer_id = models.AutoField(primary_key=True)
+    lecturer_name = models.CharField(max_length=100)
+    lecturer_type = models.CharField(max_length=50, blank=True, null=True)
+    job = models.CharField(max_length=100, blank=True, null=True)
+    current_working_day = models.IntegerField(blank=True, null=True)
+    time_preferences = models.TextField(blank=True, null=True)
+    day_preferences = models.TextField(blank=True, null=True)
+    room_preferences = models.TextField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.lecturer_name
+
+    class Meta:
+        db_table = 'lecturer'
+        managed = False
+
+
+        
+class formsemester20251(models.Model):
+    semester_id = models.AutoField(primary_key=True)
+    program_session = models.CharField(max_length=10)
+    major = models.CharField(max_length=50)
+    curriculum = models.CharField(max_length=50)
+    major_class = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    credit = models.DecimalField(max_digits=4, decimal_places=2)
+    lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.program_session} - {self.subject}"
+
+    class Meta:
+        db_table = 'form20251'
+        managed = False
+
+class formsemester20252(models.Model):
+    semester_id = models.AutoField(primary_key=True)
+    program_session = models.CharField(max_length=20)
+    major = models.CharField(max_length=100)
+    curriculum = models.CharField(max_length=100)
+    major_class = models.CharField(max_length=100)  
+    subject = models.CharField(max_length=100)
+    credit = models.DecimalField(max_digits=4, decimal_places=2)
+    lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.program_session} - {self.subject}"
+
+    class Meta:
+        db_table = 'form20252'
+        managed = False 
+
+class formsemester20253(models.Model):
+    semester_id = models.AutoField(primary_key=True)
+    program_session = models.CharField(max_length=20)
+    major = models.CharField(max_length=100)
+    curriculum = models.CharField(max_length=100)
+    major_class = models.CharField(max_length=100)  
+    subject = models.CharField(max_length=100)
+    credit = models.DecimalField(max_digits=4, decimal_places=2)
+    lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.program_session} - {self.subject}"
+
+    class Meta:
+        db_table = 'form20253'
+        managed = False 
+
+class formsemester20261(models.Model):
+    semester_id = models.AutoField(primary_key=True)
+    program_session = models.CharField(max_length=20)
+    major = models.CharField(max_length=100)
+    curriculum = models.CharField(max_length=100)
+    major_class = models.CharField(max_length=100)  
+    subject = models.CharField(max_length=100)
+    credit = models.DecimalField(max_digits=4, decimal_places=2)
+    lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
+    lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.program_session} - {self.subject}"
+
+    class Meta:
+        db_table = 'form20261'
+        managed = False 

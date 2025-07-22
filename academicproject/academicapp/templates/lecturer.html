@@ -7,82 +7,91 @@
 <div id="main-content" class="w-full p-12 select-none">
 
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-red-500">Lecturer Information</h1>
+      <h1 class="text-3xl font-bold text-gray-800">Lecturer Information</h1>
       <a href="{% url 'addLecturer' %}" class="bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
         <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
       </a>
     </div>
 
-    <div class="flex flex-wrap items-center gap-4 mb-8">
-      <div class="relative w-60">
-        <i data-lucide="search"
-          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
-        <select
-          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <option value="" disabled selected hidden>Enter lecturer name...</option>
-          <option>Siti</option>
-          <option>Eko</option>
-          <option>Rosdianti</option>
-        </select>
-      </div>
+<div class="flex flex-wrap items-center gap-4 mb-8">
+ 
+  <div class="relative w-60">
+    <i data-lucide="search"
+       class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
+    <input type="text" name="lecturer_name" placeholder="Enter lecturer name..."
+           value="{{ request.GET.lecturer_name }}"
+           class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+  </div>
 
-      <div class="relative w-60">
-        <i data-lucide="search"
-          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
-        <select
-          class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <option value="" disabled selected hidden>Enter lecturer job...</option>
-          <option>Dosen</option>
-          <option>Kaprodi</option>
-          <option>Dekan</option>
-        </select>
-      </div>
 
-      <button class="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg transition-colors">
-        <img src="{% static 'svg/search.svg' %}" alt="Search Icon" class="w-5 h-5">
-      </button>
-    </div>
+  <div class="relative w-60">
+    <i data-lucide="search"
+       class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
+    <select name="job"
+            class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      <option value="" disabled selected hidden>Enter lecturer job...</option>
+      {% for job_title in job_choices %}
+        <option value="{{ job_title }}" {% if request.GET.job == job_title %}selected{% endif %}>
+          {{ job_title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit"
+          class="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg transition-colors">
+    <img src="{% static 'svg/search.svg' %}" alt="Search Icon" class="w-5 h-5">
+  </button>
+</div>
 
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-200 border-b border-gray-300">
             <tr>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Name</th>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Study Program</th>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Type</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lecturer Name</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lecturer Type</th>
               <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Job</th>
               <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Current Working Days</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Time Preference</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Day Preference</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Room Preference</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Notes</th>
               <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            <tr class="hover:bg-gray-50">
-              <td class="px-6 py-4 text-sm text-gray-900">Dr. Ahmad Wijaya</td>
-              <td class="px-6 py-4 text-sm text-gray-600">Information System</td>
-              <td class="px-6 py-4 text-sm text-gray-600">Full</td>
-              <td class="px-6 py-4 text-center text-sm text-gray-600">Kaprodi</td>
-              <td class="px-6 py-4 text-center text-sm text-gray-600">5</td>
-              <td class="px-6 py-4 text-center">
-                <div class="flex justify-center gap-2">
-                  <a href="{% url 'editLecturer' %}" class="p-2 bg-green-100 rounded hover:bg-blue-200 transition-colors">
-                    <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4" alt="Edit">
-                  </a>
-                  <a href="#" class="p-2 bg-red-100 rounded hover:bg-red-200 transition-colors">
-                    <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4" alt="Delete">
-                  </a>
-                </div>
-              </td>
-            </tr>
-          </tbody>
+  {% for lecturer in lecturers %}
+  <tr class="hover:bg-gray-50">
+    <td class="px-6 py-4 text-sm text-gray-900">{{ lecturer.lecturer_name }}</td>
+    <td class="px-6 py-4 text-sm text-gray-600">{{ lecturer.lecturer_type }}</td>
+    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.job|default:"-" }}</td>
+    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.current_working_day|default:"-" }}</td>
+    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.time_preferences|default:"-" }}</td>
+    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.day_preferences|default:"-" }}</td>
+    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.room_preferences|default:"-" }}</td>
+    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.notes|default:"-" }}</td>
+    <td class="px-6 py-4 text-center">
+      <div class="flex justify-center items-center gap-2">
+        <a href="{% url 'editLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors">
+          <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
+        </a>
+        <a href="{% url 'deleteLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-blue-200 transition-colors">
+  <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
+</a>
+      </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-400">No lecturers found.</td>
+  </tr>
+  {% endfor %}
+</tbody>
         </table>
       </div>
       
     </div>
-   <div class="mt-4 flex justify-between text-sm text-gray-600 p-4">
-  <span>Showing 1 lecturer</span>
-  <span>Page 1 of 1</span>
-</div>
 
 
 <div class="flex justify-end p-4">
@@ -92,6 +101,35 @@
     </svg>
     <span class="text-sm">Print</span>
   </button>
+</div>
+<div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
+  <div class="flex items-center justify-between">
+    <div class="text-sm text-gray-700">
+      Page {{ lecturers.number }} of {{ lecturers.paginator.num_pages }} (Total {{ lecturers.paginator.count }} data)
+    </div>
+
+    <div class="flex space-x-1">
+      {% if page_range.0 > 1 %}
+        <a href="?page={{ page_range.0|add:"-1" }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Previous</a>
+      {% else %}
+        <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Previous</span>
+      {% endif %}
+
+      {% for num in page_range %}
+        {% if num == lecturers.number %}
+          <span class="px-3 py-1 rounded bg-blue-500 text-white font-semibold">{{ num }}</span>
+        {% else %}
+          <a href="?page={{ num }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_range|last < lecturers.paginator.num_pages %}
+        <a href="?page={{ page_range|last|add:"1" }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Next</a>
+      {% else %}
+        <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Next</span>
+      {% endif %}
+    </div>
+  </div>
 </div>
 
 
