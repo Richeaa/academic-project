@@ -12,7 +12,17 @@ from django.views.decorators.http import require_http_methods
 
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    context = {
+        "show_dashboard": True,
+    }
+    return render(request, 'dashboard.html', context)
+
+
+def dashboard_hsp(request):
+    context = {
+        "show_dashboard": True,
+    }
+    return render(request, 'dashboard_hsp.html', context)
 
 
 def signin(request):
@@ -20,11 +30,16 @@ def signin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        
+
         try:
             user = profile.objects.get(username=username)
             if user.password == password:
-                return redirect('dashboard')
+                if username == 'academic':
+                    return redirect('dashboard')
+                elif username == 'Head of Study Program':
+                    return redirect('dashboard_hsp')
+                elif username == 'lecturer':
+                    return redirect('dashboard_lecturer') 
             else:
                 return render(request, 'signin.html', {
                     'error': 'Incorrect password',
@@ -37,6 +52,14 @@ def signin(request):
             })
 
     return render(request, 'signin.html', {'users': users})
+    return render(request, 'dashboard_hsp.html', context)
+
+def dashboard_lecturer(request):
+    context = {
+        "show_dashboard": True,
+    }
+    return render(request, 'dashboard_lecturer.html', context)
+
 
 def logout(request):
     return redirect('signin')

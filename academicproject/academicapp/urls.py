@@ -5,7 +5,7 @@ from .views import studyprogram, formstudyprogram
 urlpatterns = [
     path('', views.signin, name='signin'),
     path('logout/', views.logout, name='logout'),
-    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/academic/', views.dashboard, name='dashboard'),
     path('lecturer/', views.lecturer, name='lecturer'),
     path('lecturer/add/', views.addLecturer, name='addLecturer'),
     path('lecturer/edit/<int:lecturer_id>/', views.editLecturer, name='editLecturer'),
@@ -17,6 +17,7 @@ urlpatterns = [
     path('studyprogram/<str:semester_url>/', studyprogram, name='studyprogram'),
     path('assignlecturer/create/', views.assignlecturer_create, name='assignlecturer_create'),
     path('assign/delete/', views.assignlecturer_delete, name='assignlecturer_delete'),
-    path('schedule20251/', views.schedule20251, name='schedule20251')
-
+    path('schedule20251/', views.schedule20251, name='schedule20251'),
+    path('dashboard/hsp/', views.dashboard_hsp, name='dashboard_hsp'),
+    path('dashboard/lecturer/', views.dashboard_lecturer, name='dashboard_lecturer'),
 ]
