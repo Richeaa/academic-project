@@ -104,74 +104,79 @@ function toggleDropdown() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const ctx = document.getElementById('myChart').getContext('2d');
-  
-  const gradient = ctx.createLinearGradient(0, 0, 0, 250);  
-  gradient.addColorStop(0, 'rgba(54, 162, 235, 0.5)');
-  gradient.addColorStop(1, 'rgba(54, 162, 235, 0)');
+    const ctx = document.getElementById('myChart').getContext('2d');
+    
+    const gradient = ctx.createLinearGradient(0, 0, 0, 250);  
+    gradient.addColorStop(0, 'rgba(54, 162, 235, 0.5)');
+    gradient.addColorStop(1, 'rgba(54, 162, 235, 0)');
 
-  const myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'August'],
-      datasets: [{
-        data: [100, 150, 80, 140, 90, 170, 130, 160],
-        fill: true,
-        borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: gradient,
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 8,
-        pointHitRadius: 20
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          display: false 
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'August'],
+            datasets: [{
+                data: [100, 150, 80, 140, 90, 170, 130, 160],
+                fill: true,
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: gradient,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 8,
+                pointHitRadius: 20
+            }]
         },
-        title: {
-          display: true,
-          text: 'Active Lecturer',
-          align: 'start',
-          padding: {
-            bottom: 30,
-          },
-          font: {
-            size: 18,
-            weight: 'bold',
-            family: 'poppins'
-          }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, 
+            plugins: {
+                legend: {
+                    display: false 
+                },
+                title: {
+                    display: true,
+                    text: 'Active Lecturer',
+                    align: 'start',
+                    padding: {
+                        bottom: 30,
+                    },
+                    font: {
+                        size: 18,
+                        weight: 'bold',
+                        family: 'poppins'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        display: true
+                    },
+                    grid: {
+                        display: false,
+                    }
+                },
+                y: {
+                    min: 60,
+                    ticks: {
+                        display: false,
+                    },
+                    grid: {
+                        display: true,
+                    },
+                    border: {
+                        dash: [2,4],
+                        display: false
+                    }
+                }
+            }
         }
-      },
-      scales: {
-        x: {
-          ticks: {
-            display: true
-          },
-          grid: {
-            display: false,
-          }
-        },
-        y: {
-          min: 60,
-          ticks: {
-            display: false,
-          },
-          grid: {
-            display: true,
-          },
-          border: {
-            dash: [2,4],
-            display: false
-          }
-        }
-      }
-    }
-  })
+    });
+
+     window.addEventListener('resize', function() {
+        myChart.resize();
+    });
 });
+
 
 
 document.getElementById('assignForm').addEventListener('submit', function(event) {

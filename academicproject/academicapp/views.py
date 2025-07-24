@@ -179,20 +179,43 @@ def assignlecturer_delete(request):
     
 
 def schedule20251(request):
-    schedule = assignlecturer20251.objects.select_related('semester')
+    schedule = assignlecturer20251.objects.select_related('semester').order_by('room', 'lecturer_day', 'start_time')
 
     room_schedule = defaultdict(lambda: defaultdict(list))
+    conflict_ids = set() 
+    has_conflicts = False
+    conflict_details = []
+
     for entry in schedule:
-        room = entry.room
-        day = entry.lecturer_day
-        room_schedule[room][day].append(entry)
+        room_schedule[entry.room][entry.lecturer_day].append(entry)
 
     for room in room_schedule:
         for day in room_schedule[room]:
-            room_schedule[room][day].sort(key=lambda x: x.start_time)
+            daily_entries = room_schedule[room][day]
+
+            for i in range(len(daily_entries)):
+                for j in range(i + 1, len(daily_entries)):
+                    entry1 = daily_entries[i]
+                    entry2 = daily_entries[j]
+                    
+                    if entry1.end_time > entry2.start_time and entry1.start_time < entry2.end_time:
+                        conflict_ids.add(entry1.assign_id)
+                        conflict_ids.add(entry2.assign_id)
+                        has_conflicts = True
+                        conflict_details.append({
+                            'room': room,
+                            'day': day,
+                            'subject1': entry1.semester.subject,
+                            'subject2': entry2.semester.subject,
+                            'time1': f"{entry1.start_time.strftime('%H:%M')} - {entry1.end_time.strftime('%H:%M')}",
+                            'time2': f"{entry2.start_time.strftime('%H:%M')} - {entry2.end_time.strftime('%H:%M')}",
+                        })
 
     context = {
         'room_schedule': dict(room_schedule),
+        'conflict_ids': conflict_ids,
+        'has_conflicts': has_conflicts,
+        'conflict_details': conflict_details,
         'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
     }
     return render(request, 'schedule20251.html', context)
