@@ -11,9 +11,14 @@ document.addEventListener('DOMContentLoaded', function () {
       match: (p) => p.startsWith('/schedule20251/'), 
     },
     {
+      id: 'schedule20252-link',
+      match: (p) => p.startsWith('/schedule20252/'), 
+    },
+    {
       id: 'studyprogram-link',
       match: (p) => p.startsWith('/studyprogram/'), 
     },
+    
   ];
 
   navItems.forEach(item => {
@@ -172,9 +177,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-     window.addEventListener('resize', function() {
-        myChart.resize();
-    });
+     const container = document.getElementById('myChart').parentElement;
+
+      const observer = new ResizeObserver(() => {
+          myChart.resize();
+      });
+      observer.observe(container);
 });
 
 
@@ -217,12 +225,15 @@ document.getElementById('assignForm').addEventListener('submit', function(event)
                 window.location.reload();
             });
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: data.error || 'Unknown error occurred',
-                confirmButtonText: 'Try Again',
-                confirmButtonColor: '#EF4444'
+             Swal.fire({
+                position: "top-end",
+                icon: "error",
+                title: "Oops! Something went wrong",
+                showConfirmButton: false,
+                timer: 1500
+            }).then((result) => {
+                closeAssign();
+                window.location.reload();
             });
         }
     })

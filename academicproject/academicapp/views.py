@@ -12,9 +12,40 @@ from django.views.decorators.http import require_http_methods
 
 
 def dashboard(request):
+    semester_data = semester20251.objects.all()
+
+    all_lecturers = set()
+    for item in semester_data:
+        if item.lecturer_1:
+            all_lecturers.add(item.lecturer_1)
+        if item.lecturer_2:
+            all_lecturers.add(item.lecturer_2)
+        if item.lecturer_3:
+            all_lecturers.add(item.lecturer_3)
+
+    total_lecturers = len(all_lecturers)
+
+    all_classes = set()
+    for item in semester_data:
+        if item.major_class:
+            all_classes.add(item.major_class)
+
+    total_classes = len(all_classes)
+
+    all_subjects = set()
+    for item in semester_data:
+        if item.subject:
+            all_subjects.add(item.subject)
+
+    total_subjects = len(all_subjects)
+
+
     context = {
-        "show_dashboard": True,
+        'total_lecturers': total_lecturers,
+        'total_classes': total_classes,
+        'total_subject': total_subjects
     }
+
     return render(request, 'dashboard.html', context)
 
 
@@ -129,19 +160,29 @@ def studyprogram(request, semester_url='20251'):
     return render(request, 'studyprogram.html', context)
 
 
+from django.http import JsonResponse
+import traceback
+
 def assignlecturer_create(request):
-    if request.method == 'POST':
-        semester_id = request.POST.get('semester_id')
-        entry_id = request.POST.get('entry_id')
+    try:
+        if request.method == 'POST':
+            semester_id = request.POST.get('semester_id')
+            entry_id = request.POST.get('entry_id')
+            semester_url = request.POST.get('semester_url')  
 
-        try:
-            semester_instance = semester20251.objects.get(semester_id=semester_id)
-        except semester20251.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Semester not found.'}, status=404)
+            if semester_url == '20251':
+                semester_model = semester20251
+                assign_model = assignlecturer20251
+            elif semester_url == '20252':
+                semester_model = semester20252
+                assign_model = assignlecturer20252
+            else:
+                return JsonResponse({'success': False, 'error': 'Invalid semester'}, status=400)
 
-        try:
+            semester_instance = semester_model.objects.get(semester_id=semester_id)
+
             if entry_id:
-                assign_obj = assignlecturer20251.objects.get(assign_id=entry_id)
+                assign_obj = assign_model.objects.get(assign_id=entry_id)
                 assign_obj.semester = semester_instance
                 assign_obj.lecturer_day = request.POST.get('day')
                 assign_obj.room = request.POST.get('room')
@@ -150,7 +191,7 @@ def assignlecturer_create(request):
                 assign_obj.save()
                 return JsonResponse({'success': True, 'message': 'Assignment updated successfully'})
             else:
-                assignlecturer20251.objects.create(
+                assign_model.objects.create(
                     semester=semester_instance,
                     lecturer_day=request.POST.get('day'),
                     room=request.POST.get('room'),
@@ -158,10 +199,14 @@ def assignlecturer_create(request):
                     end_time=request.POST.get('time2')
                 )
                 return JsonResponse({'success': True, 'message': 'Assignment created successfully'})
-        except assignlecturer20251.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Assignment not found.'}, status=404)
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+    
+    except Exception as e:
+        # print ke terminal + kirim ke browser
+        traceback.print_exc()
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
     
 
 def assignlecturer_delete(request):
@@ -219,6 +264,48 @@ def schedule20251(request):
         'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
     }
     return render(request, 'schedule20251.html', context)
+
+def schedule20252(request):
+    schedule = assignlecturer20252.objects.select_related('semester').order_by('room', 'lecturer_day', 'start_time')
+
+    room_schedule = defaultdict(lambda: defaultdict(list))
+    conflict_ids = set() 
+    has_conflicts = False
+    conflict_details = []
+
+    for entry in schedule:
+        room_schedule[entry.room][entry.lecturer_day].append(entry)
+
+    for room in room_schedule:
+        for day in room_schedule[room]:
+            daily_entries = room_schedule[room][day]
+
+            for i in range(len(daily_entries)):
+                for j in range(i + 1, len(daily_entries)):
+                    entry1 = daily_entries[i]
+                    entry2 = daily_entries[j]
+                    
+                    if entry1.end_time > entry2.start_time and entry1.start_time < entry2.end_time:
+                        conflict_ids.add(entry1.assign_id)
+                        conflict_ids.add(entry2.assign_id)
+                        has_conflicts = True
+                        conflict_details.append({
+                            'room': room,
+                            'day': day,
+                            'subject1': entry1.semester.subject,
+                            'subject2': entry2.semester.subject,
+                            'time1': f"{entry1.start_time.strftime('%H:%M')} - {entry1.end_time.strftime('%H:%M')}",
+                            'time2': f"{entry2.start_time.strftime('%H:%M')} - {entry2.end_time.strftime('%H:%M')}",
+                        })
+
+    context = {
+        'room_schedule': dict(room_schedule),
+        'conflict_ids': conflict_ids,
+        'has_conflicts': has_conflicts,
+        'conflict_details': conflict_details,
+        'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+    }
+    return render(request, 'schedule20252.html', context)
 
 def lecturer(request):
     lecturers = Lecturer.objects.all()

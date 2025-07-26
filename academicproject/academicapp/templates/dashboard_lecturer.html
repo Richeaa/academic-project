@@ -1,0 +1,39 @@
+{% extends 'dashboard_hsp.html' %}
+{% load static %}
+
+{% block title %}Delete Lecturer{% endblock %}
+
+{% block content %}
+<div id="main-content" class="w-full p-12 select-none">
+  <div class="flex items-center justify-center p-6">
+    <div class="bg-white rounded-lg shadow-sm p-8 w-full max-w-xl text-center">
+      <h1 class="text-3xl font-bold text-red-600 mb-6">Delete Lecturer</h1>
+
+      <p class="text-gray-800 text-lg mb-4">Are you sure you want to delete the following lecturer?</p>
+
+      <div class="bg-gray-100 rounded-lg p-4 text-left mb-6">
+        <p><span class="font-semibold text-gray-700">Name:</span> {{ lecturer.lecturer_name }}</p>
+        <p><span class="font-semibold text-gray-700">Type:</span> {{ lecturer.lecturer_type }}</p>
+        <p><span class="font-semibold text-gray-700">Job:</span> {{ lecturer.job|default:"-" }}</p>
+        <p><span class="font-semibold text-gray-700">Current Working Days:</span> {{ lecturer.current_working_day|default:"-" }}</p>
+        <p><span class="font-semibold text-gray-700">Time Preference:</span> {{ lecturer.time_preferences|default:"-" }}</p>
+        <p><span class="font-semibold text-gray-700">Day Preference:</span> {{ lecturer.day_preferences|default:"-" }}</p>
+        <p><span class="font-semibold text-gray-700">Room Preference:</span> {{ lecturer.room_preferences|default:"-" }}</p>
+        <p><span class="font-semibold text-gray-700">Notes:</span> {{ lecturer.notes|default:"-" }}</p>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="flex justify-center gap-4">
+          <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">
+            Yes, Delete
+          </button>
+          <a href="{% url 'lecturer' %}" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

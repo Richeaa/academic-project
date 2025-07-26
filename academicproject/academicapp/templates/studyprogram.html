@@ -46,15 +46,28 @@
     <div class="bg-white rounded-lg shadow-md mb-4 p-4">
         <div class="flex items-center justify-between">
 
-            <div class="relative w-64">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+            <div class="flex items-center space-x-4">
+                <div class="flex space-x-1">
+                    <button id="filterAll" class="px-3 py-1 text-sm font-medium rounded-md bg-blue-100 text-blue-800 border border-blue-200">
+                        All
+                    </button>
+                    <button id="filterM" class="px-3 py-1 text-sm font-medium rounded-md bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200">
+                        M
+                    </button>
+                    <button id="filterN" class="px-3 py-1 text-sm font-medium rounded-md bg-gray-100 text-gray-800 border border-gray-200 hover:bg-gray-200">
+                        N
+                    </button>
                 </div>
-                <input type="text" 
-                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                       placeholder="Filter...">
+                <div class="relative w-64">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" 
+                           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                           placeholder="Filter...">
+                </div>
             </div>
 
             <div class="flex items-center space-x-1">
@@ -186,6 +199,7 @@
                     {% csrf_token %}
                     <input type="hidden" id="assignSemesterId" name="semester_id">
                     <input type="hidden" id="assignEntryId" name="entry_id">
+                    <input type="hidden" name="semester_url" value="{{ active_semester }}">
                 <div class="mb-8">
                     <label for="day" class="block text-sm font-medium text-gray-700">Day</label>
                     <select id="day" name="day" class="mt-1 block w-full h-12 border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200 cursor-pointer" required>
@@ -344,12 +358,72 @@ function openAssign(button) {
 
     document.getElementById('assignSemesterId').value = semesterId;
     document.getElementById('assignEntryId').value = entryId || '';
+    document.querySelector('input[name="semester_url"]').value = "{{ active_semester }}";
     document.getElementById('assignMorning').classList.remove('hidden');
 }
 
 function closeAssign() {
   document.getElementById('assignMorning').classList.add('hidden');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const filterAll = document.getElementById('filterAll');
+    const filterM = document.getElementById('filterM');
+    const filterN = document.getElementById('filterN');
+    const tableRows = document.querySelectorAll('tbody tr');
+    const searchInput = document.getElementById('searchInput');
+
+    function filterRows(programSession = null) {
+        const searchTerm = searchInput.value.toLowerCase();
+        
+        tableRows.forEach(row => {
+            const programSessionCell = row.querySelector('td:nth-child(2)');
+            const programSessionValue = programSessionCell.textContent.trim();
+            const rowText = row.textContent.toLowerCase();
+            
+            const matchesProgramSession = !programSession || programSessionValue.includes(programSession);
+            const matchesSearch = !searchTerm || rowText.includes(searchTerm);
+            
+            row.style.display = (matchesProgramSession && matchesSearch) ? '' : 'none';
+        });
+    }
+
+    filterAll.addEventListener('click', () => {
+        filterAll.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterAll.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterM.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterN.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterRows();
+    });
+
+    filterM.addEventListener('click', () => {
+        filterM.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterM.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterAll.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterN.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterRows('M');
+    });
+
+    filterN.addEventListener('click', () => {
+        filterN.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterN.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterAll.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterM.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterRows('N');
+    });
+
+
+    searchInput.addEventListener('input', () => {
+        let activeFilter = null;
+        if (filterM.classList.contains('bg-blue-100')) activeFilter = 'M';
+        else if (filterN.classList.contains('bg-blue-100')) activeFilter = 'N';
+        
+        filterRows(activeFilter);
+    });
+
+ 
+    filterRows();
+});
 
 </script>
 
