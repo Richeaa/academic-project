@@ -108,10 +108,10 @@ def studyprogram(request, semester_url='20251'):
     page_range = range(start_block, end_block + 1)
 
 
-    rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 110)]
-    rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 211)]
-    rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 311)]
-    rooms4 = [f'B{str(i).zfill(3)}' for i in range(401, 411)]
+    rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 109)]
+    rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 212)]
+    rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 312)]
+    rooms4 = [f'B{str(i).zfill(3)}' for i in range(401, 412)]
     
     context = {
         'semester_data': page_obj,  
@@ -309,10 +309,10 @@ def formstudyprogram(request, semester_url='20251'):
     end_block = min(start_block + block_size - 1, paginator.num_pages)
     page_range = range(start_block, end_block + 1)
 
-    rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 110)]
-    rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 211)]
-    rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 311)]
-    rooms4 = [f'B{str(i).zfill(3)}' for i in range(401, 411)]
+    rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 109)]
+    rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 212)]
+    rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 312)]
+    rooms4 = [f'B{str(i).zfill(3)}' for i in range(401, 412)]
     
     context = {
         'semester_data': page_obj,  
