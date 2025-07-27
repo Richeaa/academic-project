@@ -7,7 +7,9 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from collections import defaultdict
 from django.http import JsonResponse
+import json
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
 
 
@@ -128,7 +130,7 @@ def studyprogram(request, semester_url='20251'):
         item.is_assigned = bool(assignment)
         item.assign_id = assignment.assign_id if assignment else None
 
-    paginator = Paginator(semester_data, 10)  
+    paginator = Paginator(semester_data, 25)  
     page_number = int(request.GET.get('page', 1))
     page_obj = paginator.get_page(page_number)
 
@@ -203,7 +205,6 @@ def assignlecturer_create(request):
             return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
     
     except Exception as e:
-        # print ke terminal + kirim ke browser
         traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
@@ -221,6 +222,42 @@ def assignlecturer_delete(request):
     else:
         messages.error(request, "Method Unallowed.")
         return redirect('studyprogram', '20251')  
+    
+@require_POST
+def schedulelecturer_delete(request):
+    try:
+        data = json.loads(request.body)
+        assign_id = data.get('assign_id')
+        semester_id = data.get('semester_id')
+        semester_url = data.get('semester_url')
+
+        print('semester_url:', semester_url)
+        print('assign_id:', assign_id)
+        print('semester_id:', semester_id)
+
+        if semester_url == '20251':
+            assign_model = assignlecturer20251
+            semester_model = semester20251
+        elif semester_url == '20252':
+            assign_model = assignlecturer20252
+            semester_model = semester20252
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid semester'}, status=400)
+
+        assign_model.objects.filter(assign_id=assign_id).delete()
+        
+        semester = semester_model.objects.get(semester_id=semester_id)
+        semester.is_assigned = False
+        semester.save()
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Assignment deleted successfully',
+            'semester_id': semester_id
+        })
+    
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
 
 def schedule20251(request):

@@ -55,14 +55,17 @@
     {% endif %}
 
     {% for room, day_schedule in room_schedule.items %}
-    <div class="mb-12 bg-white rounded-xl shadow-md overflow-hidden">
-        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+    <div class="mb-12 bg-white rounded-xl shadow-md overflow-hidden" id="room-{{ room|slugify }}">
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                 <h3 class="text-xl font-semibold text-gray-800 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     Room {{ room }}
                 </h3>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-blue-500 hover:text-blue-700 cursor-pointer print-room" data-room="{{ room }}">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+                </svg>
         </div>
         
         <div class="overflow-x-auto">
@@ -124,7 +127,16 @@
                                             {% if item.semester.lecturer_2 %}, {{ item.semester.lecturer_2 }}{% endif %}
                                         </p>
                                     </div>
-
+                                    <div class="absolute bottom-2 right-2">
+                                        <button class="remove-schedule" 
+                                                data-assign-id="{{ item.assign_id }}" 
+                                                data-semester-id="{{ item.semester.semester_id }}"
+                                                data-semester-url="20252">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                     {% if item.assign_id in conflict_ids %}
                                     <div class="mt-2 flex items-center text-xs font-medium text-red-600">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,6 +195,255 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
+document.querySelectorAll('.remove-schedule').forEach(button => {
+    button.addEventListener('click', function() {
+        const assignId = this.getAttribute('data-assign-id');
+        const semesterId = this.getAttribute('data-semester-id');
+        const semesterUrl = this.getAttribute('data-semester-url');
+        
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Deleting...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                fetch("{% url 'schedulelecturer_delete' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                     body: JSON.stringify({
+                        assign_id: assignId,
+                        semester_id: semesterId,
+                        semester_url: semesterUrl
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.close();
+                        
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "Schedule deleted successfully",
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            button.closest('.relative').remove();
+                        
+                            if (window.opener) {
+                                window.opener.postMessage({
+                                    type: 'UPDATE_SEMESTER_STATUS',
+                                    semester_id: semesterId,
+                                    status: 'pending'
+                                }, '*');
+                            }
+                            
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Delete error:', error);
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "error",
+                        title: "Delete failed",
+                        text: error.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                });
+            }
+        });
+    });
+});
+
+
+const { jsPDF } = window.jspdf;
+
+document.querySelectorAll('.print-room').forEach(button => {
+    button.addEventListener('click', function() {
+        const roomName = this.getAttribute('data-room');
+        const roomElement = document.getElementById(`room-${roomName.toLowerCase().replace(/ /g, '-')}`);
+         
+        Swal.fire({
+            title: 'Export Room Schedule',
+            text: 'Choose export option for ' + roomName,
+            showCancelButton: true,
+            confirmButtonText: 'Download PDF',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+           if (result.isConfirmed) {
+                downloadAsPDF(roomElement, roomName);
+            }
+        });
+    });
+});
+
+function downloadAsPDF(element, roomName) {
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    
+    pdf.setFontSize(16);
+    pdf.setFont(undefined, 'bold');
+    pdf.text(`Schedule Report 20252 by : ${roomName}`, 148, 15, { align: 'center' });
+    
+    const timeSlots = [
+        '07:00-07:50', '07:50-08:40', '08:40-09:30', '09:30-10:20', '10:20-11:10', 
+        '11:10-12:00', '12:00-12:50', '12:50-13:40', '13:40-14:30', '14:30-15:20', 
+        '15:20-16:10', '16:10-17:00', '17:00-17:50', '17:50-18:40', '18:40-19:30'
+    ];
+    
+    const dayHeaders = ['Time'];
+    element.querySelectorAll('thead th').forEach(th => {
+        dayHeaders.push(th.innerText.trim());
+    });
+    
+    const scheduleData = {};
+    const tds = element.querySelectorAll('tbody td');
+    
+    tds.forEach((td, dayIndex) => {
+        const dayName = dayHeaders[dayIndex + 1];
+        if (!dayName) return;
+        
+        scheduleData[dayName] = [];
+        
+        td.querySelectorAll('.relative').forEach(scheduleItem => {
+            const subject = scheduleItem.querySelector('h4')?.innerText.trim() || '';
+            const classInfo = scheduleItem.querySelector('p.text-xs')?.innerText.trim() || '';
+            const timeSpan = scheduleItem.querySelector('span.text-xs')?.innerText.trim() || '';
+            const lecturer = scheduleItem.querySelector('.mt-2 p.font-medium')?.innerText.trim() || '';
+            const programInfo = scheduleItem.querySelector('.mt-2 .text-xs')?.innerText.trim() || '';
+  
+            const timeMatch = timeSpan.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
+            if (timeMatch) {
+                const startTime = timeMatch[1];
+                const endTime = timeMatch[2];
+                
+                scheduleData[dayName].push({
+                    subject,
+                    classInfo,
+                    startTime,
+                    endTime,
+                    lecturer,
+                    programInfo,
+                    fullText: `${subject}\n${timeSpan}\n${classInfo}\n${lecturer}`
+                });
+            }
+        });
+    });
+    
+    const tableData = [];
+    const schedulesShown = {}; 
+    
+    timeSlots.forEach((timeSlot, rowIndex) => {
+        const row = [timeSlot];
+        
+        const [slotStart, slotEnd] = timeSlot.split('-');
+        
+        dayHeaders.slice(1).forEach((day, dayIndex) => {
+            let cellContent = '';
+            
+            if (scheduleData[day]) {
+                scheduleData[day].forEach(item => {
+                    const scheduleKey = `${day}-${item.subject}-${item.startTime}-${item.endTime}`;
+
+                    if (item.startTime >= slotStart && item.startTime < slotEnd && !schedulesShown[scheduleKey]) {
+                        if (cellContent === '') {
+                            cellContent = item.fullText;
+                            schedulesShown[scheduleKey] = true; 
+                        }
+                    }
+                });
+            }
+            
+            row.push(cellContent);
+        });
+        
+        tableData.push(row);
+    });
+    
+    pdf.autoTable({
+        startY: 25,
+        head: [dayHeaders],
+        body: tableData,
+        styles: {
+            fontSize: 7,
+            cellPadding: 2,
+            valign: 'top',
+            halign: 'center',
+            overflow: 'linebreak',
+            lineWidth: 0.1,
+            lineColor: [128, 128, 128],
+        },
+        headStyles: {
+            fillColor: [240, 240, 240],
+            textColor: [0, 0, 0],
+            fontStyle: 'bold',
+            halign: 'center',
+            fontSize: 8
+        },
+        columnStyles: {
+            0: { 
+                cellWidth: 20, 
+                halign: 'center',
+                fontStyle: 'bold',
+                fillColor: [250, 250, 250]
+            },
+            1: { cellWidth: 48 },
+            2: { cellWidth: 48 },
+            3: { cellWidth: 48 },
+            4: { cellWidth: 48 },
+            5: { cellWidth: 48 }
+        },
+        theme: 'grid',
+        tableWidth: 'auto',
+        margin: { left: 10, right: 10 },
+        didParseCell: function(data) {
+            if (data.column.index === 0) {
+                data.cell.styles.fillColor = [245, 245, 245];
+                data.cell.styles.textColor = [0, 0, 0];
+                data.cell.styles.fontStyle = 'bold';
+            }
+            
+            if (data.column.index > 0 && data.cell.text.length > 0) {
+                data.cell.styles.fillColor = [255, 255, 255];
+                data.cell.styles.textColor = [0, 0, 0];
+            }
+        },
+        didDrawCell: function(data) {
+            if (data.column.index === 0) {
+                pdf.setDrawColor(128, 128, 128);
+                pdf.setLineWidth(0.2);
+                pdf.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
+            }
+        }
+    });
+    
+    pdf.save(`Schedule_${roomName.replace(/ /g, '_')}_Table_Format.pdf`);
+}
 </script>
 
 {% endblock %}
