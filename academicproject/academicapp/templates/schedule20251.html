@@ -302,6 +302,8 @@ document.querySelectorAll('.print-room').forEach(button => {
     });
 });
 
+
+
 function downloadAsPDF(element, roomName) {
     const pdf = new jsPDF('l', 'mm', 'a4');
     
@@ -310,15 +312,22 @@ function downloadAsPDF(element, roomName) {
     
     const timeSlots = [
         '07:00-07:50', '07:50-08:40', '08:40-09:30', '09:30-10:20', '10:20-11:10', 
-        '11:10-12:00', '12:00-12:50', '12:50-13:40', '13:40-14:30', '14:30-15:20', 
-        '15:20-16:10', '16:10-17:00', '17:00-17:50', '17:50-18:40', '18:40-19:30'
+        '11:10-12:00', '12:00-12:50', '12:50-13:40', '13:40-14:30', '14:30-15:20',
+        '15:20-16:10', '16:10-17:00', '17:00-17:50', '17:50-18:40', '18:40-19:30',
+        '19:30-20:20', '20:20-21:10', '21:10-22:00', '22:00-22:50', '22:50-23:40'
     ];
     
-    const dayHeaders = ['S', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    const dayHeaders = ['Time', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
     
     const scheduleData = {};
     const tds = element.querySelectorAll('tbody td');
-    
+    const uniqueSchedules = new Set();
+
     tds.forEach((td, dayIndex) => {
         const dayName = dayHeaders[dayIndex + 1];
         if (!dayName) return;
@@ -333,27 +342,36 @@ function downloadAsPDF(element, roomName) {
             
             const timeMatch = timeSpan.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
             if (timeMatch) {
-                scheduleData[dayName].push({
-                    subject,
-                    classInfo,
-                    startTime: timeMatch[1],
-                    endTime: timeMatch[2],
-                    lecturer,
-                    fullText: `${subject}\n${classInfo}\n${lecturer}`
-                });
+                const scheduleKey = `${dayName}-${timeMatch[1]}-${timeMatch[2]}-${subject}-${lecturer}`;
+                
+                if (!uniqueSchedules.has(scheduleKey)) {
+                    uniqueSchedules.add(scheduleKey);
+                    scheduleData[dayName].push({
+                        subject,
+                        classInfo,
+                        startTime: timeMatch[1],
+                        endTime: timeMatch[2],
+                        lecturer,
+                        fullText: `${subject}\n${classInfo}\n${lecturer}`
+                    });
+                }
             }
         });
     });
-    
+
     const tableData = [];
     const mergedCells = {};
     
     timeSlots.forEach((timeSlot, rowIndex) => {
         const row = [timeSlot];
-        const [slotStart] = timeSlot.split('-');
+        const [slotStart, slotEnd] = timeSlot.split('-');
+        const slotStartMin = timeToMinutes(slotStart);
+        const slotEndMin = timeToMinutes(slotEnd);
         
         dayHeaders.slice(1).forEach((day, dayIndex) => {
-            if (mergedCells[`${rowIndex}-${dayIndex}`]) {
+            const cellKey = `${rowIndex}-${dayIndex}`;
+            
+            if (mergedCells[cellKey]) {
                 row.push('');
                 return;
             }
@@ -362,23 +380,37 @@ function downloadAsPDF(element, roomName) {
             let spanRows = 1;
             
             if (scheduleData[day]) {
-                scheduleData[day].forEach(item => {
-                    if (item.startTime === slotStart) {
-                        const startMin = parseInt(item.startTime.split(':')[0]) * 60 + 
-                                        parseInt(item.startTime.split(':')[1]);
-                        const endMin = parseInt(item.endTime.split(':')[0]) * 60 + 
-                                      parseInt(item.endTime.split(':')[1]);
-                        const duration = endMin - startMin;
+                for (const item of scheduleData[day]) {
+                    const itemStartMin = timeToMinutes(item.startTime);
+                    const itemEndMin = timeToMinutes(item.endTime);
+                    
+                    // Check if this slot is the first overlapping slot for this item
+                    if (itemStartMin < slotEndMin && itemEndMin > slotStartMin && 
+                        itemStartMin <= slotStartMin) {
                         
-                        spanRows = Math.max(1, Math.ceil(duration / 50));
+                        // Find all overlapping slots
+                        const overlappingSlots = [];
+                        for (let i = rowIndex; i < timeSlots.length; i++) {
+                            const [tsStart, tsEnd] = timeSlots[i].split('-');
+                            const tsStartMin = timeToMinutes(tsStart);
+                            const tsEndMin = timeToMinutes(tsEnd);
+                            
+                            if (itemStartMin < tsEndMin && itemEndMin > tsStartMin) {
+                                overlappingSlots.push(i);
+                            } else {
+                                break;
+                            }
+                        }
                         
+                        spanRows = overlappingSlots.length;
                         cellContent = `${item.startTime}-${item.endTime}\n${item.fullText}`;
                         
                         for (let i = 1; i < spanRows; i++) {
                             mergedCells[`${rowIndex + i}-${dayIndex}`] = true;
                         }
+                        break;
                     }
-                });
+                }
             }
             
             row.push(cellContent);
@@ -387,6 +419,7 @@ function downloadAsPDF(element, roomName) {
         tableData.push(row);
     });
     
+    // Generate PDF
     pdf.autoTable({
         startY: 20,
         head: [dayHeaders],
@@ -397,68 +430,24 @@ function downloadAsPDF(element, roomName) {
             valign: 'middle',
             halign: 'center',
             overflow: 'linebreak',
-            lineWidth: 0.2,
-            lineColor: [0, 0, 0], 
-            textColor: [0, 0, 0], 
-            fillColor: [255, 255, 255] 
-        },
-        headStyles: {
-            fontStyle: 'bold',
-            halign: 'center',
-            textColor: [0, 0, 0],
-            fillColor: [255, 255, 255], 
-            lineWidth: 0.2
-        },
-        bodyStyles: {
-            fillColor: [255, 255, 255],
-            lineWidth: 0.2
+            lineWidth: 0.1,
+            fillColor: false
         },
         columnStyles: {
-            0: { 
-                cellWidth: 22,
-                halign: 'center',
-                fontStyle: 'bold',
-                fillColor: [255, 255, 255] 
-            },
-            1: { 
-                cellWidth: 50,
-                fillColor: [255, 255, 255] 
-            },
-            2: { 
-                cellWidth: 50,
-                fillColor: [255, 255, 255] 
-            },
-            3: { 
-                cellWidth: 50,
-                fillColor: [255, 255, 255] 
-            },
-            4: { 
-                cellWidth: 50,
-                fillColor: [255, 255, 255] 
-            },
-            5: { 
-                cellWidth: 50,
-                fillColor: [255, 255, 255] 
-            }
+            0: { cellWidth: 22, fontStyle: 'bold' },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 50 },
+            3: { cellWidth: 50 },
+            4: { cellWidth: 50 },
+            5: { cellWidth: 50 }
         },
+        theme: 'plain',
         didDrawCell: function(data) {
             if (data.column.index > 0 && mergedCells[`${data.row.index}-${data.column.index - 1}`]) {
-                pdf.setDrawColor(255, 255, 255); 
-                pdf.setLineWidth(0.3);
-                
-                pdf.line(
-                    data.cell.x, 
-                    data.cell.y, 
-                    data.cell.x + data.cell.width, 
-                    data.cell.y
-                );
-    
-                pdf.line(
-                    data.cell.x, 
-                    data.cell.y + data.cell.height, 
-                    data.cell.x + data.cell.width, 
-                    data.cell.y + data.cell.height
-                );
+                pdf.setDrawColor(255, 255, 255);
+                pdf.line(data.cell.x, data.cell.y, data.cell.x + data.cell.width, data.cell.y);
+                pdf.line(data.cell.x, data.cell.y + data.cell.height, 
+                        data.cell.x + data.cell.width, data.cell.y + data.cell.height);
             }
         }
     });
@@ -468,4 +457,3 @@ function downloadAsPDF(element, roomName) {
 </script>
 
 {% endblock %}
-

@@ -308,7 +308,7 @@ def studyprogram(request, semester_url='20251'):
     if not semester_model:
         return HttpResponse("Semester not found", status=404)
 
-    semester_data = semester_model.objects.all()
+    semester_data = semester_model.objects.all().order_by('semester_id')
 
     assign_model = assign_model_title.get(semester_url)
     assignments = assign_model.objects.select_related('semester').all()
@@ -438,10 +438,6 @@ def schedulelecturer_delete(request):
         assign_id = data.get('assign_id')
         semester_id = data.get('semester_id')
         semester_url = data.get('semester_url')
-
-        print('semester_url:', semester_url)
-        print('assign_id:', assign_id)
-        print('semester_id:', semester_id)
 
         if semester_url == '20251':
             assign_model = assignlecturer20251
