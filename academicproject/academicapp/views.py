@@ -19,6 +19,9 @@ def dashboard(request):
     if 'user_id' not in request.session:
         return redirect('signin')
     
+    if request.session.get('username') != 'academic':
+        return HttpResponse("Unauthorized", status=403)
+    
     semester_data = semester20251.objects.all()
 
     all_lecturers = set()
@@ -59,6 +62,10 @@ def dashboard(request):
 def dashboard_hsp(request):
     if 'user_id' not in request.session:
         return redirect('signin')
+    
+    if request.session.get('username') != 'Head of Study Program':
+        return HttpResponse("Unauthorized", status=403)
+
     
     context = {
         "show_dashboard": True,
@@ -104,6 +111,9 @@ def signin(request):
 def dashboard_lecturer(request):
     if 'user_id' not in request.session:
         return redirect('signin')
+    
+    if request.session.get('username') != 'lecturer':
+        return HttpResponse("Unauthorized", status=403)
     
     context = {
         "show_dashboard": True,
