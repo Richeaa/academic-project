@@ -305,8 +305,7 @@ document.querySelectorAll('.print-room').forEach(button => {
 function downloadAsPDF(element, roomName) {
     const pdf = new jsPDF('l', 'mm', 'a4');
     
-    pdf.setFontSize(16);
-    pdf.setFont(undefined, 'bold');
+    pdf.setFontSize(14);
     pdf.text(`Schedule Report 20251 by : ${roomName}`, 148, 15, { align: 'center' });
     
     const timeSlots = [
@@ -315,10 +314,7 @@ function downloadAsPDF(element, roomName) {
         '15:20-16:10', '16:10-17:00', '17:00-17:50', '17:50-18:40', '18:40-19:30'
     ];
     
-    const dayHeaders = ['Time'];
-    element.querySelectorAll('thead th').forEach(th => {
-        dayHeaders.push(th.innerText.trim());
-    });
+    const dayHeaders = ['S', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     
     const scheduleData = {};
     const tds = element.querySelectorAll('tbody td');
@@ -334,45 +330,52 @@ function downloadAsPDF(element, roomName) {
             const classInfo = scheduleItem.querySelector('p.text-xs')?.innerText.trim() || '';
             const timeSpan = scheduleItem.querySelector('span.text-xs')?.innerText.trim() || '';
             const lecturer = scheduleItem.querySelector('.mt-2 p.font-medium')?.innerText.trim() || '';
-            const programInfo = scheduleItem.querySelector('.mt-2 .text-xs')?.innerText.trim() || '';
-  
+            
             const timeMatch = timeSpan.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
             if (timeMatch) {
-                const startTime = timeMatch[1];
-                const endTime = timeMatch[2];
-                
                 scheduleData[dayName].push({
                     subject,
                     classInfo,
-                    startTime,
-                    endTime,
+                    startTime: timeMatch[1],
+                    endTime: timeMatch[2],
                     lecturer,
-                    programInfo,
-                    fullText: `${subject}\n${timeSpan}\n${classInfo}\n${lecturer}`
+                    fullText: `${subject}\n${classInfo}\n${lecturer}`
                 });
             }
         });
     });
     
     const tableData = [];
-    const schedulesShown = {}; 
+    const mergedCells = {};
     
     timeSlots.forEach((timeSlot, rowIndex) => {
         const row = [timeSlot];
-        
-        const [slotStart, slotEnd] = timeSlot.split('-');
+        const [slotStart] = timeSlot.split('-');
         
         dayHeaders.slice(1).forEach((day, dayIndex) => {
+            if (mergedCells[`${rowIndex}-${dayIndex}`]) {
+                row.push('');
+                return;
+            }
+            
             let cellContent = '';
+            let spanRows = 1;
             
             if (scheduleData[day]) {
                 scheduleData[day].forEach(item => {
-                    const scheduleKey = `${day}-${item.subject}-${item.startTime}-${item.endTime}`;
-
-                    if (item.startTime >= slotStart && item.startTime < slotEnd && !schedulesShown[scheduleKey]) {
-                        if (cellContent === '') {
-                            cellContent = item.fullText;
-                            schedulesShown[scheduleKey] = true; 
+                    if (item.startTime === slotStart) {
+                        const startMin = parseInt(item.startTime.split(':')[0]) * 60 + 
+                                        parseInt(item.startTime.split(':')[1]);
+                        const endMin = parseInt(item.endTime.split(':')[0]) * 60 + 
+                                      parseInt(item.endTime.split(':')[1]);
+                        const duration = endMin - startMin;
+                        
+                        spanRows = Math.max(1, Math.ceil(duration / 50));
+                        
+                        cellContent = `${item.startTime}-${item.endTime}\n${item.fullText}`;
+                        
+                        for (let i = 1; i < spanRows; i++) {
+                            mergedCells[`${rowIndex + i}-${dayIndex}`] = true;
                         }
                     }
                 });
@@ -385,65 +388,82 @@ function downloadAsPDF(element, roomName) {
     });
     
     pdf.autoTable({
-        startY: 25,
+        startY: 20,
         head: [dayHeaders],
         body: tableData,
-        tableWidth: 'auto',
-        margin: { left: 'auto', right: 'auto' },
         styles: {
-            fontSize: 7,
-            cellPadding: 2,
-            valign: 'top',
+            fontSize: 8,
+            cellPadding: 3,
+            valign: 'middle',
             halign: 'center',
             overflow: 'linebreak',
-            lineWidth: 0.1,
-            lineColor: [128, 128, 128],
+            lineWidth: 0.2,
+            lineColor: [0, 0, 0], 
+            textColor: [0, 0, 0], 
+            fillColor: [255, 255, 255] 
         },
         headStyles: {
-            fillColor: [240, 240, 240],
-            textColor: [0, 0, 0],
             fontStyle: 'bold',
             halign: 'center',
-            fontSize: 8
+            textColor: [0, 0, 0],
+            fillColor: [255, 255, 255], 
+            lineWidth: 0.2
+        },
+        bodyStyles: {
+            fillColor: [255, 255, 255],
+            lineWidth: 0.2
         },
         columnStyles: {
             0: { 
-                cellWidth: 20, 
+                cellWidth: 22,
                 halign: 'center',
                 fontStyle: 'bold',
-                fillColor: [250, 250, 250]
+                fillColor: [255, 255, 255] 
             },
-            1: { cellWidth: 51 },
-            2: { cellWidth: 51 },
-            3: { cellWidth: 51 },
-            4: { cellWidth: 51 },
-            5: { cellWidth: 51 }
-        },
-        theme: 'grid',
-        tableWidth: 'auto',
-        margin: { left: 10, right: 10 },
-        didParseCell: function(data) {
-            if (data.column.index === 0) {
-                data.cell.styles.fillColor = [245, 245, 245];
-                data.cell.styles.textColor = [0, 0, 0];
-                data.cell.styles.fontStyle = 'bold';
-            }
-            
-            if (data.column.index > 0 && data.cell.text.length > 0) {
-                data.cell.styles.fillColor = [255, 255, 255];
-                data.cell.styles.textColor = [0, 0, 0];
+            1: { 
+                cellWidth: 50,
+                fillColor: [255, 255, 255] 
+            },
+            2: { 
+                cellWidth: 50,
+                fillColor: [255, 255, 255] 
+            },
+            3: { 
+                cellWidth: 50,
+                fillColor: [255, 255, 255] 
+            },
+            4: { 
+                cellWidth: 50,
+                fillColor: [255, 255, 255] 
+            },
+            5: { 
+                cellWidth: 50,
+                fillColor: [255, 255, 255] 
             }
         },
         didDrawCell: function(data) {
-            if (data.column.index === 0) {
-                pdf.setDrawColor(128, 128, 128);
-                pdf.setLineWidth(0.2);
-                pdf.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height);
+            if (data.column.index > 0 && mergedCells[`${data.row.index}-${data.column.index - 1}`]) {
+                pdf.setDrawColor(255, 255, 255); 
+                pdf.setLineWidth(0.3);
+                
+                pdf.line(
+                    data.cell.x, 
+                    data.cell.y, 
+                    data.cell.x + data.cell.width, 
+                    data.cell.y
+                );
+    
+                pdf.line(
+                    data.cell.x, 
+                    data.cell.y + data.cell.height, 
+                    data.cell.x + data.cell.width, 
+                    data.cell.y + data.cell.height
+                );
             }
         }
     });
     
-    pdf.save(`Schedule_${roomName.replace(/ /g, '_')}_Table_Format.pdf`);
+    pdf.save(`Schedule_${roomName.replace(/ /g, '_')}.pdf`);
 }
 </script>
 

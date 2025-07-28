@@ -11,6 +11,8 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
+import traceback
 
 
 def dashboard(request):
@@ -162,9 +164,6 @@ def studyprogram(request, semester_url='20251'):
     return render(request, 'studyprogram.html', context)
 
 
-from django.http import JsonResponse
-import traceback
-
 def assignlecturer_create(request):
     try:
         if request.method == 'POST':
@@ -209,20 +208,42 @@ def assignlecturer_create(request):
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     
-
 def assignlecturer_delete(request):
     if request.method == 'POST':
         semester_id = request.POST.get('semester_id')
-
-        obj = get_object_or_404(semester20251, semester_id=semester_id)
-        obj.delete()
-
-        messages.success(request, "Data has been deleted.")
-        return redirect('studyprogram', semester_id)
-    else:
-        messages.error(request, "Method Unallowed.")
-        return redirect('studyprogram', '20251')  
+        semester_url = request.POST.get('semester_url', '20251')
+        
+        try:
+            if semester_url == '20251':
+                model = semester20251
+            elif semester_url == '20252':
+                model = semester20252
+            else:
+                return JsonResponse({'success': False, 'error': 'Invalid semester'})
+            
+            obj = model.objects.get(semester_id=semester_id)
+            obj.delete()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            else:
+                messages.success(request, "Data has been deleted successfully.")
+                return redirect('studyprogram', semester_url)
+                
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            else:
+                messages.error(request, f"Error deleting data: {str(e)}")
+                return redirect('studyprogram', semester_url)
     
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'success': False, 'error': 'Invalid method'})
+    else:
+        messages.error(request, "Invalid request method.")
+        return redirect('studyprogram', '20251')
+    
+
 @require_POST
 def schedulelecturer_delete(request):
     try:

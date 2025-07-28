@@ -99,8 +99,6 @@ class Lecturer(models.Model):
     class Meta:
         db_table = 'lecturer'
         managed = False
-
-
         
 class formsemester20251(models.Model):
     semester_id = models.AutoField(primary_key=True)
