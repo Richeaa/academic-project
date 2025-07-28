@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import redirect, get_object_or_404
-from .models import profile, semester20251, semester20252, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer
+from .models import profile, semester20251, semester20252, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer, Viewschedule20251, Viewschedule20252, Viewschedule20253
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -13,7 +13,10 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 import traceback
-
+from django.db.models import Q, Count
+from django.utils import timezone
+from datetime import datetime
+from collections import Counter
 
 def dashboard(request):
     if 'user_id' not in request.session:
@@ -72,6 +75,160 @@ def dashboard_hsp(request):
     }
     return render(request, 'dashboard_hsp.html', context)
 
+def dashboard_lecturer_view(request):
+    context = {
+        "show_dashboard": True,
+    }
+    lecturer_name = request.session.get('user_name', '')
+
+    semester_models = [Viewschedule20251, Viewschedule20252, Viewschedule20253]
+
+    semester_model = {
+        '20251': Viewschedule20251,
+        '20252': Viewschedule20252,
+        '20253': Viewschedule20253
+    }
+
+    # Get the selected schedule from the request
+    schedule_choice_doughnut = request.GET.get('schedule_choice_doughnut', '20251')
+    schedule_choice_bar = request.GET.get('schedule_choice_bar', '20251')
+
+    #barchart for room distribution
+    room_counts = {}
+
+    # Get the schedules for the selected semester (no lecturer filter)
+    schedule_model_bar = semester_model.get(schedule_choice_bar)
+
+    if schedule_model_bar:
+        schedules = schedule_model_bar.objects.filter(
+            Q(lecturer1__icontains=lecturer_name) |
+            Q(lecturer2__icontains=lecturer_name) |
+            Q(lecturer3__icontains=lecturer_name)
+        )  # Get all schedules, not just the lecturer's
+
+        for schedule in schedules:
+            try:
+                # Split room if there are multiple rooms
+                rooms = schedule.room.split('/')  # Split rooms (e.g., "B401/B203")
+                for room in rooms:
+                    room = room.strip()  # Clean the room name (remove spaces)
+                    if room:
+                        # Aggregate the counts for the same room (sum them)
+                        room_counts[room] = room_counts.get(room, 0) + 1  # Sum values for the same room
+            except AttributeError:
+                continue
+
+    # Sort room_counts in descending order and get the top 5 rooms
+    sorted_rooms = sorted(room_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    # Get the top 5 room labels and values
+    room_labels = [room[0] for room in sorted_rooms]  # Room names (e.g., B401, B402, etc.)
+    room_values = [room[1] for room in sorted_rooms]
+
+    # Doughnut chart (class distribution by day)
+    day_counts = {'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0}
+
+    schedule_model_doughnut = semester_model.get(schedule_choice_doughnut)
+
+    if schedule_model_doughnut:
+        schedules = schedule_model_doughnut.objects.filter(
+            Q(lecturer1__icontains=lecturer_name) |
+            Q(lecturer2__icontains=lecturer_name) |
+            Q(lecturer3__icontains=lecturer_name)
+        )  # Get all schedules, not just the lecturer's
+
+        for schedule in schedules:
+            try:
+                # Split schedule time if there are multiple time slots (e.g., "Mon, 07:00-09:00 / Tue, 10:00-11:00")
+                time_slots = schedule.schedule_time.split(' / ')  # Split time slots by '/'
+                for time_slot in time_slots:
+                    day_time = time_slot.split(', ')  # Split day and time (e.g., ["Mon", "07:00-09:00"])
+                    if len(day_time) == 2:
+                        day = day_time[0]  # Extract the day (e.g., "Mon")
+                        if day in day_counts:
+                            day_counts[day] += 1  # Increment the class count for that day
+            except AttributeError:
+                continue
+
+    # Prepare the data for the doughnut chart (count per day)
+    day_counts_values = list(day_counts.values())
+    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+
+    # Check if there are no classes
+    no_classes_warning = day_counts_values == [0, 0, 0, 0, 0]
+
+    # Update context with all the necessary data
+    context.update({
+        'lecturer_name': lecturer_name,
+        'day_counts_values': day_counts_values,
+        'labels': labels,
+        'schedule_choice_doughnut': schedule_choice_doughnut,
+        'no_classes_warning': no_classes_warning,
+        'room_labels': room_labels,
+        'room_values': room_values,
+        'schedule_choice_bar': schedule_choice_bar,
+    })
+
+
+#dashboard for total courses, classes, and lecturers
+    all_courses = []
+    all_lecturers = []
+    all_classes = []
+
+    total_courses = 0
+    total_classes = 0
+    total_lecturers = 0
+
+    for model in semester_models:
+        courses = model.objects.filter(
+                Q(subject__isnull=False) & ~Q(subject='(Tba)')
+            ).values('subject').distinct()
+
+        all_courses.extend([subject['subject'] for subject in courses])
+
+        unique_courses = sorted(set(all_courses))
+        total_courses = len(unique_courses)
+
+        classes = model.objects.filter(
+                Q(class_name__isnull=False) & ~Q(class_name='(Tba)')
+            ).values('class_name').distinct()
+
+        all_classes.extend([class_name['class_name'] for class_name in classes])
+
+        unique_classes = sorted(set(all_classes))
+        total_classes = len(unique_classes)
+
+        lecturers = model.objects.filter(
+                Q(lecturer1__isnull=False) & ~Q(lecturer1='(Tba)') |
+                Q(lecturer2__isnull=False) & ~Q(lecturer2='(Tba)') |
+                Q(lecturer3__isnull=False) & ~Q(lecturer3='(Tba)')
+            ).values('lecturer1', 'lecturer2', 'lecturer3')
+
+        for lecturer in lecturers:
+                if lecturer['lecturer1']:
+                    all_lecturers.append(lecturer['lecturer1'])
+                if lecturer['lecturer2']:
+                    all_lecturers.append(lecturer['lecturer2'])
+                if lecturer['lecturer3']:
+                    all_lecturers.append(lecturer['lecturer3'])
+
+        unique_lecturers = set(all_lecturers)
+        total_lecturers = len(unique_lecturers)
+
+    context.update({
+        'total_courses': total_courses,
+        'total_classes': total_classes,
+        'total_lecturers': total_lecturers,
+        'lecturer_name': lecturer_name,
+        'lecturer_name': lecturer_name,
+        'day_counts_values': day_counts_values,
+        'labels': labels,
+        'schedule_choice_dougnut': schedule_choice_doughnut,
+        'schedule_choice_bar': schedule_choice_bar,
+    })
+
+    return render(request, 'dashboard_lecturer_view.html', context)
+
 
 def signin(request):
     users = profile.objects.all()
@@ -94,6 +251,8 @@ def signin(request):
                     request.session['user_id'] = user.profile_id  
                     request.session['username'] = user.username
                     return redirect('dashboard_lecturer') 
+                else :
+                    return redirect('dashboard_lecturer_view')
             else:
                 return render(request, 'signin.html', {
                     'error': 'Incorrect password',
@@ -501,6 +660,71 @@ def formstudyprogram(request, semester_url='20251'):
     }
     return render(request, 'formstudyprogram.html', context)
 
+def viewschedule20251(request):
+    lecturer_name = request.session.get('user_name', '') 
+
+    schedule_data = Viewschedule20251.objects.all()
+
+    if lecturer_name:
+        schedule_data = schedule_data.filter(
+            Q(lecturer1__icontains=lecturer_name) |
+            Q(lecturer2__icontains=lecturer_name) |
+            Q(lecturer3__icontains=lecturer_name)
+        )
+
+    day = request.GET.get('day', '').strip()
+    if day:
+        schedule_data = schedule_data.filter(schedule_time__icontains=day)
+
+    return render(request, 'viewschedule20251.html', {
+        'schedule_data': schedule_data,
+        'lecturer_name': lecturer_name,
+        'day': day
+    })
+
+def viewschedule20252(request):
+    lecturer_name = request.session.get('user_name', '') 
+
+    schedule_data = Viewschedule20252.objects.all()
+
+    if lecturer_name:
+        schedule_data = schedule_data.filter(
+            Q(lecturer1__icontains=lecturer_name) |
+            Q(lecturer2__icontains=lecturer_name) |
+            Q(lecturer3__icontains=lecturer_name)
+        )
+
+    day = request.GET.get('day', '').strip()
+    if day:
+        schedule_data = schedule_data.filter(schedule_time__icontains=day)
+
+    return render(request, 'viewschedule20252.html', {
+        'schedule_data': schedule_data,
+        'lecturer_name': lecturer_name,
+        'day': day
+    })
+
+def viewschedule20253(request):
+    lecturer_name = request.session.get('user_name', '') 
+
+    schedule_data = Viewschedule20253.objects.all()
+
+    if lecturer_name:
+        schedule_data = schedule_data.filter(
+            Q(lecturer1__icontains=lecturer_name) |
+            Q(lecturer2__icontains=lecturer_name) |
+            Q(lecturer3__icontains=lecturer_name)
+        )
+
+    day = request.GET.get('day', '').strip()
+    if day:
+        schedule_data = schedule_data.filter(schedule_time__icontains=day)
+
+    return render(request, 'viewschedule20253.html', {
+        'schedule_data': schedule_data,
+        'lecturer_name': lecturer_name,
+        'day': day
+    })
 
 @csrf_exempt
 @require_http_methods(["POST"])

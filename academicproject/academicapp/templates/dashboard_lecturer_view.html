@@ -1,0 +1,566 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="icon" href="{% static 'svg/idea.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+</head>
+<body class="poppins-regular ">
+    <navbar class="fixed top-0 left-0 right-0 z-30 bg-white shadow-sm border-b border-gray-200 select-none">
+        <div class="w-full relative h-18 flex justify-between px-6 p-2 shadow-sm" >
+            <div class="md:w-96 w-24 flex items-center">
+                <img src="{% static 'svg/logo.svg' %}" alt="Logo" class="h-10 w-10 hidden md:block">
+                <h1 class="px-3 font-semibold text-gray-900 text-xl hidden md:block">Academic</h1>
+        
+                <div id="hamburger" class="button w-10 h-10 md:ml-18 hover:bg-blue-50/10 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-gray-900">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="md:w-1/3 w-2/5 flex md:space-x-4 p-2 md:mt-0 mt-1 justify-end">
+            <input type="text" placeholder="Search..." class="hidden lg:block w-80 pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+            
+            <div class="button hover:bg-blue-50/10 px-4 py-2 rounded-lg ripple group">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-blue-900">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
+                </svg>
+            </div>
+
+            <div id="profile-button" class="button hover:bg-blue-50/10 px-4 py-2 rounded-lg select-none">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-blue-900">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+            </div>
+            <div id="dropdown-menu-profile" class="absolute right-8 md:right-12 h-14 mt-14 w-40 bg-white rounded-md shadow-lg hidden z-50 select-none group">
+  
+                <a href="{% url 'logout' %}"
+                    class="flex items-center px-4 py-2 text-gray-800 hover:bg-blue-100 group-hover:text-blue-700 hover:rounded-md h-14 w-full">
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                        class="size-5 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6
+                            a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6
+                            a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3
+                            m0 0 3-3m-3 3H15"/>
+                    </svg>
+                    <span>Logout</span>
+                </a>
+                </div>
+            </div>
+        </div>
+    </navbar>
+
+    <div class="flex min-h-screen pt-18">
+        <aside id="sidebar" class="bg-white w-64 md:w-64 shadow-sm border-r border-gray-200 transform fixed h-full overflow-y-auto transition-all duration-300 ease-in-out z-20 p-2">
+
+        
+            <div class="flex flex-col h-full mt-4 select-none">
+                <div class="w-full h-12">
+                    <h3 class="text-xs font-semibold text-sky-700 leading-7 pl-6">ACADEMIC</h3>
+                    <h3 class="text-xs font-normal pl-6">Dashboard</h3>
+                </div>
+
+                <a href="{% url 'dashboard_lecturer_view' %}"  id="dashboard_lecturer_view-link" ><div class="w-full h-14 mt-4 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg>
+                    </div>
+                    <div class="ml-4 ">
+                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Dashboard</p>
+                    </div>
+                </div>
+                </a>
+
+
+                <div class="w-full h-12 mt-4 mb-4">
+                    <h3 class="text-xs font-semibold text-sky-700 leading-7 pl-6">VIEW SCHEDULE</h3>
+                    <h3 class="text-xs font-normal pl-6">SEMESTER</h3>
+                </div>
+
+                <a href="{% url 'viewschedule20251' %}" id="viewschedule20251-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                    </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Semester 20251</p>
+                    </div>
+                </div>
+                </a>
+                <br>
+
+                <a href="{% url 'viewschedule20252' %}" id="viewschedule20252-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                    </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Semester 20252</p>
+                    </div>
+                </div>
+                </a>
+                <br>
+
+                <a href="{% url 'viewschedule20253' %}" id="viewschedule20253-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                    </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Semester 20253</p>
+                    </div>
+                </div>
+                </a>
+
+                <div class="w-full h-12 mt-4 mb-4">
+                    <h3 class="text-xs font-semibold text-sky-700 leading-7 pl-6">CONTACT</h3>
+                    <h3 class="text-xs font-normal pl-6">ACADEMIC</h3>
+                </div>
+
+                <a href="https://wa.me/6281315190980" id="whatsapp-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="0" stroke="currentColor" class="size-7">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.6 6.31999C16.8669 5.58141 15.9943 4.99596 15.033 4.59767C14.0716 4.19938 13.0406 3.99622 12 3.99999C10.6089 4.00135 9.24248 4.36819 8.03771 5.06377C6.83294 5.75935 5.83208 6.75926 5.13534 7.96335C4.4386 9.16745 4.07046 10.5335 4.06776 11.9246C4.06507 13.3158 4.42793 14.6832 5.12 15.89L4 20L8.2 18.9C9.35975 19.5452 10.6629 19.8891 11.99 19.9C14.0997 19.9001 16.124 19.0668 17.6222 17.5816C19.1205 16.0965 19.9715 14.0796 19.99 11.97C19.983 10.9173 19.7682 9.87634 19.3581 8.9068C18.948 7.93725 18.3505 7.05819 17.6 6.31999ZM12 18.53C10.8177 18.5308 9.65701 18.213 8.64 17.61L8.4 17.46L5.91 18.12L6.57 15.69L6.41 15.44C5.55925 14.0667 5.24174 12.429 5.51762 10.8372C5.7935 9.24545 6.64361 7.81015 7.9069 6.80322C9.1702 5.79628 10.7589 5.28765 12.3721 5.37368C13.9853 5.4597 15.511 6.13441 16.66 7.26999C17.916 8.49818 18.635 10.1735 18.66 11.93C18.6442 13.6859 17.9355 15.3645 16.6882 16.6006C15.441 17.8366 13.756 18.5301 12 18.53ZM15.61 13.59C15.41 13.49 14.44 13.01 14.26 12.95C14.08 12.89 13.94 12.85 13.81 13.05C13.6144 13.3181 13.404 13.5751 13.18 13.82C13.07 13.96 12.95 13.97 12.75 13.82C11.6097 13.3694 10.6597 12.5394 10.06 11.47C9.85 11.12 10.26 11.14 10.64 10.39C10.6681 10.3359 10.6827 10.2759 10.6827 10.215C10.6827 10.1541 10.6681 10.0941 10.64 10.04C10.64 9.93999 10.19 8.95999 10.03 8.56999C9.87 8.17999 9.71 8.23999 9.58 8.22999H9.19C9.08895 8.23154 8.9894 8.25465 8.898 8.29776C8.8066 8.34087 8.72546 8.403 8.66 8.47999C8.43562 8.69817 8.26061 8.96191 8.14676 9.25343C8.03291 9.54495 7.98287 9.85749 8 10.17C8.0627 10.9181 8.34443 11.6311 8.81 12.22C9.6622 13.4958 10.8301 14.5293 12.2 15.22C12.9185 15.6394 13.7535 15.8148 14.58 15.72C14.8552 15.6654 15.1159 15.5535 15.345 15.3915C15.5742 15.2296 15.7667 15.0212 15.91 14.78C16.0428 14.4856 16.0846 14.1583 16.03 13.84C15.94 13.74 15.81 13.69 15.61 13.59Z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Whatsapp</p>
+                    </div>
+                </div>
+                </a>
+                <br>
+
+                <a href="https://mail.google.com/mail/u/0/?view=cm&tf=1&fs=1&to=mufid.rabbani@student.president.ac.id" id="email-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                    <div>
+                        <svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="style=linear"> <g id="email">
+                            <path id="vector" d="M17 20.5H7C4 20.5 2 19 2 15.5V8.5C2 5 4 3.5 7 3.5H17C20 3.5 22 5 22 8.5V15.5C22 19 20 20.5 17 20.5Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <path id="vector_2" d="M18.7698 7.7688L13.2228 12.0551C12.5025 12.6116 11.4973 12.6116 10.777 12.0551L5.22998 7.7688" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path> </g> </g> </g>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-normal transition-all duration-100 ease-in-out">Email</p>
+                    </div>
+                </div>
+                </a>
+            </div>
+        </aside>    
+
+        {% block content %}
+
+        <main id="main-content" class="w-full p-12 select-none">
+           <h1 class="text-4xl font-bold text-blue-900 mb-8">Hello, {{ lecturer_name }}</h1>
+           <div class="max-w-8xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
+                        <div class="p-7">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 mb-1">Total Lecturers</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ total_lecturers }}</p>
+                                    <p class="text-sm text-green-600 mt-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+                                        </svg>
+                                        85 active
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-amber-100 rounded-full">
+                                    <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3">
+                            <div class="flex items-center justify-between text-white">
+                                <span class="text-sm font-medium">85% active rate</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
+                        <div class="p-7">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 mb-1">Total Subjects</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ total_courses }}</p>
+                                    <p class="text-sm text-blue-600 mt-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                        3 new this semester
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-emerald-100 rounded-full">
+                                    <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3">
+                            <div class="flex items-center justify-between text-white">
+                                <span class="text-sm font-medium">Growing curriculum</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
+                        <div class="p-7">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 mb-1">Total Classes</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ total_classes }}</p>
+                                    <p class="text-sm text-red-600 mt-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                        </svg>
+                                        12% fewer than 2023
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-red-100 rounded-full">
+                                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-3">
+                            <div class="flex items-center justify-between text-white">
+                                <span class="text-sm font-medium">Optimization needed</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
+                        <div class="p-7">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 mb-1">Current Semester</p>
+                                    <p class="text-3xl font-bold text-gray-900">20243</p>
+                                    <p class="text-sm text-blue-600 mt-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        Ongoing since June
+                                    </p>
+                                </div>
+                                <div class="p-3 bg-blue-100 rounded-full">
+                                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3">
+                            <div class="flex items-center justify-between text-white">
+                                <span class="text-sm font-medium">Active semester</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
+    <!-- Room Distribution Bar Chart -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
+        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Room Distribution</p>
+        <div class="flex items-center justify-center space-x-4 mb-4">
+            <!-- Buttons for selecting schedule -->
+            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20251&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
+            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20252&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
+            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20253&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
+        </div>
+
+        <div class="h-80">
+            <canvas id="roomChart" class="w-full h-full"></canvas>
+        </div>
+    </div>
+
+    <!-- Classes per Day (Doughnut Chart) -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
+        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Classes per Day</p>
+        <div class="flex items-center justify-center space-x-4 mb-4">
+            <!-- Buttons for selecting schedule -->
+            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20251&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
+            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20252&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
+            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20253&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
+        </div>
+
+        <!-- Warning for no classes -->
+        {% if no_classes_warning %}
+            <div class="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-4 flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="24" height="24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                    <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                </svg>
+                <p>No classes</p>
+            </div>
+        {% else %}
+            <!-- Display the chart if there are classes -->
+            <div class="h-80">
+                <canvas id="myDonutChart" class="w-full h-full"></canvas>
+            </div>
+        {% endif %}
+    </div>
+</div>
+        </main>
+        {% endblock %}
+
+        
+    </div>
+
+    <script src="{% static 'js/script.js' %}">
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+    <script>
+
+            const ctx1 = document.getElementById('roomChart').getContext('2d');
+        const roomChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: {{ room_labels|safe }},
+                datasets: [{
+                    label: 'Number of Classes',
+                    data: {{ room_values|safe }},
+                    backgroundColor: [
+                        'rgba(252, 35, 35, 1)',
+                        'rgba(255, 191, 0, 1)',
+                        'rgba(35, 176, 87, 1)',
+                        'rgba(35, 90, 252, 1)',
+                        'rgba(206, 28, 255, 1)'
+                    ],
+                    hoverBackgroundColor: [
+                        '#f76363',
+                        '#ffd352',
+                        '#3ec26f',
+                        '#3e6df7',
+                        '#d952ff'
+                    ],
+                    datalabels: {
+                display: true,  // Enable data labels
+                color: '#ffffff',  // Set color of labels
+                font: {
+                    weight: 'bold',  // Make the label bold
+                    size: 14,  // Font size of the label
+                },
+                formatter: function(value, ctx) {
+                    return value;  // Display the value inside the chart
+                },
+                anchor: 'center',  // Position the label at the center of each slice
+                align: 'center',   // Align the label to the center
+                offset: 0,         // Keep the label centered without any offset
+            },
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+            enabled: true,
+            animation: 100,
+            displayColors: false,
+            backgroundColor: function(context) {
+            const index = context.tooltip.dataPoints[0].dataIndex;
+            const dataset = context.tooltip.dataPoints[0].dataset;
+            return dataset.backgroundColor[index];
+            },
+            borderRadius: 6,
+            padding: 10,
+            custom: function(context) {
+            if (context.tooltip && context.tooltip.opacity > 0) {
+            const tooltipEl = context.tooltip.el;
+            tooltipEl.style.boxShadow = '0px 4px 10px rgba(0, 0, 0, 0.2)';
+            }
+            },
+            callbacks: {
+            label: function(tooltipItem) {
+                const label = tooltipItem.label; 
+                const value = tooltipItem.raw; 
+                return `${value} Classes`; 
+            },
+            }
+        }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 }
+                    }
+                }
+            }
+        });
+
+
+
+
+const ctx2 = document.getElementById('myDonutChart');
+
+new Chart(ctx2, {
+    type: 'pie',
+    data: {
+        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        datasets: [{
+            data: {{ day_counts_values|safe }},
+            borderColor: 'white',
+            hoverBorderColor: 'white',
+            borderWidth: 2,
+            hoverOffset: 50,
+            backgroundColor: [
+                'rgba(252, 35, 35, 1)',   // Red
+                'rgba(255, 191, 0, 1)',   // Yellow
+                'rgba(35, 176, 87, 1)',   // Green
+                'rgba(35, 90, 252, 1)',   // Blue
+                'rgba(206, 28, 255, 1)'   // Purple
+            ],
+            hoverBackgroundColor: [
+                '#f76363',
+                '#ffd352',
+                '#3ec26f',
+                '#3e6df7',
+                '#d952ff'
+            ],
+            padding: 20,
+            datalabels: {
+                display: true,  // Ensure data labels are always visible
+                color: '#ffffff',  // Set label color to white
+                font: {
+                    weight: 'bold',  // Make label text bold
+                    size: 14,  // Adjust font size if necessary
+                },
+                formatter: function(value) {
+                    return value;  // Show the actual class count inside each slice
+                },
+                anchor: 'center',  // Position label at the center of each slice
+                align: 'center',   // Align label to the center
+                offset: 0,         // Keep label centered within slice
+            },
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                    generateLabels: function(chart) {
+                        const data = chart.data;
+                        const dataset = data.datasets[0];
+                        const colors = dataset._originalBackgroundColor || dataset.backgroundColor;
+
+                        return data.labels.map((label, i) => ({
+                            text: label,
+                            fillStyle: colors[i],  // Always use the original color for the legend
+                            strokeStyle: colors[i],
+                            index: i
+                        }));
+                    }
+                },
+                onHover: function(evt, item, legend) {
+                    const chart = legend.chart;
+                    const dataset = chart.data.datasets[0];
+                    const hoveredIndex = item.index;
+
+                    if (!dataset._originalBackgroundColor) {
+                        dataset._originalBackgroundColor = [...dataset.backgroundColor];
+                    }
+
+                    dataset.backgroundColor = dataset._originalBackgroundColor.map((color, index) => {
+                        if (index === hoveredIndex) return color;
+
+                        if (color.startsWith('rgba')) {
+                            return color.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/, 'rgba($1,$2,$3,0.3)');
+                        }
+
+                        const rgb = hexToRgb(color);
+                        return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;
+                    });
+
+                    chart.update();
+                },
+                onLeave: function(evt, item, legend) {
+                    const chart = legend.chart;
+                    const dataset = chart.data.datasets[0];
+
+                    if (dataset._originalBackgroundColor) {
+                        dataset.backgroundColor = [...dataset._originalBackgroundColor];
+                    }
+
+                    chart.update();
+                }
+            },
+            tooltip: {
+                enabled: true,
+                animation: 100,
+                displayColors: false,
+                backgroundColor: function(context) {
+                    const index = context.tooltip.dataPoints[0].dataIndex;
+                    const dataset = context.tooltip.dataPoints[0].dataset;
+                    return dataset.backgroundColor[index];
+                },
+                borderRadius: 6,
+                padding: 10,
+                custom: function(context) {
+                    if (context.tooltip && context.tooltip.opacity > 0) {
+                        const tooltipEl = context.tooltip.el;
+                        tooltipEl.style.boxShadow = '0px 4px 10px rgba(0, 0, 0, 0.2)';
+                    }
+                },
+                callbacks: {
+                    label: function(tooltipItem) {
+                        const value = tooltipItem.raw;
+                        return `${value} Classes`;  // Show value with label in tooltip
+                    },
+                }
+            }
+        }
+    },
+});
+
+    </script>
+
+</body>
+</html>

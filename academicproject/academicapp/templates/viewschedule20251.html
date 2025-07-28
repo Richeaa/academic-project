@@ -1,0 +1,105 @@
+{% extends 'dashboard_lecturer_view.html' %}
+{% load static %}
+
+{% block title %}View Schedule 20251{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+      /* Hide everything except the printable content */
+      body * {
+        visibility: hidden;
+      }
+      .printable-content, .printable-content * {
+        visibility: visible;
+      }
+      /* Adjust page size or margins if necessary */
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+<div id="main-content" class="w-full p-12 select-none">
+  <div class="flex justify-between items-center mb-5">
+    <h1 class="printable-content text-3xl font-bold text-blue-900">Schedule Information</h1>
+  </div>
+
+  <form method="get" action="{% url 'viewschedule20251' %}">
+  <div class="flex gap-4 mb-4">
+    <select name="day" class="bg-white px-4 py-2 border border-gray-300 rounded">
+      <option value="">All Days</option>
+      <option value="Mon" {% if day == 'Mon' %}selected{% endif %}>Mon</option>
+      <option value="Tue" {% if day == 'Tue' %}selected{% endif %}>Tue</option>
+      <option value="Wed" {% if day == 'Wed' %}selected{% endif %}>Wed</option>
+      <option value="Thu" {% if day == 'Thu' %}selected{% endif %}>Thu</option>
+      <option value="Fri" {% if day == 'Fri' %}selected{% endif %}>Fri</option>
+    </select>
+    <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded">Search</button>
+  </div>
+  </form>
+
+  <div class="printable-content bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-200 border-b border-gray-300">
+          <tr>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">No.</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lecturer Name</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Subject</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Class</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Schedule Time</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for viewschedule20251 in schedule_data %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-900">{{ forloop.counter }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">
+              {% if viewschedule20251.lecturer2 and viewschedule20251.lecturer3 %}
+                {{ viewschedule20251.lecturer1 }} / {{ viewschedule20251.lecturer2 }} / {{ viewschedule20251.lecturer3 }}
+              {% elif viewschedule20251.lecturer2 %}
+                {{ viewschedule20251.lecturer1 }} / {{ viewschedule20251.lecturer2 }}
+              {% else %}
+                {{ viewschedule20251.lecturer1 }}
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ viewschedule20251.subject }}</td>
+            <td class="px-6 py-4 text-center text-sm text-gray-600">{{ viewschedule20251.class_name }}</td>
+            <td class="px-6 py-4 text-center text-sm text-gray-600">
+              {% if viewschedule20251.schedule_time != '(TBA)' and viewschedule20251.room != '(TBA)' %}
+                <p class=font-semibold>Time:</p>{{ viewschedule20251.schedule_time }}<br><p class=font-semibold>Room:</p> {{ viewschedule20251.room }}
+              {% else %}
+                (Tba)
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-4 flex justify-between text-sm text-gray-600 p-4">
+    <span>Showing All Schedule</span>
+    <span>Page 1 of 1</span>
+  </div>
+
+  <div class="flex justify-end p-4">
+    <button onclick="window.print()" class="flex items-center gap-1 bg-red-400 text-white px-3 py-2 rounded hover:bg-red-400 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v7H6v-7zm0 0V9h12v5" />
+      </svg>
+      <span class="text-sm">Print</span>
+    </button>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script src="https://unpkg.com/lucide-static@latest/dist/lucide.min.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+{% endblock %}

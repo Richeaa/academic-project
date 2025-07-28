@@ -22,4 +22,8 @@ urlpatterns = [
     path('schedule20252/', views.schedule20252, name='schedule20252'),
     path('dashboard/hsp/', views.dashboard_hsp, name='dashboard_hsp'),
     path('dashboard/lecturer/', views.dashboard_lecturer, name='dashboard_lecturer'),
+    path('dashboard/lecturerview/', views.dashboard_lecturer_view, name='dashboard_lecturer_view'),
+    path('viewschedule/20251/', views.viewschedule20251, name='viewschedule20251'),
+    path('viewschedule/20252/', views.viewschedule20252, name='viewschedule20252'),
+    path('viewschedule/20253/', views.viewschedule20253, name='viewschedule20253'),
 ]

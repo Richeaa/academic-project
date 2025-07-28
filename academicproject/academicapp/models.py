@@ -5,6 +5,7 @@ class profile(models.Model):
     profile_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=250, unique=True)
     password = models.CharField(max_length=250)
+    name = models.CharField(max_length=250)
 
     def __str__(self):
         return self.username
@@ -175,3 +176,42 @@ class formsemester20261(models.Model):
     class Meta:
         db_table = 'form20261'
         managed = False 
+
+class Viewschedule20251(models.Model):
+    id = models.AutoField(primary_key=True)
+    lecturer1 = models.CharField(max_length=255)
+    lecturer2 = models.CharField(max_length=255, blank=True, null=True)
+    lecturer3 = models.CharField(max_length=255, blank=True, null=True)
+    subject = models.CharField(max_length=255)
+    class_name = models.CharField(max_length=255)
+    schedule_time = models.CharField()
+    room = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'schedule20251'
+
+class Viewschedule20252(models.Model):
+    id = models.AutoField(primary_key=True)
+    lecturer1 = models.CharField(max_length=255)
+    lecturer2 = models.CharField(max_length=255, blank=True, null=True)
+    lecturer3 = models.CharField(max_length=255, blank=True, null=True)
+    subject = models.CharField(max_length=255)
+    class_name = models.CharField(max_length=255)
+    schedule_time = models.CharField(max_length=255)
+    room = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'schedule20252'
+
+class Viewschedule20253(models.Model):
+    id = models.AutoField(primary_key=True)
+    lecturer1 = models.CharField(max_length=255)
+    lecturer2 = models.CharField(max_length=255, blank=True, null=True)
+    lecturer3 = models.CharField(max_length=255, blank=True, null=True)
+    subject = models.CharField(max_length=255)
+    class_name = models.CharField(max_length=255)
+    schedule_time = models.CharField(max_length=255)
+    room = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'schedule20253'
