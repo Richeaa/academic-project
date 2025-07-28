@@ -26,4 +26,13 @@ urlpatterns = [
     path('dashboard/lecturerview/', views.dashboard_lecturer_view, name='dashboard_lecturer_view'),
     path('viewschedule/20251/', views.viewschedule20251, name='viewschedule20251'),
     path('viewschedule/20252/', views.viewschedule20252, name='viewschedule20252'),
+    path('prediction/', views.prediction_view, name='prediction'),
+    path('prediction/predict/', views.predict_schedule, name='predict_schedule'),
+    path('prediction/get-schedule/', views.get_schedule, name='get_schedule'),
+    path('prediction/clear-assignments/', views.clear_assignments, name='clear_assignments'),
+    path('prediction/stats/', views.prediction_stats, name='prediction_stats'),
+    path('preference/', views.preference_view, name='preference'),
+    path('preferences/add/', views.add_preference, name='add_preference'),
+    path('preferences/delete/', views.delete_preference, name='delete_preference'),
+    path('preferences/edit/<int:pref_id>/', views.edit_preference, name='edit_preference'),
 ]

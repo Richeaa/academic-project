@@ -1,0 +1,232 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+{% block title %}Preferences{% endblock %}
+
+{% block content %}
+<div id="main-content" class="w-full p-12 select-none">
+
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Lecturer Preference</h1>
+            <button 
+                type="button"
+                onclick="openAddModal()"
+                class="bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors hover:bg-blue-400 transition-colors"
+            >
+            <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add New
+        </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-200 border-b border-gray-300">
+            <tr>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">No</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lecturer Name</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Time Preference</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Day Preference</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Room Preference</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Notes</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Action</th>
+            </tr>
+          </thead>
+         <tbody class="divide-y divide-gray-200">
+
+            {% for pref in lecturerpreference %}
+
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-900">{{ forloop.counter }}</td>
+              <td class="px-6 py-4 text-sm text-gray-900">{{ pref.lecturer_name }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">{{ pref.time_preference|default:"-" }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">{{ pref.day_preference|default:"-" }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">{{ pref.room_preference|default:"-" }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">{{ pref.notes|default:"-" }}</td>
+              <td class="px-6 py-4 text-center">
+                <div class="flex justify-center gap-2">
+                <!-- Edit Button -->
+                    <button
+                        type="button"
+                        onclick="openEditModal('{{ pref.id }}', '{{ pref.lecturer_name }}', '{{ pref.time_preference }}', '{{ pref.day_preference }}', '{{ pref.room_preference }}', '{{ pref.notes }}')" 
+                        class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors"
+                    >
+                        <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
+                    </button>
+                  <!-- Delete Button -->
+                    <button 
+                        type="button"
+                        class="delete-btn flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-red-200 transition-colors"
+                        data-id="{{ pref.id }}"
+                    >
+                        <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
+                    </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-400">No lecturers found.</td>
+            </tr>
+            {% endfor %}
+
+            {% if messages %}
+            <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2">
+                {% for message in messages %}
+                <div class="toast-message bg-green-100 text-green-800 px-4 py-3 rounded shadow-lg transition transform duration-300 ease-out animate-slide-in">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+                <style>
+                    @keyframes slide-in {
+                    0% { opacity: 0; transform: translateX(100%); }
+                    100% { opacity: 1; transform: translateX(0); }
+                    }
+
+                    .animate-slide-in {
+                    animation: slide-in 0.4s ease-out;
+                    }
+                </style>
+            {% endif %}
+          </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ADD MODAL -->
+<div id="addPreferenceModal" class="fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg">
+    <h2 class="text-xl font-semibold mb-4">Add Lecturer Preference</h2>
+
+    <form method="POST" action="{% url 'add_preference' %}">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Lecturer Name</label>
+          <input type="text" placeholder="Full Name" name="lecturer_name" class="w-full border px-3 py-2 rounded"  required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Time Preference</label>
+          <input type="text" placeholder="Ex. 09:00, 10:15" name="time_preference" class="w-full border px-3 py-2 rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Day Preference</label>
+          <input type="text" placeholder="Short days (Mon, Tue, ...)" name="day_preference" class="w-full border px-3 py-2 rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Room Preference</label>
+          <input type="text" placeholder="Ex. Room Name or Building A (3rd Floor)" name="room_preference" class="w-full border px-3 py-2 rounded">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Notes</label>
+          <textarea name="notes" class="w-full border px-3 py-2 rounded"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" onclick="closeAddModal()" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Cancel</button>
+        <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Confirm Delete</h2>
+    <p class="text-gray-600 mb-6">Are you sure you want to delete this preference?</p>
+    <form method="POST" action="{% url 'delete_preference' %}">
+      {% csrf_token %}
+      <input type="hidden" name="pref_id" id="deletePrefId">
+      <div class="flex justify-end gap-3">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg">
+    <h2 class="text-xl font-semibold mb-4">Edit Preference</h2>
+    <form id="editForm" method="POST" action="">
+      {% csrf_token %}
+      <input type="hidden" name="id" id="edit-id">
+      <div class="mb-4">
+        <label class="block text-sm font-medium">Lecturer Name</label>
+        <input type="text" name="lecturer_name" placeholder="Full Name" id="edit-lecturer_name" class="w-full border px-3 py-2 rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium">Time Preference</label>
+        <input type="text" name="time_preference"  placeholder="Ex. 09:00, 10:15" id="edit-time_preference" class="w-full border px-3 py-2 rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium">Day Preference</label>
+        <input type="text" name="day_preference" placeholder="Short days (Mon, Tue, ...)" id="edit-day_preference" class="w-full border px-3 py-2 rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium">Room Preference</label>
+        <input type="text" name="room_preference" placeholder="Ex. Room Name or Building A (3rd Floor)" id="edit-room_preference" class="w-full border px-3 py-2 rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium">Notes</label>
+        <textarea name="notes" id="edit-notes" class="w-full border px-3 py-2 rounded"></textarea>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeEditModal()" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+function openAddModal() {
+    document.getElementById('addPreferenceModal').classList.remove('hidden');
+  }
+
+function closeAddModal() {
+    document.getElementById('addPreferenceModal').classList.add('hidden');
+  }
+
+    const deleteModal = document.getElementById("deleteModal");
+    const deleteInput = document.getElementById("deletePrefId");
+
+    document.querySelectorAll(".delete-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      const id = button.getAttribute("data-id");
+      deleteInput.value = id;
+      deleteModal.classList.remove("hidden");
+    });
+  });
+
+  function closeDeleteModal() {
+    deleteModal.classList.add("hidden");
+  }
+
+function openEditModal(id, lecturer_name, time_pref, day_pref, room_pref, notes) {
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-lecturer_name').value = lecturer_name;
+    document.getElementById('edit-time_preference').value = time_pref;
+    document.getElementById('edit-day_preference').value = day_pref;
+    document.getElementById('edit-room_preference').value = room_pref;
+    document.getElementById('edit-notes').value = notes; 
+    document.getElementById('editForm').action = `/preferences/edit/${id}/`;
+    document.getElementById('editModal').classList.remove('hidden');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+  }
+
+    setTimeout(() => {
+      const toasts = document.querySelectorAll('.toast-message');
+      toasts.forEach((toast) => {
+        toast.classList.add('opacity-0', '-translate-x-4');
+        setTimeout(() => toast.remove(), 500);
+      });
+    }, 3000);
+</script>
+{% endblock %}

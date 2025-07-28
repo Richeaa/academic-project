@@ -97,6 +97,8 @@ class Lecturer(models.Model):
     class Meta:
         db_table = 'lecturer'
         managed = False
+
+
         
 class formsemester20251(models.Model):
     semester_id = models.AutoField(primary_key=True)
@@ -173,6 +175,20 @@ class formsemester20261(models.Model):
     class Meta:
         db_table = 'form20261'
         managed = False 
+
+class LecturerPreference(models.Model):
+    lecturer_name = models.CharField(max_length=100)
+    time_preference = models.CharField(max_length=100, blank=True, null=True)
+    day_preference = models.CharField(max_length=100, blank=True, null=True)
+    room_preference = models.CharField(max_length=100, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.lecturer_name
+    
+    class Meta:
+        db_table = 'lecturer_preferences'
+        managed = False
 
 class Viewschedule20251(models.Model):
     id = models.AutoField(primary_key=True)

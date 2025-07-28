@@ -19,10 +19,18 @@ document.addEventListener('DOMContentLoaded', function () {
       match: (p) => p.startsWith('/studyprogram/'), 
     },
     {
+      id: 'prediction-link',
+      match: (p) => p.startsWith('/prediction/'), 
+    },
+    {
+      id: 'preference-link',
+      match: (p) => p.startsWith('/preference/'), 
+    },
+    {
     id: 'dashboardhsp-link',
     match: (p) => p.startsWith('/dashboard/'),
     },
-    {
+        {
       id: 'dashboard_lecturer_view-link',
       match: (p) => p.startsWith('/dashboard/lecturerview/'), 
     },

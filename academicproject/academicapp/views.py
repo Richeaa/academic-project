@@ -1,19 +1,24 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import redirect, get_object_or_404
-from .models import profile, semester20251, semester20252, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer, Viewschedule20251, Viewschedule20252, Viewschedule20253
+from .models import profile, semester20251, semester20252, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer, LecturerPreference, Viewschedule20251, Viewschedule20252, Viewschedule20253
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from collections import defaultdict
 from django.http import JsonResponse
 import json
-from .datasubject import subjects
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
+from .datasubject import subjects
+from .ml.predict import run_ml_prediction
+from .ml.utils import get_combined_schedule_data
+from django.http import JsonResponse
+import traceback
+import logging
+import pickle
+import os
 from django.http import JsonResponse
 import traceback
 from django.db.models import Q, Count
@@ -340,7 +345,6 @@ def studyprogram(request, semester_url='20251'):
     }
     return render(request, 'studyprogram.html', context)
 
-
 def assignlecturer_create(request):
     try:
         if request.method == 'POST':
@@ -384,7 +388,6 @@ def assignlecturer_create(request):
         traceback.print_exc()
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    
 def assignlecturer_delete(request):
     if request.method == 'POST':
         semester_id = request.POST.get('semester_id')
@@ -418,9 +421,8 @@ def assignlecturer_delete(request):
         return JsonResponse({'success': False, 'error': 'Invalid method'})
     else:
         messages.error(request, "Invalid request method.")
-        return redirect('studyprogram', '20251')
+        return redirect('studyprogram', '20251')  
     
-
 @require_POST
 def schedulelecturer_delete(request):
     try:
@@ -803,6 +805,268 @@ def delete_academic_module(request, semester_url, semester_id):
             return JsonResponse({'success': False, 'error': 'Record not found.'})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method.'})
-
+    
 def subject_list(request):
     return JsonResponse(subjects, safe=False)
+
+logger = logging.getLogger(__name__)
+
+def prediction_view(request):
+    return render(request, 'prediction.html')
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def predict_schedule(request):
+    try:
+        # request data
+        data = json.loads(request.body)
+        semester_choice = data.get('semester')
+        
+        if not semester_choice:
+            return JsonResponse({
+                'success': False,
+                'error': 'Semester selection is required'
+            }, status=400)
+        
+        if semester_choice not in ['20251', '20252']:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid semester choice'
+            }, status=400)
+        
+        # Run ML
+        logger.info(f"Starting ML prediction for semester {semester_choice}")
+        success, message, saved_count = run_ml_prediction(semester_choice)
+        
+        if success:
+            logger.info(f"ML prediction completed: {message}")
+            return JsonResponse({
+                'success': True,
+                'message': message,
+                'saved_count': saved_count
+            })
+        else:
+            logger.error(f"ML prediction failed: {message}")
+            return JsonResponse({
+                'success': False,
+                'error': message
+            }, status=500)
+            
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Unexpected error in predict_schedule: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Internal server error: {str(e)}'
+        }, status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_schedule(request):
+    try:
+        # request schedule data
+        data = json.loads(request.body)
+        semester_choice = data.get('semester')
+        page = int(data.get('page', 1))
+        page_size = int(data.get('page_size', 10))
+        
+        if not semester_choice:
+            return JsonResponse({
+                'success': False,
+                'error': 'Semester selection is required'
+            }, status=400)
+        
+        if semester_choice not in ['20251', '20252']:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid semester choice'
+            }, status=400)
+        
+        # combined schedule data
+        schedule_data = get_combined_schedule_data(semester_choice, page, page_size)
+        
+        return JsonResponse({
+            'success': True,
+            **schedule_data
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Error in get_schedule: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Failed to load schedule: {str(e)}'
+        }, status=500)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def clear_assignments(request):
+    try:
+        data = json.loads(request.body)
+        semester_choice = data.get('semester')
+        
+        if not semester_choice:
+            return JsonResponse({
+                'success': False,
+                'error': 'Semester selection is required'
+            }, status=400)
+        
+        if semester_choice not in ['20251', '20252']:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid semester choice'
+            }, status=400)
+        
+        if semester_choice == '20251':
+            from .models import assignlecturer20251 as AssignModel
+        else:
+            from .models import assignlecturer20252 as AssignModel
+        
+        # Clear all assignments
+        deleted_count = AssignModel.objects.all().count()
+        AssignModel.objects.all().delete()
+        
+        logger.info(f"Cleared {deleted_count} assignments for semester {semester_choice}")
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Cleared {deleted_count} assignments',
+            'deleted_count': deleted_count
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Error in clear_assignments: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Failed to clear assignments: {str(e)}'
+        }, status=500)
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def prediction_stats(request):
+    """
+    API endpoint to get prediction statistics
+    """
+    try:
+        semester_choice = request.GET.get('semester')
+        
+        if not semester_choice:
+            return JsonResponse({
+                'success': False,
+                'error': 'Semester parameter is required'
+            }, status=400)
+        
+        if semester_choice not in ['20251', '20252']:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid semester choice'
+            }, status=400)
+        
+        if semester_choice == '20251':
+            from .models import semester20251 as SemesterModel
+            from .models import assignlecturer20251 as AssignModel
+        else:
+            from .models import semester20252 as SemesterModel
+            from .models import assignlecturer20252 as AssignModel
+        
+        # calculate percentage
+        total_classes = SemesterModel.objects.count()
+        assigned_classes = AssignModel.objects.count()
+        unassigned_classes = total_classes - assigned_classes
+        
+        assigned_percentage = (assigned_classes / total_classes * 100) if total_classes > 0 else 0
+        
+        return JsonResponse({
+            'success': True,
+            'stats': {
+                'total_classes': total_classes,
+                'assigned_classes': assigned_classes,
+                'unassigned_classes': unassigned_classes,
+                'assigned_percentage': round(assigned_percentage, 2)
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in prediction_stats: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Failed to get statistics: {str(e)}'
+        }, status=500)
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def debug_unassigned(request):
+    try:
+        semester_choice = request.GET.get('semester', '20251')
+        
+        from .ml.utils import get_unassigned_classes
+        unassigned_df = get_unassigned_classes(semester_choice)
+        
+        unassigned_data = unassigned_df.to_dict('records') if not unassigned_df.empty else []
+        
+        return JsonResponse({
+            'success': True,
+            'semester': semester_choice,
+            'count': len(unassigned_data),
+            'unassigned_classes': unassigned_data[:10]
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+def preference_view(request):
+    lecturerpreference = LecturerPreference.objects.all()
+    lecturerpreference = lecturerpreference.order_by('lecturer_name')
+    
+    return render(request, 'lecturerpref.html', {'lecturerpreference': lecturerpreference})
+
+def add_preference(request):
+    if request.method == 'POST':
+        LecturerPreference.objects.create(
+            lecturer_name=request.POST.get('lecturer_name'),
+            time_preference=request.POST.get('time_preference'),
+            day_preference=request.POST.get('day_preference'),
+            room_preference=request.POST.get('room_preference'),
+            notes=request.POST.get('notes')
+        )
+        messages.success(request, "Added successfully.")
+        return redirect('preference')
+    
+def delete_preference(request):
+    if request.method == 'POST':
+        pref_id = request.POST.get('pref_id')
+        try:
+            LecturerPreference.objects.get(id=pref_id).delete()
+        except LecturerPreference.DoesNotExist:
+            pass
+    messages.success(request, "Deleted successfully.")
+    return redirect('preference')
+
+def edit_preference(request, pref_id):
+    pref = get_object_or_404(LecturerPreference, pk=pref_id)
+
+    if request.method == 'POST':
+        pref.lecturer_name = request.POST.get('lecturer_name')
+        pref.time_preference = request.POST.get('time_preference')
+        pref.day_preference = request.POST.get('day_preference')
+        pref.room_preference = request.POST.get('room_preference')
+        pref.notes = request.POST.get('notes')
+        pref.save()
+        messages.success(request, "Updated successfully.")
+        return redirect('preference')
