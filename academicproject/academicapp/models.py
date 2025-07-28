@@ -89,10 +89,6 @@ class Lecturer(models.Model):
     lecturer_type = models.CharField(max_length=50, blank=True, null=True)
     job = models.CharField(max_length=100, blank=True, null=True)
     current_working_day = models.IntegerField(blank=True, null=True)
-    time_preferences = models.TextField(blank=True, null=True)
-    day_preferences = models.TextField(blank=True, null=True)
-    room_preferences = models.TextField(blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.lecturer_name

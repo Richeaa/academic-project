@@ -13,7 +13,8 @@
       </a>
     </div>
 
-<div class="flex flex-wrap items-center gap-4 mb-8">
+    <form method="GET" class="flex flex-wrap items-center gap-4 mb-8">
+
  
   <div class="relative w-60">
     <i data-lucide="search"
@@ -42,57 +43,55 @@
           class="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg transition-colors">
     <img src="{% static 'svg/search.svg' %}" alt="Search Icon" class="w-5 h-5">
   </button>
-</div>
+</form>
+
 
     <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-200 border-b border-gray-300">
+          <thead class="bg-gray-200 border-b border-gray-300 sticky top-0 z-10">
             <tr>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lecturer Name</th>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lecturer Type</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Job</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Current Working Days</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Time Preference</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Day Preference</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Room Preference</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Notes</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Action</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[150px]">Lecturer Name</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Lecturer Type</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Job</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[140px]">Current Working Days</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Action</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
-  {% for lecturer in lecturers %}
-  <tr class="hover:bg-gray-50">
-    <td class="px-6 py-4 text-sm text-gray-900">{{ lecturer.lecturer_name }}</td>
-    <td class="px-6 py-4 text-sm text-gray-600">{{ lecturer.lecturer_type }}</td>
-    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.job|default:"-" }}</td>
-    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.current_working_day|default:"-" }}</td>
-    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.time_preferences|default:"-" }}</td>
-    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.day_preferences|default:"-" }}</td>
-    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.room_preferences|default:"-" }}</td>
-    <td class="px-6 py-4 text-center text-sm text-gray-600">{{ lecturer.notes|default:"-" }}</td>
-    <td class="px-6 py-4 text-center">
-      <div class="flex justify-center items-center gap-2">
-        <a href="{% url 'editLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors">
-          <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
-        </a>
-        <a href="{% url 'deleteLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-blue-200 transition-colors">
-  <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
-</a>
-      </div>
-    </td>
-  </tr>
-  {% empty %}
-  <tr>
-    <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-400">No lecturers found.</td>
-  </tr>
-  {% endfor %}
-</tbody>
         </table>
       </div>
       
+     
+      <div class="overflow-x-auto overflow-y-auto max-h-96">
+        <table class="w-full">
+          <tbody class="divide-y divide-gray-200">
+            {% for lecturer in lecturers %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-900 min-w-[150px]">{{ lecturer.lecturer_name }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600 min-w-[120px]">{{ lecturer.lecturer_type }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[100px]">{{ lecturer.job|default:"-" }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[140px]">{{ lecturer.current_working_day|default:"-" }}</td>
+              <td class="px-6 py-4 text-center min-w-[100px]">
+                <div class="flex justify-center items-center gap-2">
+                  <a href="{% url 'editLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors">
+                    <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
+                  </a>
+                  <a href="{% url 'deleteLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-blue-200 transition-colors">
+                    <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-400">No lecturers found.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-
 
 <div class="flex justify-end p-4">
   <button onclick="window.print()" class="flex items-center gap-1 bg-red-400 text-white px-3 py-2 rounded hover:bg-red-400 transition">
@@ -102,6 +101,7 @@
     <span class="text-sm">Print</span>
   </button>
 </div>
+
 <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
   <div class="flex items-center justify-between">
     <div class="text-sm text-gray-700">
@@ -132,7 +132,6 @@
   </div>
 </div>
 
-
   </div>
 
 </div>
@@ -144,3 +143,5 @@
   lucide.createIcons();
 </script>
 {% endblock %}
+
+

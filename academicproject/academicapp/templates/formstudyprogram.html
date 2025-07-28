@@ -16,8 +16,9 @@
                     </svg>
                 </div>
                 <input type="text" 
-                       class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
-                       placeholder="Filter...">
+                      id="lecturerFilter"
+                      class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                      placeholder="Filter...">
             </div>
 
             <div class="flex items-center space-x-1">
@@ -33,10 +34,6 @@
                    class="px-4 py-2 text-sm font-medium {% if active_semester == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300{% endif %}">
                     20253
                 </a>
-                <a href="{% url 'formstudyprogram' '20261' %}" 
-                   class="px-4 py-2 text-sm font-medium {% if active_semester == '20261' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300{% endif %}">
-                    20261
-                </a>
             </div>
         </div>
     </div>
@@ -49,71 +46,73 @@
       <h2 class="text-2xl font-bold text-gray-800">Semester {{semester_title}}</h2>
       <p class="text-gray-600 mt-1">Information: Assign Academic Module</p>
     </div>
-    <button onclick="openAddModal()" class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-600 transition-colors">
+  <button onclick="openAddModal()" class="cursor-pointer bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
   <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5">
   Academic Module
 </button>
   </div>
 </div>
 
-        <div class="w-full overflow-x-auto rounded-md border border-gray-200">
-            <table class="w-full divide-y divide-gray-200 min-w-[1000px]">
-                <thead class="bg-gray-200">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">No</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Program Session</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Major</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Curriculum</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Class</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Subject</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Credit</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer1</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer2</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Lecturer3</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Action</th>
-                    </tr>
-                </thead>
-                
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for item in semester_data %}
-                    <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.semester_id}}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.program_session }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.major }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.curriculum }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.major_class }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.subject }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.credit }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_1 }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_2 }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.lecturer_3 }}</td>
-                        <td class="px-6 py-4  text-sm font-medium">
-                        <div class="flex space-x-2">
-                            <button onclick="openEdit(this)"
-      class="text-indigo-600 hover:text-indigo-900 bg-indigo-100 hover:bg-indigo-200 px-3 py-1 rounded-md text-xs font-medium transition-colors"
-      data-id="{{ item.semester_id }}"
-      data-session="{{ item.program_session }}"
-      data-major="{{ item.major }}"
-      data-curriculum="{{ item.curriculum }}"
-      data-major_class="{{ item.major_class }}"
-      data-subject="{{ item.subject }}"
-      data-credit="{{ item.credit }}"
-      data-lecturer1="{{ item.lecturer_1 }}"
-      data-lecturer2="{{ item.lecturer_2 }}"
-      data-lecturer3="{{ item.lecturer_3 }}">
-      Edit
-    </button>
-    <button onclick="deleteRecord('{{ item.semester_id }}')" 
-  class="text-red-600 hover:text-red-900 bg-red-100 hover:bg-red-200 px-3 py-1 rounded-md text-xs font-medium transition-colors">
-  Delete
-</button>
-
-                        </div>
-                    </td>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="border-t border-gray-200">
+  <div class="overflow-auto max-h-[500px]">
+    <table class="min-w-[1200px] w-full table-fixed">
+  <thead class="bg-gray-200 sticky top-0 z-10">
+    <tr>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[120px]">Program Session</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[120px]">Major</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[120px]">Curriculum</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[140px]">Class</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[200px]">Subject</th>
+      <th class="px-2 py-2 text-left text-xs font-semibold text-gray-700 uppercase w-[60px]">Credit</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[160px]">Lecturer 1</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[160px]">Lecturer 2</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase break-words w-[160px]">Lecturer 3</th>
+      <th class="px-4 py-2 text-left text-xs font-semibold text-gray-700 uppercase w-[100px]">Action</th>
+    </tr>
+  </thead>
+  <tbody class="bg-white divide-y divide-gray-200 text-sm text-gray-900">
+    {% for item in semester_data %}
+    <tr class="hover:bg-gray-50">
+      <td class="px-4 py-2 break-words">{{ item.program_session }}</td>
+      <td class="px-4 py-2 break-words">{{ item.major }}</td>
+      <td class="px-4 py-2 break-words">{{ item.curriculum }}</td>
+      <td class="px-4 py-2 break-words">{{ item.major_class }}</td>
+      <td class="px-4 py-2 break-words">{{ item.subject }}</td>
+      <td class="px-2 py-2 text-center">{{ item.credit }}</td>
+      <td class="px-4 py-2 break-words">{{ item.lecturer_1 }}</td>
+      <td class="px-4 py-2 break-words">{{ item.lecturer_2 }}</td>
+      <td class="px-4 py-2 break-words">{{ item.lecturer_3 }}</td>
+      <td class="px-4 py-2">
+        <div class="flex justify-center items-center gap-2">
+          <button onclick="openEdit(this)"
+            class="w-8 h-8 bg-indigo-100 hover:bg-indigo-200 rounded flex justify-center items-center"
+            data-id="{{ item.semester_id }}"
+            data-session="{{ item.program_session }}"
+            data-major="{{ item.major }}"
+            data-curriculum="{{ item.curriculum }}"
+            data-major_class="{{ item.major_class }}"
+            data-subject="{{ item.subject }}"
+            data-credit="{{ item.credit }}"
+            data-lecturer1="{{ item.lecturer_1 }}"
+            data-lecturer2="{{ item.lecturer_2 }}"
+            data-lecturer3="{{ item.lecturer_3 }}">
+            <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
+          </button>
+          <button onclick="deleteRecord('{{ item.semester_id }}')"
+            class="w-8 h-8 bg-red-100 hover:bg-red-200 rounded flex justify-center items-center">
+            <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
+          </button>
         </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+  </div>
+</div>
+
 
        
         <div id="addModal" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center z-50 hidden">
@@ -121,7 +120,7 @@
     
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-bold text-gray-900">Academic Module</h2>
-      <button type="button" onclick="closeAddModal()" class="group hover:text-red-600 transition-colors">
+      <button type="button" onclick="closeAddModal()" class="group hover:text-red-600 cursor-pointer transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
           stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -129,173 +128,218 @@
       </button>
     </div>
 
-    <form id="addForm">
-      {% csrf_token %}
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Program Session</label>
-          <select name="program_session" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
-            <option value="">Select program session</option>
-            <option value="M">M</option>
-            <option value="N">N</option>
-          </select>
-        </div>
+  <form id="addForm">
+  {% csrf_token %}
+  <div class="space-y-4">
+   
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Program Session</label>
+      <select name="program_session" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select program session</option>
+        <option value="M">M</option>
+        <option value="N">N</option>
+      </select>
+    </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Major</label>
-          <select name="major" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
-            <option value="">Select major</option>
-            <option value="PS_AB">PS_AB</option>
-            <option value="PS_Ak">PS_Ak</option>
-            <option value="PS_AR">PS_AR</option>
-            <option value="PS_BA">PS_BA</option>
-            <option value="PS_DI">PS_DI</option>
-            <option value="PS_DKV_2017">PS_DKV_2017</option>
-            <option value="PS_HI">PS_HI</option>
-            <option value="PS_Hukum">PS_Hukum</option>
-            <option value="PS_IA">PS_IA</option>
-            <option value="PS_IKom">PS_IKom</option>
-            <option value="PS_Ked">PS_Ked</option>
-            <option value="PS_Man">PS_Man</option>
-            <option value="PS_MH">PS_MH</option>
-            <option value="PS_MMTek">PS_MMTek</option>
-            <option value="PS_MTI">PS_MTI</option>
-            <option value="PS_PGSD">PS_PGSD</option>
-            <option value="PS_SI">PS_SI</option>
-            <option value="PS_SI_KKP">PS_SI_KKP</option>
-            <option value="PS_TE">PS_TE</option>
-            <option value="PS_TInd">PS_TInd</option>
-            <option value="PS_TInf">PS_TInf</option>
-            <option value="PS_TInf_KKP">PS_TInf_KKP</option>
-            <option value="PS_TL">PS_TL</option>
-            <option value="PS_TM">PS_TM</option>
-            <option value="PS_TS">PS_TS</option>
-          </select>
-        </div>
+  
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Major</label>
+      <select id="majorSelect" name="major" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select major</option>
+        <option value="PS_AB">PS_AB</option>
+  <option value="PS_Ak">PS_Ak</option>
+  <option value="PS_AR">PS_AR</option>
+  <option value="PS_BA">PS_BA</option>
+  <option value="PS_DI">PS_DI</option>
+  <option value="PS_DKV">PS_DKV</option>
+  <option value="PS_HI">PS_HI</option>
+  <option value="PS_Hukum">PS_Hukum</option>
+  <option value="PS_IA">PS_IA</option>
+  <option value="PS_IKom">PS_IKom</option>
+  <option value="PS_Man">PS_Man</option>
+  <option value="PS_PGSD">PS_PGSD</option>
+  <option value="PS_SI">PS_SI</option>
+  <option value="PS_TE">PS_TE</option>
+  <option value="PS_TInd">PS_TInd</option>
+  <option value="PS_TInf">PS_TInf</option>
+  <option value="PS_TL">PS_TL</option>
+  <option value="PS_TM">PS_TM</option>
+  <option value="PS_TS">PS_TS</option>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
-          <select name="curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
-            <option value="">Select curriculum</option>
-            <option value="AB-2022">AB-2022</option>
-            <option value="AB-2023">AB-2023</option>
-            <option value="AB-2024">AB-2024</option>
-            <option value="ACC-2022">ACC-2022</option>
-            <option value="ACC-2023">ACC-2023</option>
-            <option value="ACC-2024">ACC-2024</option>
-            <option value="ACS-2022">ACS-2022</option>
-            <option value="ACS-2023">ACS-2023</option>
-            <option value="ACS-2024">ACS-2024</option>
-            <option value="ARC-2022">ARC-2022</option>
-            <option value="ARC-2023">ARC-2023</option>
-            <option value="ARC-2024">ARC-2024</option>
-            <option value="BA-2022">BA-2022</option>
-            <option value="BA-2023">BA-2023</option>
-            <option value="BA-2024">BA-2024</option>
-            <option value="CE-2022">CE-2022</option>
-            <option value="CE-2023">CE-2023</option>
-            <option value="CE-2024">CE-2024</option>
-            <option value="COMM-2022">COMM-2022</option>
-            <option value="COMM-2023">COMM-2023</option>
-            <option value="COMM-2024">COMM-2024</option>
-            <option value="EE-2022">EE-2022</option>
-            <option value="EE-2023">EE-2023</option>
-            <option value="EE-2024">EE-2024</option>
-            <option value="ENV-2022">ENV-2022</option>
-            <option value="ENV-2023">ENV-2023</option>
-            <option value="ENV-2024">ENV-2024</option>
-            <option value="ID-2022">ID-2022</option>
-            <option value="ID-2023">ID-2023</option>
-            <option value="ID-2024">ID-2024</option>
-            <option value="IE-2022">IE-2022</option>
-            <option value="IE-2023">IE-2023</option>
-            <option value="IE-2024">IE-2024</option>
-            <option value="IR-2022">IR-2022</option>
-            <option value="IR-2023">IR-2023</option>
-            <option value="IR-2024">IR-2024</option>
-            <option value="IS-2022">IS-2022</option>
-            <option value="IS-2023">IS-2023</option>
-            <option value="IS-2024">IS-2024</option>
-            <option value="ISP-2024">ISP-2024</option>
-            <option value="IT-2022">IT-2022</option>
-            <option value="IT-2023">IT-2023</option>
-            <option value="IT-2024">IT-2024</option>
-            <option value="ITP-2024">ITP-2024</option>
-            <option value="LAW-2022">LAW-2022</option>
-            <option value="LAW-2023">LAW-2023</option>
-            <option value="LAW-2024">LAW-2024</option>
-            <option value="ME-2022">ME-2022</option>
-            <option value="ME-2023">ME-2023</option>
-            <option value="ME-2024">ME-2024</option>
-            <option value="MGT-2022">MGT-2022</option>
-            <option value="MGT-2023">MGT-2023</option>
-            <option value="MGT-2024">MGT-2024</option>
-            <option value="MS-2023">MS-2023</option>
-            <option value="MS-2024">MS-2024</option>
-            <option value="PSTE-2022">PSTE-2022</option>
-            <option value="PSTE-2023">PSTE-2023</option>
-            <option value="PSTE-2024">PSTE-2024</option>
-            <option value="S2IT-2023">S2IT-2023</option>
-            <option value="S2IT-2024">S2IT-2024</option>
-            <option value="S2LAW-2023">S2LAW-2023</option>
-            <option value="S2LAW-2024">S2LAW-2024</option>
-            <option value="S2MTek-2023">S2MTek-2023</option>
-            <option value="S2MTek-2024">S2MTek-2024</option>
-            <option value="VCD-2022">VCD-2022</option>
-            <option value="VCD-2023">VCD-2023</option>
-            <option value="VCD-2024">VCD-2024</option>
-          </select>
-        </div>
+      </select>
+    </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
-          <input type="text" name="major_class" placeholder="Enter class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
-        </div>
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
+  <select id="curriculumSelect" name="curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+    <option value="">Select curriculum</option>
+  </select>
+</div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-          <input type="text" name="subject" placeholder="Enter subject" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
-        </div>
+ 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+      <select id="classSelect" name="major_class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select class</option>
+      </select>
+    </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Credit</label>
-          <select name="credit" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
-            <option value="">Select credit</option>
-            <option value="0">0</option>
-            <option value="0.4">0.4</option>
-            <option value="0.5">0.5</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="8">8</option>
-          </select>
-        </div>
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+  <input type="text" name="subject" list="subjectList" placeholder="Enter subject"
+         class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+  <datalist id="subjectList"></datalist>
+</div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 1</label>
-          <input type="text" name="lecturer_1" placeholder="Enter lecturer 1" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
-        </div>
+ 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Credit</label>
+      <select name="credit" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select credit</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 2</label>
-          <input type="text" name="lecturer_2" placeholder="Enter lecturer 2" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
-        </div>
+ 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 1</label>
+      <input type="text" name="lecturer_1" placeholder="Enter lecturer 1" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+    </div>
 
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 3</label>
-          <input type="text" name="lecturer_3" placeholder="Enter lecturer 3" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
-        </div>
-      </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 2</label>
+      <input type="text" name="lecturer_2" placeholder="Enter lecturer 2" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+    </div>
 
-      <div class="flex justify-end gap-2 mt-6">
-        <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
-          Add
-        </button>
-      </div>
-    </form>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 3</label>
+      <input type="text" name="lecturer_3" placeholder="Enter lecturer 3" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2 mt-6">
+    <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
+      Add
+    </button>
+  </div>
+</form>
+  </div>
+</div>
+
+      <div id="addModal20253" class="fixed inset-0 bg-gray-800/40 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto p-8">
+    
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Academic Module</h2>
+      <button type="button" onclick="closeAddModal()" class="group hover:text-red-600 cursor-pointer transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+  <form id="addForm20253">
+  {% csrf_token %}
+  <div class="space-y-4">
+   
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Program Session</label>
+      <select name="program_session" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select program session</option>
+        <option value="M">M</option>
+        <option value="N">N</option>
+      </select>
+    </div>
+
+  
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Major</label>
+      <select id="majorSelect20253" name="major" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select major</option>
+        <option value="PS_AB">PS_AB</option>
+  <option value="PS_Ak">PS_Ak</option>
+  <option value="PS_AR">PS_AR</option>
+  <option value="PS_BA">PS_BA</option>
+  <option value="PS_DI">PS_DI</option>
+  <option value="PS_DKV">PS_DKV</option>
+  <option value="PS_HI">PS_HI</option>
+  <option value="PS_Hukum">PS_Hukum</option>
+  <option value="PS_IA">PS_IA</option>
+  <option value="PS_IKom">PS_IKom</option>
+  <option value="PS_Man">PS_Man</option>
+  <option value="PS_PGSD">PS_PGSD</option>
+  <option value="PS_SI">PS_SI</option>
+  <option value="PS_TE">PS_TE</option>
+  <option value="PS_TInd">PS_TInd</option>
+  <option value="PS_TInf">PS_TInf</option>
+  <option value="PS_TL">PS_TL</option>
+  <option value="PS_TM">PS_TM</option>
+  <option value="PS_TS">PS_TS</option>
+
+      </select>
+    </div>
+
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
+  <select id="curriculumSelect20253" name="curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" >
+    <option value="">Select curriculum</option>
+  </select>
+</div>
+
+ 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+      <select id="classSelect20253" name="major_class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+        <option value="">Select class</option>
+      </select>
+    </div>
+
+<div>
+  <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+  <input type="text" name="subject" list="subjectList" placeholder="Enter subject"
+         class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+  <datalist id="subjectList20253"></datalist>
+</div>
+
+ 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Credit</label>
+      <select name="credit" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+        <option value="">Select credit</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+
+ 
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 1</label>
+      <input type="text" name="lecturer_1" placeholder="Enter lecturer 1" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 2</label>
+      <input type="text" name="lecturer_2" placeholder="Enter lecturer 2" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Lecturer 3</label>
+      <input type="text" name="lecturer_3" placeholder="Enter lecturer 3" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2 mt-6">
+    <button type="submit" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
+      Add
+    </button>
+  </div>
+</form>
   </div>
 </div>
 
@@ -331,110 +375,37 @@
           <select id="edit-major" name="major" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
             <option value="">Select major</option>
             <option value="PS_AB">PS_AB</option>
-            <option value="PS_Ak">PS_Ak</option>
-            <option value="PS_AR">PS_AR</option>
-            <option value="PS_BA">PS_BA</option>
-            <option value="PS_DI">PS_DI</option>
-            <option value="PS_DKV_2017">PS_DKV_2017</option>
-            <option value="PS_HI">PS_HI</option>
-            <option value="PS_Hukum">PS_Hukum</option>
-            <option value="PS_IA">PS_IA</option>
-            <option value="PS_IKom">PS_IKom</option>
-            <option value="PS_Ked">PS_Ked</option>
-            <option value="PS_Man">PS_Man</option>
-            <option value="PS_MH">PS_MH</option>
-            <option value="PS_MMTek">PS_MMTek</option>
-            <option value="PS_MTI">PS_MTI</option>
-            <option value="PS_PGSD">PS_PGSD</option>
-            <option value="PS_SI">PS_SI</option>
-            <option value="PS_SI_KKP">PS_SI_KKP</option>
-            <option value="PS_TE">PS_TE</option>
-            <option value="PS_TInd">PS_TInd</option>
-            <option value="PS_TInf">PS_TInf</option>
-            <option value="PS_TInf_KKP">PS_TInf_KKP</option>
-            <option value="PS_TL">PS_TL</option>
-            <option value="PS_TM">PS_TM</option>
-            <option value="PS_TS">PS_TS</option>
+  <option value="PS_Ak">PS_Ak</option>
+  <option value="PS_AR">PS_AR</option>
+  <option value="PS_BA">PS_BA</option>
+  <option value="PS_DI">PS_DI</option>
+  <option value="PS_DKV">PS_DKV</option>
+  <option value="PS_HI">PS_HI</option>
+  <option value="PS_Hukum">PS_Hukum</option>
+  <option value="PS_IA">PS_IA</option>
+  <option value="PS_IKom">PS_IKom</option>
+  <option value="PS_Man">PS_Man</option>
+  <option value="PS_PGSD">PS_PGSD</option>
+  <option value="PS_SI">PS_SI</option>
+  <option value="PS_TE">PS_TE</option>
+  <option value="PS_TInd">PS_TInd</option>
+  <option value="PS_TInf">PS_TInf</option>
+  <option value="PS_TL">PS_TL</option>
+  <option value="PS_TM">PS_TM</option>
+  <option value="PS_TS">PS_TS</option>
           </select>
         </div>
 
         <div>
           <label for="edit-curriculum" class="block text-sm font-medium text-gray-700 mb-1">Curriculum</label>
-          <select id="edit-curriculum" name="curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+          <select id="edit-curriculum" name="curriculum" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2">
             <option value="">Select curriculum</option>
-            <option value="AB-2022">AB-2022</option>
-            <option value="AB-2023">AB-2023</option>
-            <option value="AB-2024">AB-2024</option>
-            <option value="ACC-2022">ACC-2022</option>
-            <option value="ACC-2023">ACC-2023</option>
-            <option value="ACC-2024">ACC-2024</option>
-            <option value="ACS-2022">ACS-2022</option>
-            <option value="ACS-2023">ACS-2023</option>
-            <option value="ACS-2024">ACS-2024</option>
-            <option value="ARC-2022">ARC-2022</option>
-            <option value="ARC-2023">ARC-2023</option>
-            <option value="ARC-2024">ARC-2024</option>
-            <option value="BA-2022">BA-2022</option>
-            <option value="BA-2023">BA-2023</option>
-            <option value="BA-2024">BA-2024</option>
-            <option value="CE-2022">CE-2022</option>
-            <option value="CE-2023">CE-2023</option>
-            <option value="CE-2024">CE-2024</option>
-            <option value="COMM-2022">COMM-2022</option>
-            <option value="COMM-2023">COMM-2023</option>
-            <option value="COMM-2024">COMM-2024</option>
-            <option value="EE-2022">EE-2022</option>
-            <option value="EE-2023">EE-2023</option>
-            <option value="EE-2024">EE-2024</option>
-            <option value="ENV-2022">ENV-2022</option>
-            <option value="ENV-2023">ENV-2023</option>
-            <option value="ENV-2024">ENV-2024</option>
-            <option value="ID-2022">ID-2022</option>
-            <option value="ID-2023">ID-2023</option>
-            <option value="ID-2024">ID-2024</option>
-            <option value="IE-2022">IE-2022</option>
-            <option value="IE-2023">IE-2023</option>
-            <option value="IE-2024">IE-2024</option>
-            <option value="IR-2022">IR-2022</option>
-            <option value="IR-2023">IR-2023</option>
-            <option value="IR-2024">IR-2024</option>
-            <option value="IS-2022">IS-2022</option>
-            <option value="IS-2023">IS-2023</option>
-            <option value="IS-2024">IS-2024</option>
-            <option value="ISP-2024">ISP-2024</option>
-            <option value="IT-2022">IT-2022</option>
-            <option value="IT-2023">IT-2023</option>
-            <option value="IT-2024">IT-2024</option>
-            <option value="ITP-2024">ITP-2024</option>
-            <option value="LAW-2022">LAW-2022</option>
-            <option value="LAW-2023">LAW-2023</option>
-            <option value="LAW-2024">LAW-2024</option>
-            <option value="ME-2022">ME-2022</option>
-            <option value="ME-2023">ME-2023</option>
-            <option value="ME-2024">ME-2024</option>
-            <option value="MGT-2022">MGT-2022</option>
-            <option value="MGT-2023">MGT-2023</option>
-            <option value="MGT-2024">MGT-2024</option>
-            <option value="MS-2023">MS-2023</option>
-            <option value="MS-2024">MS-2024</option>
-            <option value="PSTE-2022">PSTE-2022</option>
-            <option value="PSTE-2023">PSTE-2023</option>
-            <option value="PSTE-2024">PSTE-2024</option>
-            <option value="S2IT-2023">S2IT-2023</option>
-            <option value="S2IT-2024">S2IT-2024</option>
-            <option value="S2LAW-2023">S2LAW-2023</option>
-            <option value="S2LAW-2024">S2LAW-2024</option>
-            <option value="S2MTek-2023">S2MTek-2023</option>
-            <option value="S2MTek-2024">S2MTek-2024</option>
-            <option value="VCD-2022">VCD-2022</option>
-            <option value="VCD-2023">VCD-2023</option>
-            <option value="VCD-2024">VCD-2024</option>
           </select>
         </div>
 
         <div>
           <label for="edit-major_class" class="block text-sm font-medium text-gray-700 mb-1">Class</label>
-          <input type="text" id="edit-major_class" name="major_class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
+          <input type="text" id="edit-major_class" name="major_class" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" >
         </div>
 
         <div>
@@ -447,15 +418,9 @@
           <select id="edit-credit" name="credit" class="w-full border border-gray-300 bg-gray-50 rounded-lg p-2" required>
             <option value="">Select credit</option>
             <option value="0">0</option>
-            <option value="0.4">0.4</option>
-            <option value="0.5">0.5</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="8">8</option>
           </select>
         </div>
 
@@ -524,43 +489,595 @@
 </div>
 
 <script>
-function openAddModal() {
-  document.getElementById('addModal').classList.remove('hidden');
-}
-
-function closeAddModal() {
-  document.getElementById('addModal').classList.add('hidden');
-  document.getElementById('addForm').reset();
-}
-
-document.getElementById('addForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const formData = new FormData(this);
-  const semester = '{{ active_semester }}'; 
-
-  fetch(`/add-academic-module/${semester}/`, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      alert(data.message);
-      closeAddModal();
-      window.location.reload();
+  function openAddModal() {
+    if (semester === '20253') {
+      document.getElementById('addModal20253').classList.remove('hidden');
     } else {
-      alert('Error: ' + data.error);
+      document.getElementById('addModal').classList.remove('hidden');
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('Terjadi kesalahan saat menambah data');
+  }
+
+  function closeAddModal() {
+    if (semester === '20253') {
+      document.getElementById('addModal20253').classList.add('hidden');
+      document.getElementById('addForm20253').reset();
+    } else {
+      document.getElementById('addModal').classList.add('hidden');
+      document.getElementById('addForm').reset();
+    }
+  }
+
+const curriculumsByMajor = {
+  PS_AB: ["", "AB-2022", "AB-2023", "AB-2024"],
+  PS_Ak: ["", "ACC-2022", "ACC-2023", "ACC-2024"],
+  PS_AR: ["", "ARC-2022", "ARC-2023", "ARC-2024"],
+  PS_BA: ["", "BA-2022", "BA-2023", "BA-2024"],
+  PS_DI: ["", "ID-2022", "ID-2023", "ID-2024"],
+  PS_DKV: ["", "VCD-2022", "VCD-2023", "VCD-2024"],
+  PS_HI: ["", "IR-2022", "IR-2023", "IR-2024"],
+  PS_Hukum: ["", "LAW-2022", "LAW-2023", "LAW-2024"],
+  PS_IA: ["", "ACS-2022", "ACS-2023", "ACS-2024"],
+  PS_IKom: ["", "COMM-2022", "COMM-2023", "COMM-2024"],
+  PS_Man: ["", "MGT-2022", "MGT-2023", "MGT-2024"],
+  PS_PGSD: ["", "PSTE-2022", "PSTE-2023", "PSTE-2024"],
+  PS_SI: ["", "IS-2022", "IS-2023", "IS-2024"],
+  PS_TE: ["", "EE-2022", "EE-2023", "EE-2024"],
+  PS_TInd: ["", "IE-2022", "IE-2023", "IE-2024"],
+  PS_TInf: ["", "IT-2022", "IT-2023", "IT-2024"],
+  PS_TL: ["", "ENV-2022", "ENV-2023", "ENV-2024"],
+  PS_TM: ["", "ME-2022", "ME-2023", "ME-2024"],
+  PS_TS: ["", "CE-2022", "CE-2023", "CE-2024"],
+    
+  };
+
+  const classesByCurriculum = {
+  "AB-2022": ["M AB-2022 AB - 2022"],
+  "AB-2023": [
+    "M AB-2023 AGROECOTOURISM",
+    "M AB-2023 Food Tech & Agrotourism",
+    "M AB-2023 SMART AGRI-INNOVATION",
+  ],
+  "AB-2024": ["M AB-2024 Class 2", "M AB-2024 Class 1"],
+  "ACC-2022": [
+    "M ACC-2022 Class-1",
+    "M ACC-2022 Class-2",
+    "M ACC-2022 Class-3",
+    "N ACC-2022 ACC-2022",
+  ],
+  "ACC-2023": [
+    "M ACC-2023 Class Auditing 1",
+    "M ACC-2023 Class Auditing 2",
+    "M ACC-2023 Class Capital Market 1",
+    "M ACC-2023 Class Capital Market 2",
+    "M ACC-2023 Class Taxation 1",
+    "M ACC-2023 Class Taxation 2",
+    "N ACC-2023 Class 1",
+    "N ACC-2023 Auditing",
+  ],
+  "ACC-2024": [
+    "M ACC-2024 Class 1",
+    "M ACC-2024 Class 2",
+    "M ACC-2024 Class 3",
+    "M ACC-2024 Class 4",
+    "N ACC-2024 ACC-2024",
+    "N ACC-2024 Class",
+  ],
+
+  "ARC-2022": ["M ARC-2022 ARC 2022"],
+  "ARC-2023": ["M ARC-2023 ARC 2023 Class 1", "M ARC-2023 ARC 2023 Class 2"],
+  "ARC-2024": ["M ARC-2024 ARC 2024 Class 1", "M ARC-2024 ARC 2024 Class 2"],
+  "BA-2022": [
+    "M BA-2022 DIGITAL BUSINESS",
+    "M BA-2022 GLOBAL BUSINESS",
+    "M BA-2022 HOSPITALITY AND TOURISM BUSINESS",
+  ],
+  "BA-2023": [
+    "M BA-2023 DIGITAL BUSINESS",
+    "M BA-2023 GLOBAL BUSINESS",
+    "M BA-2023 HOSPITALITY AND TOURISM BUSINESS",
+    "N BA-2023 RETAIL BUSINESS",
+  ],
+  "BA-2024": [
+    "M BA-2024 CLASS 1",
+    "M BA-2024 CLASS 2",
+    "M BA-2024 CLASS 3",
+    "M BA-2024 CLASS 4",
+    "M BA-2024 CLASS 5",
+    "M BA-2024 CLASS 6",
+    "N BA-2024 CLASS 1",
+  ],
+  "ID-2022": ["M ID-2022 ID 2022 Class 1", "M ID-2022 ID 2022 Class 2"],
+  "ID-2023": ["M ID-2023 ID 2023 Class 1", "M ID-2023 ID 2023 Class 2"],
+  "ID-2024": ["M ID-2024 ID 2024 Class 1", "M ID-2024 ID 2024 Class 2"],
+  "VCD-2022": ["M VCD-2022 VCD 2022 Class 1", "M VCD-2022 VCD 2022 Class 2"],
+  "VCD-2023": [
+    "M VCD-2023 VCD 2023 Animation & Games",
+    "M VCD-2023 VCD 2023 Graphic Design & Emerging Media",
+  ],
+  "VCD-2024": [
+    "M VCD-2024 VCD 2024 Class 1",
+    "M VCD-2024 VCD 2024 Class 2",
+    "M VCD-2024 VCD 2024 Class 3",
+  ],
+  "IR-2022": [
+    "M IR-2022 Class 1",
+    "M IR-2022 Class 2",
+    "M IR-2022 Class 3",
+    "M IR-2022 Class 4",
+    "M IR-2022 Class 5",
+    "N IR-2022 Class 1",
+  ],
+  "IR-2023": [
+    "M IR-2023 Class 1 French",
+    "M IR-2023 Class 2 French",
+    "M IR-2023 Class 3 French",
+    "M IR-2023 Class 4 Japanese",
+    "M IR-2023 Class 5 Japanese",
+    "M IR-2023 Class 6 Mandarin",
+    "M IR-2023 Class 7 Mandarin",
+    "M IR-2023 Class 1",
+    "M IR-2023 Class 2",
+    "M IR-2023 Class 3",
+    "M IR-2023 Class 4",
+    "M IR-2023 Class 5",
+    "M IR-2023 Class 6",
+    "M IR-2023 Class 7",
+    "N IR-2023 Class 1",
+  ],
+  "IR-2024": [
+    "M IR-2024 Class 1",
+    "M IR-2024 Class 2",
+    "M IR-2024 Class 3",
+    "M IR-2024 Class 4",
+    "M IR-2024 Class 5",
+    "M IR-2024 Class 6",
+    "M IR-2024 Class 7",
+    "M IR-2024 Class 8",
+    "M IR-2024 Class 9",
+    "M IR-2024 Class 10",
+    "N IR-2024 Class",
+  ],
+  "LAW-2022": [
+    "M LAW-2022 Corporate Law",
+    "M LAW-2022 General Law",
+    "M LAW-2022 International Law",
+    "N LAW-2022 Corporate Law",
+  ],
+  "LAW-2023": [
+    "M LAW-2023 Corporate Law 1",
+    "M LAW-2023 Corporate Law 2",
+    "M LAW-2023 International Law",
+    "M LAW-2023 Litigation Law",
+    "N LAW-2023 Corporate Law",
+  ],
+  "LAW-2024": [
+    "M LAW-2024 -1",
+    "M LAW-2024 -2",
+    "M LAW-2024 -3",
+    "M LAW-2024 -4",
+    "M LAW-2024 -5",
+    "M LAW-2024 -6",
+    "N LAW-2024 Class 1",
+  ],
+  "ACS-2022": ["M ACS-2022 CLASS 1", "M ACS-2022 CLASS 2"],
+  "ACS-2023": ["M ACS-2023 CLASS 1", "M ACS-2023 CLASS 2"],
+  "ACS-2024": ["M ACS-2024 CLASS 1", "M ACS-2024 CLASS 2"],
+  "COMM-2022": [
+    "M COMM-2022 FTV Class",
+    "M COMM-2022 CJ Class",
+    "N COMM-2022 Class",
+    "M COMM-2022 PR Class 1",
+    "M COMM-2022 PR Class 2",
+  ],
+  "COMM-2023": [
+    "M COMM-2023 Class 1",
+    "M COMM-2023 Class 2",
+    "M COMM-2023 Class 3",
+    "M COMM-2023 Class 4",
+    "M COMM-2023 Public Relations & Digital Communications Class 1",
+    "M COMM-2023 Public Relations & Digital Communications Class 2",
+    "M COMM-2023 Public Relations & Digital Communications Class 3",
+    "M COMM-2023 Film & Media Studies Class 1",
+    "M COMM-2023 Film & Media Studies Class 2",
+    "N COMM-2023 Class",
+    "N COMM-2023 Film & Media Studies",
+    "N COMM-2023 Public Relation & Digital Communications",
+  ],
+   "COMM-2024": [
+    "M COMM-2024 Class 1",
+    "M COMM-2024 Class 2",
+    "M COMM-2024 Class 3",
+    "M COMM-2024 Class 4",
+    "M COMM-2024 Class 5",
+    "N COMM-2024 Class",
+  ],
+  "MGT-2022": [
+    "M MGT-2022 BF",
+    "M MGT-2022 DCM",
+    "M MGT-2022 HCM",
+    "M MGT-2022 IB-1",
+    "M MGT-2022 IB-2",
+    "N MGT-2022 DCM",
+    "N MGT-2022 HCM",
+  ],
+  "MGT-2023": [
+    "M MGT-2023 DCM-2",
+    "M MGT-2023 DCM-1",
+    "M MGT-2023 BF",
+    "M MGT-2023 HCM",
+    "M MGT-2023 IB-1",
+    "M MGT-2023 IB-2",
+    "M MGT-2023 IB-3",
+    "M MGT-2023 IB-4",
+    "N MGT-2023 DCM",
+    "N MGT-2023 HCM",
+  ],
+  "MGT-2024": [
+    "M MGT-2024 -1",
+    "M MGT-2024 -2",
+    "M MGT-2024 -3",
+    "M MGT-2024 -4",
+    "M MGT-2024 -5",
+    "M MGT-2024 -6",
+    "M MGT-2024 -7",
+    "M MGT-2024 -8",
+    "N MGT-2024 Class 1",
+  ],
+  "PSTE-2022": ["M PSTE-2022 -1"],
+  "PSTE-2023": ["M PSTE-2023 -1", "M PSTE-2023 -2"],
+  "PSTE-2024": ["M PSTE-2024 -1", "M PSTE-2024 -2"],
+  "IS-2022": [
+    "M IS-2022 IS 2022 CLASS 1",
+    "M IS-2022 IS 2022 CLASS 2",
+    "N IS-2022 Class 1",
+  ],
+  "IS-2023": [
+    "M IS-2023 BUSINESS INTELLIGENCE 2023 CLASS 1",
+    "M IS-2023 BUSINESS INTELLIGENCE 2023 CLASS 2",
+    "M IS-2023 EIS PLANNING & DEVELOPMENT 2023 CLASS 1",
+    "M IS-2023 EIS PLANNING & DEVELOPMENT 2023 CLASS 2",
+    "M IS-2023 DATA SCIENCE 2023 CLASS 1",
+    "M IS-2023 DATA SCIENCE 2023 CLASS 2",
+    "M IS-2023 ERP 2023 CLASS 1",
+    "M IS-2023 ERP 2023 CLASS 2",
+    "N IS-2023 EIS PLANNING & DEVELOPMENT",
+    "N IS-2023 ERP N 2023",
+    "N IS-2023 ERP Class",
+  ],
+  "IS-2024": [
+    "M IS-2024 IS 2024 CLASS 1",
+    "M IS-2024 IS 2024 CLASS 2",
+    "M IS-2024 IS 2024 CLASS 3",
+    "M IS-2024 IS 2024 CLASS 4",
+    "M IS-2024 IS 2024 CLASS 5",
+    "N IS-2024 IS N 2024",
+    "N IS-2024 Class",
+  ],
+  "EE-2022": ["M EE-2022 een 2022", "N EE-2022 Class"],
+  "EE-2023": ["M EE-2023 Control System", "N EE-2023 Control System"],
+  "EE-2024": [
+    "M EE-2024 EEN 2024 Class 1",
+    "M EE-2024 EEN 2024 Class 2",
+    "N EE-2024 EEN 2024",
+    "N EE-2024 Class",
+  ],
+  "IE-2022": [
+    "M IE-2022 Class 1",
+    "M IE-2022 Class 2",
+    "N IE-2022 Class 1",
+    "N IE-2022 Class 2",
+  ],
+  "IE-2023": [
+    "M IE-2023 Class 1",
+    "M IE-2023 Class 2",
+    "M IE-2023 Class 3",
+    "N IE-2023 Class 1",
+    "N IE-2023 Class 2",
+  ],
+  "IE-2024": [
+    "M IE-2024 Class 1",
+    "M IE-2024 Class 2",
+    "M IE-2024 Class 3",
+    "M IE-2024 Class 4",
+    "N IE-2024 Class 1",
+    "N IE-2024 Class 2",
+  ],
+  "IT-2022": [
+    "M IT-2022 IT 2022 Class 1",
+    "M IT-2022 IT 2022 Class 2",
+    "M IT-2022 IT 2022 Class 3",
+    "M IT-2022 IT 2022 Class 4",
+    "M IT-2022 IT 2022 Class 5",
+  ],
+  "IT-2023": [
+    "M IT-2023 Artificial Intelligence Class 1",
+    "M IT-2023 Artificial Intelligence Class 2",
+    "M IT-2023 Class 1",
+    "M IT-2023 Class 2",
+    "M IT-2023 Class 3",
+    "M IT-2023 Class 4",
+    "M IT-2023 Class 5",
+    "M IT-2023 Class 6",
+    "M IT-2023 Cyber Security Class 1",
+    "M IT-2023 Cyber Security Class 2",
+    "M IT-2023 Cyber Security Class 3",
+    "M IT-2023 Internet of Things",
+    "M IT-2023 Game Development Class 1",
+    "M IT-2023 IT 2023 Class 1",
+    "M IT-2023 IT 2023 Class 2",
+    "M IT-2023 IT 2023 Class 3",
+    "M IT-2023 IT 2023 Class 4",
+    "M IT-2023 IT 2023 Class 5",
+    "M IT-2023 IT 2023 Class 6",
+    "M IT-2023 IT 2023 Class 7",
+  ],
+  "IT-2024": [
+    "M IT-2024 IT 2024 Class 1",
+    "M IT-2024 IT 2024 Class 2",
+    "M IT-2024 IT 2024 Class 3",
+    "M IT-2024 IT 2024 Class 4",
+    "M IT-2024 IT 2024 Class 5",
+    "M IT-2024 IT 2024 Class 6",
+    "M IT-2024 IT 2024 Class 7",
+    "N IT-2024 IT 2024 N",
+    "N IT-2024 Class",
+  ],
+  "ENV-2022": ["M ENV-2022 ENV 2022", "M ENV-2022 CLASS 1"],
+  "ENV-2023": [
+    "M ENV-2023 Eco-Industrial Park Management",
+    "M ENV-2023 Environmental Management",
+    "N ENV-2023 Class",
+  ],
+  "ENV-2024": [
+    "M ENV-2024 ENV 2024 Class 1",
+    "M ENV-2024 ENV 2024 Class 2",
+    "M ENV-2024 CLASS 1",
+    "M ENV-2024 CLASS 2",
+    "N ENV-2024 Class",
+  ],
+  "ME-2022": ["M ME-2022 Class 1", "M ME-2022 Class 2", "N ME-2022 Class "],
+  "ME-2023": [
+    "M ME-2023 Class 1",
+    "M ME-2023 Class A",
+    "N ME-2023 Class 1",
+    "N ME-2023 Class A-Ev",
+    "N ME-2023 Class",
+  ],
+  "ME-2024": ["M ME-2024 Class A", "M ME-2024 Class B", "N ME-2024 Class", "N ME-2024 Class 1"],
+  "CE-2022": ["M CE-2022 M CLASS 1", "M CE-2022 CLASS 1"],
+  "CE-2023": ["M CE-2023 M CLASS 1", "M CE-2023 CLASS 1"],
+  "CE-2024": [
+    "M CE-2024 M CLASS 1",
+    "M CE-2024 M CLASS 2",
+    "M CE-2024 CLASS 1",
+    "M CE-2024 CLASS 2",
+    "N CE-2024 Class",
+    "N CE-2024 N CLASS 1",
+  ],
+
+  "": [ // Saat curriculum kosong
+    ...[
+      "M PS_Hukum CapCut Project: Video Editing for TikTok Content",
+      "M PS_Hukum Ambassador's Experience",
+      "M PS_Hukum Citizenship",
+      "M PS_Hukum Fashion for Professional",
+      "M PS_Hukum Golf Class ",
+      "M PS_Hukum Golf Class Non-Credits",
+      "M PS_Hukum Indonesian Language 1 Non Credits",
+      "M PS_Hukum Indonesian Language",
+      "M PS_Hukum Music Orchestra 1 Non-Credits",
+      "M PS_Hukum Music Orchestra 2",
+      "M PS_Hukum Music Orchestra 2 Non-Credits",
+      "M PS_Hukum Music Orchestra 3",
+      "M PS_Hukum Musicpreneur : Production to Publishing Music",
+      "M PS_Hukum Music Orchestra 3 Non-Credits",
+      "M PS_Hukum Pancasila",
+      "M PS_Hukum Padel",
+      "M PS_Hukum Pre-Internship",
+      "M PS_Hukum Projects: Tiktok Cinema: From Acting to Production",
+      "M PS_Hukum Projects: Video Editing for TikTok Content I",
+      "M PS_Hukum Projects: Video Editing for TikTok Content I Non Credits",
+      "M PS_Hukum Survival English (Batch 2022)",
+      "M PS_Hukum Religion",
+      "M PS_Hukum Taylor Swift",
+      "M PS_Hukum Tennis",
+      "M PS_Hukum Vocal Technique 1 Non-Credits",
+      "M PS_Hukum TikTok for Content Creators",
+      "M PS_Hukum Vocal Technique 2",
+      "M PS_Hukum Vocal Technique 2 Non-Credits",
+      "N PS_Hukum Open Class",
+      "N PS_Hukum By Course 1",
+      "N PS_Hukum By Course 2",
+      "M PS_HI By Course",
+      "M PS_BA Statistics and Data Literacy",
+      "M PS_BA Multimodal Communication",
+      "M PS_TE By Course 1",
+      "M PS_TE By Course 2",
+      "N PS_TE Final Project By Course 1",
+      "N PS_TE Final Project By Course 2",
+      "M PS_TL Environmental Circular Economy",
+      "M PS_TL Industrial Hygiene",
+      "N PS_TL Final Project By Course 1",
+      "N PS_TL Final Project By Course 2",
+      "N PS_TM Advance Manufacturing and Sustainable Industri",
+      "N PS_TM Electric Vehicle Technology",
+      "N PS_TM By Course 1",
+      "N PS_TM By Course 2",
+      "M PS_TM By Course 1",
+      "M PS_TM By Course 2",
+      "N PS_TM Final Project By Course 1",
+      "N PS_TM Final Project By Course 2",
+      "M PS_TS Extra Class",
+      "N PS_TS Extra Class",
+    ]
+  ],
+};
+
+  const majorSelect = document.getElementById("majorSelect");
+  const curriculumSelect = document.getElementById("curriculumSelect");
+  const classSelect = document.getElementById("classSelect");
+
+  fetch('/subjects/')
+    .then(response => response.json())
+    .then(data => {
+      const datalist = document.getElementById("subjectList");
+      data.forEach(subject => {
+        const option = document.createElement("option");
+        option.value = subject;
+        datalist.appendChild(option);
+      });
+    })
+    .catch(error => console.error('Error loading subjects:', error));
+
+  majorSelect.addEventListener("change", function () {
+    const selectedMajor = this.value;
+
+  
+    curriculumSelect.innerHTML = '<option value="">Select curriculum</option>';
+    classSelect.innerHTML = '<option value="">Select class</option>';
+
+    if (curriculumsByMajor[selectedMajor]) {
+      curriculumsByMajor[selectedMajor].forEach(curr => {
+        const option = document.createElement("option");
+        option.value = curr;
+        option.textContent = curr;
+        curriculumSelect.appendChild(option);
+      });
+    }
   });
+
+  curriculumSelect.addEventListener("change", function () {
+    const selectedCurriculum = this.value;
+
+    classSelect.innerHTML = '<option value="">Select class</option>';
+
+    if (classesByCurriculum[selectedCurriculum]) {
+      classesByCurriculum[selectedCurriculum].forEach(cls => {
+        const option = document.createElement("option");
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+      });
+    }
+  });
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (semester === '20253') {
+    // ====== Dropdown logic ======
+    const majorSelect = document.getElementById("majorSelect20253");
+    const curriculumSelect = document.getElementById("curriculumSelect20253");
+    const classSelect = document.getElementById("classSelect20253");
+
+    majorSelect?.addEventListener("change", function () {
+      const selectedMajor = this.value;
+
+      curriculumSelect.innerHTML = '<option value="">Select curriculum</option>';
+      classSelect.innerHTML = '<option value="">Select class</option>';
+
+      if (curriculumsByMajor[selectedMajor]) {
+        curriculumsByMajor[selectedMajor].forEach(curr => {
+          const option = document.createElement("option");
+          option.value = curr;
+          option.textContent = curr;
+          curriculumSelect.appendChild(option);
+        });
+      }
+    });
+
+    curriculumSelect?.addEventListener("change", function () {
+      const selectedCurriculum = this.value;
+      classSelect.innerHTML = '<option value="">Select class</option>';
+
+      if (classesByCurriculum[selectedCurriculum]) {
+        classesByCurriculum[selectedCurriculum].forEach(cls => {
+          const option = document.createElement("option");
+          option.value = cls;
+          option.textContent = cls;
+          classSelect.appendChild(option);
+        });
+      }
+    });
+
+    // ====== Subject list fetch ======
+    fetch('/subjects/')
+      .then(response => response.json())
+      .then(data => {
+        const datalist = document.getElementById("subjectList20253");
+        data.forEach(subject => {
+          const option = document.createElement("option");
+          option.value = subject;
+          datalist.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Error loading subjects:', error));
+
+    // ====== Form submit handler ======
+    const form20253 = document.getElementById('addForm20253');
+    if (form20253) {
+      form20253.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch(`/add-academic-module/${semester}/`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            closeAddModal();
+            window.location.reload();
+          } else {
+            alert('Error: ' + data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menambah data');
+        });
+      });
+    }
+
+  } else {
+    // ====== Form submit untuk semester lain ======
+    const form = document.getElementById('addForm');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch(`/add-academic-module/${semester}/`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert(data.message);
+            closeAddModal();
+            window.location.reload();
+          } else {
+            alert('Error: ' + data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menambah data');
+        });
+      });
+    }
+  }
 });
+
 
 function openEdit(button) {
   const id = button.getAttribute('data-id');
@@ -646,6 +1163,27 @@ function deleteRecord(semesterId) {
     });
   }
 }
+</script>
+<script>
+const semester = '{{ active_semester }}'; 
+document.getElementById('lecturerFilter').addEventListener('keyup', function () {
+  const filterValue = this.value.toLowerCase();
+  const tableRows = document.querySelectorAll('tbody tr');
+
+  tableRows.forEach(row => {
+    const lecturer1 = row.children[7]?.textContent.toLowerCase() || '';
+    const lecturer2 = row.children[8]?.textContent.toLowerCase() || '';
+    const lecturer3 = row.children[9]?.textContent.toLowerCase() || '';
+
+    const match = lecturer1.includes(filterValue) || lecturer2.includes(filterValue) || lecturer3.includes(filterValue);
+
+    if (match || filterValue === '') {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+});
 </script>
 
 {% endblock %}

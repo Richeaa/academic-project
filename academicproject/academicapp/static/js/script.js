@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', function () {
       id: 'studyprogram-link',
       match: (p) => p.startsWith('/studyprogram/'), 
     },
+    {
+    id: 'dashboardhsp-link',
+    match: (p) => p.startsWith('/dashboard/'),
+    },
     
   ];
 

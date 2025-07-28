@@ -8,6 +8,9 @@ from django.contrib import messages
 from collections import defaultdict
 from django.http import JsonResponse
 import json
+from .datasubject import subjects
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
@@ -549,36 +552,30 @@ def schedule20252(request):
     return render(request, 'schedule20252.html', context)
 
 def lecturer(request):
-    lecturers = Lecturer.objects.all()
+    lecturer_name = request.GET.get('lecturer_name', '')
+    job = request.GET.get('job', '')
 
-    lecturer_name = request.GET.get('lecturer_name')
-    job = request.GET.get('job')
+    lecturers = Lecturer.objects.all()
 
     if lecturer_name:
         lecturers = lecturers.filter(lecturer_name__icontains=lecturer_name)
 
     if job:
-        lecturers = lecturers.filter(job__iexact=job)
+        lecturers = lecturers.filter(job=job)
 
-    job_choices = Lecturer.objects.exclude(job__isnull=True).exclude(job__exact='').values_list('job', flat=True).distinct()
-    
-    paginator = Paginator(lecturers, 50)  
-    page_number = int(request.GET.get('page', 1))
-    page_obj = paginator.get_page(page_number)
+    paginator = Paginator(lecturers, 10)  
+    page = request.GET.get('page')
+    lecturers_page = paginator.get_page(page)
 
-    block_size = 5
-    current_block = (page_number - 1) // block_size
-    start_block = current_block * block_size + 1
-    end_block = min(start_block + block_size - 1, paginator.num_pages)
-    page_range = range(start_block, end_block + 1)
+    job_choices = Lecturer.objects.values_list('job', flat=True).distinct()
 
-    context = {
-        'lecturers': page_obj,      
+    page_range = paginator.get_elided_page_range(number=lecturers_page.number, on_each_side=1, on_ends=1)
+
+    return render(request, 'lecturer.html', {
+        'lecturers': lecturers_page,
         'page_range': page_range,
-        'job_choices': job_choices,   
-    }
-    return render(request, 'lecturer.html', context)
-
+        'job_choices': job_choices,
+    })
 
 def addLecturer(request):
     if request.method == 'POST':
@@ -587,10 +584,6 @@ def addLecturer(request):
             lecturer_type=request.POST.get('type'),
             job=request.POST.get('job'),
             current_working_day=request.POST.get('working_days'),
-            time_preferences=request.POST.get('time_preferences'),
-            day_preferences=request.POST.get('day_preferences'),
-            room_preferences=request.POST.get('room_preferences'),
-            notes=request.POST.get('notes'),
         )
         return redirect('lecturer')  
     return render(request, 'addLecturer.html')
@@ -603,10 +596,6 @@ def editLecturer(request, lecturer_id):
         lecturer.lecturer_type = request.POST.get('type')
         lecturer.job = request.POST.get('job')
         lecturer.current_working_day = request.POST.get('working_days')
-        lecturer.time_preferences = request.POST.get('time_preferences')
-        lecturer.day_preferences = request.POST.get('day_preferences')
-        lecturer.room_preferences = request.POST.get('room_preferences')
-        lecturer.notes = request.POST.get('notes')
         lecturer.save()
         return redirect('lecturer')
 
@@ -637,10 +626,10 @@ def formstudyprogram(request, semester_url='20251'):
     end_block = min(start_block + block_size - 1, paginator.num_pages)
     page_range = range(start_block, end_block + 1)
 
-    rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 109)]
-    rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 212)]
-    rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 312)]
-    rooms4 = [f'B{str(i).zfill(3)}' for i in range(401, 412)]
+    rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 110)]
+    rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 211)]
+    rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 311)]
+    rooms4 = [f'B{str(i).zfill(3)}' for i in range(401, 411)]
     
     context = {
         'semester_data': page_obj,  
@@ -725,39 +714,56 @@ def viewschedule20253(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def add_academic_module(request, semester_url):
-    try:
+    if request.method == 'POST':
         semester_model = semester_academic_model.get(semester_url)
         if not semester_model:
-            return JsonResponse({'success': False, 'error': 'Semester not found'}, status=404)
-        data = {
-            'program_session': request.POST.get('program_session'),
-            'major': request.POST.get('major'),
-            'curriculum': request.POST.get('curriculum'),
-            'major_class': request.POST.get('major_class'),
-            'subject': request.POST.get('subject'),
-            'credit': request.POST.get('credit'),
-            'lecturer_1': request.POST.get('lecturer_1', ''),
-            'lecturer_2': request.POST.get('lecturer_2', ''),
-            'lecturer_3': request.POST.get('lecturer_3', ''),
-        }
+            return JsonResponse({'success': False, 'error': 'Semester tidak ditemukan'}, status=404)
 
-     
-        required_fields = ['program_session', 'major', 'curriculum', 'major_class', 'subject', 'credit']
-        for field in required_fields:
-            if not data[field]:
-                return JsonResponse({'success': False, 'error': f'{field} is required'}, status=400)
+        # Ambil data dari form
+        program_session = request.POST.get('program_session')
+        major = request.POST.get('major')
+        curriculum = request.POST.get('curriculum')
+        major_class = request.POST.get('major_class')
+        subject = request.POST.get('subject')
+        credit = request.POST.get('credit')
+        lecturer_1 = request.POST.get('lecturer_1')
+        lecturer_2 = request.POST.get('lecturer_2')
+        lecturer_3 = request.POST.get('lecturer_3')
 
-       
-        new_record = semester_model.objects.create(**data)
+        try:
+            if semester_url == '20253':
+                # Buat dua entri
+                for _ in range(2):
+                    semester_model.objects.create(
+                        program_session=program_session,
+                        major=major,
+                        curriculum=curriculum,
+                        major_class=major_class,
+                        subject=subject,
+                        credit=credit,
+                        lecturer_1=lecturer_1,
+                        lecturer_2=lecturer_2,
+                        lecturer_3=lecturer_3,
+                    )
+            else:
+                semester_model.objects.create(
+                    program_session=program_session,
+                    major=major,
+                    curriculum=curriculum,
+                    major_class=major_class,
+                    subject=subject,
+                    credit=credit,
+                    lecturer_1=lecturer_1,
+                    lecturer_2=lecturer_2,
+                    lecturer_3=lecturer_3,
+                )
+
+            return JsonResponse({'success': True, 'message': 'Data berhasil ditambahkan'})
         
-        return JsonResponse({
-            'success': True, 
-            'message': 'Academic module added successfully',
-            'record_id': new_record.semester_id
-        })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -796,6 +802,7 @@ def edit_academic_module(request, semester_url):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+
 @csrf_exempt
 def delete_academic_module(request, semester_url, semester_id): 
     if request.method == 'POST':
@@ -811,3 +818,6 @@ def delete_academic_module(request, semester_url, semester_id):
             return JsonResponse({'success': False, 'error': 'Record not found.'})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+def subject_list(request):
+    return JsonResponse(subjects, safe=False)
