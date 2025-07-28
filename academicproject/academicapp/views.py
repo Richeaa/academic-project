@@ -16,6 +16,9 @@ import traceback
 
 
 def dashboard(request):
+    if 'user_id' not in request.session:
+        return redirect('signin')
+    
     semester_data = semester20251.objects.all()
 
     all_lecturers = set()
@@ -54,6 +57,9 @@ def dashboard(request):
 
 
 def dashboard_hsp(request):
+    if 'user_id' not in request.session:
+        return redirect('signin')
+    
     context = {
         "show_dashboard": True,
     }
@@ -70,10 +76,16 @@ def signin(request):
             user = profile.objects.get(username=username)
             if user.password == password:
                 if username == 'academic':
+                    request.session['user_id'] = user.profile_id  
+                    request.session['username'] = user.username
                     return redirect('dashboard')
                 elif username == 'Head of Study Program':
+                    request.session['user_id'] = user.profile_id  
+                    request.session['username'] = user.username
                     return redirect('dashboard_hsp')
                 elif username == 'lecturer':
+                    request.session['user_id'] = user.profile_id  
+                    request.session['username'] = user.username
                     return redirect('dashboard_lecturer') 
             else:
                 return render(request, 'signin.html', {
@@ -90,6 +102,9 @@ def signin(request):
     return render(request, 'dashboard_hsp.html', context)
 
 def dashboard_lecturer(request):
+    if 'user_id' not in request.session:
+        return redirect('signin')
+    
     context = {
         "show_dashboard": True,
     }
@@ -97,6 +112,9 @@ def dashboard_lecturer(request):
 
 
 def logout(request):
+    if 'user_id' in request.session:
+        del request.session['user_id']
+        del request.session['username']
     return redirect('signin')
 
 semester_title = {
@@ -292,9 +310,9 @@ def schedule20251(request):
     for entry in schedule:
         room_schedule[entry.room][entry.lecturer_day].append(entry)
 
-    for room in room_schedule:
-        for day in room_schedule[room]:
-            daily_entries = room_schedule[room][day]
+        for room in room_schedule:
+            for day in room_schedule[room]:
+                daily_entries = room_schedule[room][day]
 
             for i in range(len(daily_entries)):
                 for j in range(i + 1, len(daily_entries)):
