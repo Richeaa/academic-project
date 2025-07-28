@@ -78,25 +78,25 @@ def dashboard_hsp(request):
     }
     return render(request, 'dashboard_hsp.html', context)
 
+from django.db.models import Q
+
 def dashboard_lecturer_view(request):
     context = {
         "show_dashboard": True,
     }
-    lecturer_name = request.session.get('user_name', '')
+    lecturer_name = request.session.get('name', '')
 
-    semester_models = [Viewschedule20251, Viewschedule20252, Viewschedule20253]
 
     semester_model = {
-        '20251': Viewschedule20251,
-        '20252': Viewschedule20252,
-        '20253': Viewschedule20253
+        '20251': assignlecturer20251,
+        '20252': assignlecturer20252,
     }
 
     # Get the selected schedule from the request
     schedule_choice_doughnut = request.GET.get('schedule_choice_doughnut', '20251')
     schedule_choice_bar = request.GET.get('schedule_choice_bar', '20251')
 
-    #barchart for room distribution
+    # Barchart for room distribution
     room_counts = {}
 
     # Get the schedules for the selected semester (no lecturer filter)
@@ -104,10 +104,10 @@ def dashboard_lecturer_view(request):
 
     if schedule_model_bar:
         schedules = schedule_model_bar.objects.filter(
-            Q(lecturer1__icontains=lecturer_name) |
-            Q(lecturer2__icontains=lecturer_name) |
-            Q(lecturer3__icontains=lecturer_name)
-        )  # Get all schedules, not just the lecturer's
+            Q(semester__lecturer_1__icontains=lecturer_name) |
+            Q(semester__lecturer_2__icontains=lecturer_name) |
+            Q(semester__lecturer_3__icontains=lecturer_name)
+        )  # Get all schedules for the lecturer
 
         for schedule in schedules:
             try:
@@ -128,6 +128,9 @@ def dashboard_lecturer_view(request):
     room_labels = [room[0] for room in sorted_rooms]  # Room names (e.g., B401, B402, etc.)
     room_values = [room[1] for room in sorted_rooms]
 
+    room_has_data = bool(room_labels and room_values)
+  
+
     # Doughnut chart (class distribution by day)
     day_counts = {'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0}
 
@@ -135,29 +138,25 @@ def dashboard_lecturer_view(request):
 
     if schedule_model_doughnut:
         schedules = schedule_model_doughnut.objects.filter(
-            Q(lecturer1__icontains=lecturer_name) |
-            Q(lecturer2__icontains=lecturer_name) |
-            Q(lecturer3__icontains=lecturer_name)
-        )  # Get all schedules, not just the lecturer's
+            Q(semester__lecturer_1__icontains=lecturer_name) |
+            Q(semester__lecturer_2__icontains=lecturer_name) |
+            Q(semester__lecturer_3__icontains=lecturer_name)
+        )  # Get all schedules for the lecturer
 
         for schedule in schedules:
             try:
-                # Split schedule time if there are multiple time slots (e.g., "Mon, 07:00-09:00 / Tue, 10:00-11:00")
-                time_slots = schedule.schedule_time.split(' / ')  # Split time slots by '/'
-                for time_slot in time_slots:
-                    day_time = time_slot.split(', ')  # Split day and time (e.g., ["Mon", "07:00-09:00"])
-                    if len(day_time) == 2:
-                        day = day_time[0]  # Extract the day (e.g., "Mon")
-                        if day in day_counts:
-                            day_counts[day] += 1  # Increment the class count for that day
+            # Directly use the lecturer_day field instead of schedule_time
+                day = schedule.lecturer_day.strip()  # Get the day (e.g., "Mon")
+                if day in day_counts:
+                    day_counts[day] += 1  # Increment the class count for that day
             except AttributeError:
                 continue
 
-    # Prepare the data for the doughnut chart (count per day)
+# Prepare the data for the doughnut chart (count per day)
     day_counts_values = list(day_counts.values())
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
-    # Check if there are no classes
+# Check if there are no classes
     no_classes_warning = day_counts_values == [0, 0, 0, 0, 0]
 
     # Update context with all the necessary data
@@ -172,65 +171,51 @@ def dashboard_lecturer_view(request):
         'schedule_choice_bar': schedule_choice_bar,
     })
 
+    semester_data = semester20251.objects.all()
 
-#dashboard for total courses, classes, and lecturers
-    all_courses = []
-    all_lecturers = []
-    all_classes = []
+    all_lecturers = set()
+    for item in semester_data:
+        if item.lecturer_1:
+            all_lecturers.add(item.lecturer_1)
+        if item.lecturer_2:
+            all_lecturers.add(item.lecturer_2)
+        if item.lecturer_3:
+            all_lecturers.add(item.lecturer_3)
 
-    total_courses = 0
-    total_classes = 0
-    total_lecturers = 0
+    total_lecturers = len(all_lecturers)
 
-    for model in semester_models:
-        courses = model.objects.filter(
-                Q(subject__isnull=False) & ~Q(subject='(Tba)')
-            ).values('subject').distinct()
+    all_classes = set()
+    for item in semester_data:
+        if item.major_class:
+            all_classes.add(item.major_class)
 
-        all_courses.extend([subject['subject'] for subject in courses])
+    total_classes = len(all_classes)
 
-        unique_courses = sorted(set(all_courses))
-        total_courses = len(unique_courses)
+    all_subjects = set()
+    for item in semester_data:
+        if item.subject:
+            all_subjects.add(item.subject)
 
-        classes = model.objects.filter(
-                Q(class_name__isnull=False) & ~Q(class_name='(Tba)')
-            ).values('class_name').distinct()
+    total_subjects = len(all_subjects)
 
-        all_classes.extend([class_name['class_name'] for class_name in classes])
-
-        unique_classes = sorted(set(all_classes))
-        total_classes = len(unique_classes)
-
-        lecturers = model.objects.filter(
-                Q(lecturer1__isnull=False) & ~Q(lecturer1='(Tba)') |
-                Q(lecturer2__isnull=False) & ~Q(lecturer2='(Tba)') |
-                Q(lecturer3__isnull=False) & ~Q(lecturer3='(Tba)')
-            ).values('lecturer1', 'lecturer2', 'lecturer3')
-
-        for lecturer in lecturers:
-                if lecturer['lecturer1']:
-                    all_lecturers.append(lecturer['lecturer1'])
-                if lecturer['lecturer2']:
-                    all_lecturers.append(lecturer['lecturer2'])
-                if lecturer['lecturer3']:
-                    all_lecturers.append(lecturer['lecturer3'])
-
-        unique_lecturers = set(all_lecturers)
-        total_lecturers = len(unique_lecturers)
 
     context.update({
-        'total_courses': total_courses,
-        'total_classes': total_classes,
-        'total_lecturers': total_lecturers,
-        'lecturer_name': lecturer_name,
         'lecturer_name': lecturer_name,
         'day_counts_values': day_counts_values,
         'labels': labels,
-        'schedule_choice_dougnut': schedule_choice_doughnut,
+        'schedule_choice_doughnut': schedule_choice_doughnut,
+        'no_classes_warning': no_classes_warning,
+        'room_labels': room_labels,
+        'room_values': room_values,
         'schedule_choice_bar': schedule_choice_bar,
+        'total_lecturers': total_lecturers,
+        'total_classes': total_classes,
+        'total_subjects': total_subjects
     })
 
+    
     return render(request, 'dashboard_lecturer_view.html', context)
+
 
 
 def signin(request):
@@ -238,10 +223,12 @@ def signin(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
+        name = request.POST.get('name')
 
         try:
             user = profile.objects.get(username=username)
             if user.password == password:
+                request.session['name'] = user.name
                 if username == 'academic':
                     request.session['user_id'] = user.profile_id  
                     request.session['username'] = user.username
@@ -646,21 +633,30 @@ def formstudyprogram(request, semester_url='20251'):
     return render(request, 'formstudyprogram.html', context)
 
 def viewschedule20251(request):
-    lecturer_name = request.session.get('user_name', '') 
+    # Retrieve the lecturer's name from the session
+    lecturer_name = request.session.get('name', '')  # Ensure it's set or return empty string
 
-    schedule_data = Viewschedule20251.objects.all()
+    # Debugging: Check if lecturer_name is properly fetched fr
 
+    # Retrieve all assignment data, joining with the semester data using select_related
+    schedule_data = assignlecturer20251.objects.select_related('semester').all()
+
+    # If the lecturer's name is present, filter the data based on the lecturer's name
     if lecturer_name:
         schedule_data = schedule_data.filter(
-            Q(lecturer1__icontains=lecturer_name) |
-            Q(lecturer2__icontains=lecturer_name) |
-            Q(lecturer3__icontains=lecturer_name)
+            Q(semester__lecturer_1__icontains=lecturer_name) | 
+            Q(semester__lecturer_2__icontains=lecturer_name) | 
+            Q(semester__lecturer_3__icontains=lecturer_name)
         )
 
+    # Debugging: Print the query that is being executed
+
+    # Get the 'day' parameter from the GET request and filter the schedule accordingly
     day = request.GET.get('day', '').strip()
     if day:
-        schedule_data = schedule_data.filter(schedule_time__icontains=day)
+        schedule_data = schedule_data.filter(lecturer_day__icontains=day)
 
+    # Render the schedule data in the template
     return render(request, 'viewschedule20251.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
@@ -668,48 +664,37 @@ def viewschedule20251(request):
     })
 
 def viewschedule20252(request):
-    lecturer_name = request.session.get('user_name', '') 
+    # Retrieve the lecturer's name from the session
+    lecturer_name = request.session.get('name', '')  # Ensure it's set or return empty string
 
-    schedule_data = Viewschedule20252.objects.all()
+    # Debugging: Check if lecturer_name is properly fetched from
 
+    # Retrieve all assignment data, joining with the semester data using select_related
+    schedule_data = assignlecturer20252.objects.select_related('semester').all()
+
+    # If the lecturer's name is present, filter the data based on the lecturer's name
     if lecturer_name:
         schedule_data = schedule_data.filter(
-            Q(lecturer1__icontains=lecturer_name) |
-            Q(lecturer2__icontains=lecturer_name) |
-            Q(lecturer3__icontains=lecturer_name)
+            Q(semester__lecturer_1__icontains=lecturer_name) | 
+            Q(semester__lecturer_2__icontains=lecturer_name) | 
+            Q(semester__lecturer_3__icontains=lecturer_name)
         )
 
+    # Debugging: Print the query that is being executed
+
+    # Get the 'day' parameter from the GET request and filter the schedule accordingly
     day = request.GET.get('day', '').strip()
     if day:
-        schedule_data = schedule_data.filter(schedule_time__icontains=day)
+        schedule_data = schedule_data.filter(lecturer_day__icontains=day)
 
-    return render(request, 'viewschedule20252.html', {
+    # Render the schedule data in the template
+    return render(request, 'viewschedule20251.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
         'day': day
     })
 
-def viewschedule20253(request):
-    lecturer_name = request.session.get('user_name', '') 
 
-    schedule_data = Viewschedule20253.objects.all()
-
-    if lecturer_name:
-        schedule_data = schedule_data.filter(
-            Q(lecturer1__icontains=lecturer_name) |
-            Q(lecturer2__icontains=lecturer_name) |
-            Q(lecturer3__icontains=lecturer_name)
-        )
-
-    day = request.GET.get('day', '').strip()
-    if day:
-        schedule_data = schedule_data.filter(schedule_time__icontains=day)
-
-    return render(request, 'viewschedule20253.html', {
-        'schedule_data': schedule_data,
-        'lecturer_name': lecturer_name,
-        'day': day
-    })
 
 @csrf_exempt
 @require_http_methods(["POST"])

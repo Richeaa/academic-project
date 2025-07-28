@@ -5,6 +5,7 @@ class profile(models.Model):
     profile_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=250, unique=True)
     password = models.CharField(max_length=250)
+    name = models.CharField(max_length=250)
 
 
     def __str__(self):

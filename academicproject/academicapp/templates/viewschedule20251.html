@@ -49,29 +49,29 @@
             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Subject</th>
             <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Class</th>
             <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Schedule Time</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Room</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          {% for viewschedule20251 in schedule_data %}
+          {% for schedule in schedule_data %}
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4 text-sm text-gray-900">{{ forloop.counter }}</td>
             <td class="px-6 py-4 text-sm text-gray-600">
-              {% if viewschedule20251.lecturer2 and viewschedule20251.lecturer3 %}
-                {{ viewschedule20251.lecturer1 }} / {{ viewschedule20251.lecturer2 }} / {{ viewschedule20251.lecturer3 }}
-              {% elif viewschedule20251.lecturer2 %}
-                {{ viewschedule20251.lecturer1 }} / {{ viewschedule20251.lecturer2 }}
+              {% if schedule.semester.lecturer_2 and schedule.semester.lecturer_3 %}
+                {{ schedule.semester.lecturer_1 }} <br> {{ schedule.semester.lecturer_2 }} <br> {{ schedule.semester.lecturer_3 }}
+              {% elif schedule.semester.lecturer_2 %}
+                {{ schedule.semester.lecturer_1 }} <br> {{ schedule.semester.lecturer_2 }}
               {% else %}
-                {{ viewschedule20251.lecturer1 }}
+                {{ schedule.semester.lecturer_1 }}
               {% endif %}
             </td>
-            <td class="px-6 py-4 text-sm text-gray-600">{{ viewschedule20251.subject }}</td>
-            <td class="px-6 py-4 text-center text-sm text-gray-600">{{ viewschedule20251.class_name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ schedule.semester.subject }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600">{{ schedule.semester.major_class }}</td>
             <td class="px-6 py-4 text-center text-sm text-gray-600">
-              {% if viewschedule20251.schedule_time != '(TBA)' and viewschedule20251.room != '(TBA)' %}
-                <p class=font-semibold>Time:</p>{{ viewschedule20251.schedule_time }}<br><p class=font-semibold>Room:</p> {{ viewschedule20251.room }}
-              {% else %}
-                (Tba)
-              {% endif %}
+              {{ schedule.lecturer_day }}, {{ schedule.start_time }} - {{ schedule.end_time }}
+            </td>
+            <td class="px-6 py-4 text-center text-sm text-gray-600">
+              {{ schedule.room }}
             </td>
           </tr>
           {% endfor %}
@@ -85,14 +85,6 @@
     <span>Page 1 of 1</span>
   </div>
 
-  <div class="flex justify-end p-4">
-    <button onclick="window.print()" class="flex items-center gap-1 bg-red-400 text-white px-3 py-2 rounded hover:bg-red-400 transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v7H6v-7zm0 0V9h12v5" />
-      </svg>
-      <span class="text-sm">Print</span>
-    </button>
-  </div>
 
 </div>
 {% endblock %}

@@ -22,6 +22,18 @@ document.addEventListener('DOMContentLoaded', function () {
     id: 'dashboardhsp-link',
     match: (p) => p.startsWith('/dashboard/'),
     },
+    {
+      id: 'dashboard_lecturer_view-link',
+      match: (p) => p.startsWith('/dashboard/lecturerview/'), 
+    },
+    {
+      id: 'viewschedule20251-link',
+      match: (p) => p.startsWith('/viewschedule/20251/'), 
+    },
+    {
+      id: 'viewschedule20252-link',
+      match: (p) => p.startsWith('/viewschedule/20252/'), 
+    },
     
   ];
 

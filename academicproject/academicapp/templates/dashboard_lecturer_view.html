@@ -32,7 +32,7 @@
             </div>
 
             <div class="md:w-1/3 w-2/5 flex md:space-x-4 p-2 md:mt-0 mt-1 justify-end">
-            <input type="text" placeholder="Search..." class="hidden lg:block w-80 pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+            
             
             <div class="button hover:bg-blue-50/10 px-4 py-2 rounded-lg ripple group">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-blue-900">
@@ -120,7 +120,7 @@
                 </a>
                 <br>
 
-                <a href="{% url 'viewschedule20253' %}" id="viewschedule20253-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                <a href="#" id="viewschedule20253-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
@@ -206,7 +206,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Total Subjects</p>
-                                    <p class="text-3xl font-bold text-gray-900">{{ total_courses }}</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ total_subjects }}</p>
                                     <p class="text-sm text-blue-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -266,7 +266,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Current Semester</p>
-                                    <p class="text-3xl font-bold text-gray-900">20243</p>
+                                    <p class="text-3xl font-bold text-gray-900">20251</p>
                                     <p class="text-sm text-blue-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -295,7 +295,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
     <!-- Room Distribution Bar Chart -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
-        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Room Distribution</p>
+        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Number of Schedules by Room</p>
         <div class="flex items-center justify-center space-x-4 mb-4">
             <!-- Buttons for selecting schedule -->
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20251&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
@@ -303,14 +303,26 @@
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20253&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
         </div>
 
-        <div class="h-80">
-            <canvas id="roomChart" class="w-full h-full"></canvas>
-        </div>
+        {% if no_room_distribution_warning %}
+            <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                    <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                </svg>
+                <p class="text-lg">{{ no_room_distribution_warning }}</p>
+            </div>
+        {% else %}
+            <div class="h-80">
+                <canvas id="roomChart" class="w-full h-full"></canvas>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Classes per Day (Doughnut Chart) -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
-        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Classes per Day</p>
+        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Schedules per Day</p>
         <div class="flex items-center justify-center space-x-4 mb-4">
             <!-- Buttons for selecting schedule -->
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20251&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
@@ -320,14 +332,14 @@
 
         <!-- Warning for no classes -->
         {% if no_classes_warning %}
-            <div class="bg-yellow-100 text-yellow-800 p-4 rounded-md mb-4 flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="24" height="24">
+            <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
                     <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
                     <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
                     <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
                 </svg>
-                <p>No classes</p>
+                <p class="text-lg">No schedule in this semester</p>
             </div>
         {% else %}
             <!-- Display the chart if there are classes -->
@@ -348,6 +360,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js" integrity="sha512-JPcRR8yFa8mmCsfrw4TNte1ZvF1e3+1SdGMslZvmrzDYxS69J7J49vkFL8u6u8PlPJK+H3voElBtUCzaXj+6ig==" crossorigin="anonymous" referrerpolicy="no-referrer">
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
     <script>
 
             const ctx1 = document.getElementById('roomChart').getContext('2d');
@@ -366,11 +381,11 @@
                         'rgba(206, 28, 255, 1)'
                     ],
                     hoverBackgroundColor: [
-                        '#f76363',
-                        '#ffd352',
-                        '#3ec26f',
-                        '#3e6df7',
-                        '#d952ff'
+                        'rgba(252, 35, 35, 0.5)',
+                        'rgba(255, 191, 0, 0.5)',
+                        'rgba(35, 176, 87, 0.5)',
+                        'rgba(35, 90, 252, 0.5)',
+                        'rgba(206, 28, 255, 0.5)'
                     ],
                     datalabels: {
                 display: true,  // Enable data labels
@@ -379,8 +394,8 @@
                     weight: 'bold',  // Make the label bold
                     size: 14,  // Font size of the label
                 },
-                formatter: function(value, ctx) {
-                    return value;  // Display the value inside the chart
+                formatter: function(data, ctx1) {
+                    return data;  // Display the value inside the chart
                 },
                 anchor: 'center',  // Position the label at the center of each slice
                 align: 'center',   // Align the label to the center
@@ -390,6 +405,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         display: false,
@@ -415,7 +431,7 @@
             label: function(tooltipItem) {
                 const label = tooltipItem.label; 
                 const value = tooltipItem.raw; 
-                return `${value} Classes`; 
+                return `${value} Schedules`;  // Show value with label in tooltip
             },
             }
         }
@@ -443,7 +459,7 @@ new Chart(ctx2, {
             borderColor: 'white',
             hoverBorderColor: 'white',
             borderWidth: 2,
-            hoverOffset: 50,
+            hoverOffset: 20,
             backgroundColor: [
                 'rgba(252, 35, 35, 1)',   // Red
                 'rgba(255, 191, 0, 1)',   // Yellow
@@ -452,11 +468,11 @@ new Chart(ctx2, {
                 'rgba(206, 28, 255, 1)'   // Purple
             ],
             hoverBackgroundColor: [
-                '#f76363',
-                '#ffd352',
-                '#3ec26f',
-                '#3e6df7',
-                '#d952ff'
+                'rgba(252, 35, 35, 0.7)',
+                'rgba(255, 191, 0, 0.7)',
+                'rgba(35, 176, 87, 0.7)',
+                'rgba(35, 90, 252, 0.7)',
+                'rgba(206, 28, 255, 0.7)'
             ],
             padding: 20,
             datalabels: {
@@ -464,10 +480,14 @@ new Chart(ctx2, {
                 color: '#ffffff',  // Set label color to white
                 font: {
                     weight: 'bold',  // Make label text bold
-                    size: 14,  // Adjust font size if necessary
+                    size: 20,  // Adjust font size if necessary
                 },
-                formatter: function(value) {
-                    return value;  // Show the actual class count inside each slice
+                formatter: function(data, ctx2) {
+                    if (data > 0) {
+                        return data;  // Display raw value (or percentage)
+                    } else {
+                        return '';  // No label for values less than or equal to 0
+                    }
                 },
                 anchor: 'center',  // Position label at the center of each slice
                 align: 'center',   // Align label to the center
@@ -552,12 +572,13 @@ new Chart(ctx2, {
                 callbacks: {
                     label: function(tooltipItem) {
                         const value = tooltipItem.raw;
-                        return `${value} Classes`;  // Show value with label in tooltip
+                        return `${value} Schedules`;  // Show value with label in tooltip
                     },
                 }
             }
         }
     },
+    plugins: [ChartDataLabels],
 });
 
     </script>
