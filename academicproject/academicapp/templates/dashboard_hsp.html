@@ -299,25 +299,16 @@
                 let charts = [];
 
                 function getTop(data, key, labelKey='major') {
-                    const counts = {};
-                    data.forEach(item => {
-                        const label = item[labelKey];
-                        if (!label) return;
-
-                        if (key === 'credit') {
-                            const val = parseFloat(item[key]);
-                            if (!isNaN(val)) {
-                                counts[label] = (counts[label] || 0) + val;
-                            }
-                        } else {
-                            counts[label] = (counts[label] || 0) + 1;
-                        }
-                    });
-                    return Object.entries(counts)
-                        .sort((a,b) => b[1]-a[1])
-                        .slice(0, 10);
-                }
-
+    const counts = {};
+    data.forEach(item => {
+        const label = item[labelKey];
+        if (!label || label === '(Tba)' || label.trim() === '') return;
+        counts[label] = (counts[label] || 0) + (key === 'credit' ? parseFloat(item[key]) || 0 : 1);
+    });
+    return Object.entries(counts)
+        .sort((a,b) => b[1]-a[1])
+        .slice(0, 10);
+}
                 function renderCharts(data) {
                     const topMajors = getTop(data, 'subject', 'major');
                     const topCurriculum = getTop(data, 'subject', 'curriculum');

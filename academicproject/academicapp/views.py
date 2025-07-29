@@ -1,7 +1,8 @@
+from django.db import models
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import redirect, get_object_or_404
-from .models import profile, semester20251, semester20252, semester20243, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer, LecturerPreference
+from .models import profile, semester20251, semester20252, semester20253, semester20243, assignlecturer20251, assignlecturer20252, assignlecturer20253, Lecturer, LecturerPreference
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -376,19 +377,15 @@ def logout(request):
 semester_title = {
     '20251': semester20251,
     '20252': semester20252,
+    '20253': semester20253,
 }
 
 assign_model_title = {
     '20251': assignlecturer20251,
     '20252': assignlecturer20252,
+    '20253': assignlecturer20253,
 }
 
-semester_academic_model = {
-    '20251': formsemester20251,
-    '20252': formsemester20252,
-    '20253': formsemester20253,
-    '20261': formsemester20261,
-}
 
 def studyprogram(request, semester_url='20251'):
     semester_model = semester_title.get(semester_url)
@@ -692,7 +689,7 @@ def deleteLecturer(request, lecturer_id):
     return render(request, 'deleteLecturer.html', {'lecturer': lecturer})
 
 def formstudyprogram(request, semester_url='20251'): 
-    semester_model = semester_academic_model.get(semester_url)
+    semester_model = semester_title.get(semester_url)
     if not semester_model:
         return HttpResponse("Semester not found", status=404)
 
@@ -794,47 +791,43 @@ def viewschedule20252(request):
 @require_http_methods(["POST"])
 def add_academic_module(request, semester_url):
     if request.method == 'POST':
-        semester_model = semester_academic_model.get(semester_url)
+        semester_model = semester_title.get(semester_url)
         if not semester_model:
             return JsonResponse({'success': False, 'error': 'Semester tidak ditemukan'}, status=404)
 
-       
-        program_session = request.POST.get('program_session')
-        major = request.POST.get('major')
-        curriculum = request.POST.get('curriculum')
-        major_class = request.POST.get('major_class')
-        subject = request.POST.get('subject')
-        credit = request.POST.get('credit')
-        lecturer_1 = request.POST.get('lecturer_1')
-        lecturer_2 = request.POST.get('lecturer_2')
-        lecturer_3 = request.POST.get('lecturer_3')
-
+    
         try:
+            # Get the highest current ID and increment it
+            max_id = semester_model.objects.all().aggregate(models.Max('semester_id'))['semester_id__max'] or 0
+            new_id = max_id + 1
+            
             if semester_url == '20253':
               
-                for _ in range(2):
+                for i in range(2):
                     semester_model.objects.create(
-                        program_session=program_session,
-                        major=major,
-                        curriculum=curriculum,
-                        major_class=major_class,
-                        subject=subject,
-                        credit=credit,
-                        lecturer_1=lecturer_1,
-                        lecturer_2=lecturer_2,
-                        lecturer_3=lecturer_3,
+                        semester_id=new_id + i,
+                        program_session = request.POST.get('program_session'),
+                        major = request.POST.get('major'),
+                        curriculum = request.POST.get('curriculum'),
+                        major_class = request.POST.get('major_class'),
+                        subject = request.POST.get('subject'),
+                        credit = request.POST.get('credit'),
+                        lecturer_1 = request.POST.get('lecturer_1'),
+                        lecturer_2 = request.POST.get('lecturer_2'),
+                        lecturer_3 = request.POST.get('lecturer_3'),
                     )
             else:
                 semester_model.objects.create(
-                    program_session=program_session,
-                    major=major,
-                    curriculum=curriculum,
-                    major_class=major_class,
-                    subject=subject,
-                    credit=credit,
-                    lecturer_1=lecturer_1,
-                    lecturer_2=lecturer_2,
-                    lecturer_3=lecturer_3,
+                    semester_id=new_id,
+                    program_session = request.POST.get('program_session'),
+                    major = request.POST.get('major'),
+                    curriculum = request.POST.get('curriculum'),
+                    major_class = request.POST.get('major_class'),
+                    subject = request.POST.get('subject'),
+                    credit = request.POST.get('credit'),
+                    lecturer_1 = request.POST.get('lecturer_1'),
+                    lecturer_2 = request.POST.get('lecturer_2'),
+                    lecturer_3 = request.POST.get('lecturer_3'),
                 )
 
             return JsonResponse({'success': True, 'message': 'Data berhasil ditambahkan'})
@@ -848,7 +841,7 @@ def add_academic_module(request, semester_url):
 @require_http_methods(["POST"])
 def edit_academic_module(request, semester_url):
     try:
-        semester_model = semester_academic_model.get(semester_url)
+        semester_model = semester_title.get(semester_url)
         if not semester_model:
             return JsonResponse({'success': False, 'error': 'Semester not found'}, status=404)
 
@@ -988,7 +981,7 @@ def edit_academic_module(request, semester_url):
 @csrf_exempt
 def delete_academic_module(request, semester_url, semester_id): 
     if request.method == 'POST':
-        model = semester_academic_model.get(semester_url)
+        model = semester_title.get(semester_url)
         if not model:
             return JsonResponse({'success': False, 'error': 'Invalid semester.'})
 
