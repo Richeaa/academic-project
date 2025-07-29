@@ -142,7 +142,7 @@
                                         <button class="remove-schedule" 
                                                 data-assign-id="{{ item.assign_id }}" 
                                                 data-semester-id="{{ item.semester.semester_id }}"
-                                                data-semester-url="20252">
+                                                data-semester-url="20253">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500 hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -318,7 +318,7 @@ function downloadAsPDF(element, roomName) {
     const pdf = new jsPDF('l', 'mm', 'a4');
     
     pdf.setFontSize(14);
-    pdf.text(`Schedule Report 20251 by : ${roomName}`, 148, 15, { align: 'center' });
+    pdf.text(`Schedule Report 20253 by : ${roomName}`, 148, 15, { align: 'center' });
     
     const timeSlots = [
         '07:00-07:50', '07:50-08:40', '08:40-09:30', '09:30-10:20', '10:20-11:10', 

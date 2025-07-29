@@ -672,7 +672,7 @@ def schedule20253(request):
         'conflict_details': conflict_details,
         'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
     }
-    return render(request, 'schedule20251.html', context)
+    return render(request, 'schedule20253.html', context)
 
 def lecturer(request):
     lecturer_name = request.GET.get('lecturer_name', '')
@@ -825,7 +825,6 @@ def add_academic_module(request, semester_url):
 
     
         try:
-            # Get the highest current ID and increment it
             max_id = semester_model.objects.all().aggregate(models.Max('semester_id'))['semester_id__max'] or 0
             new_id = max_id + 1
             

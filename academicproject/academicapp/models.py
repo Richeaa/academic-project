@@ -56,10 +56,10 @@ class semester20252(models.Model):
         
 class semester20253(models.Model):
     semester_id = models.AutoField(primary_key=True)
-    program_session = models.CharField(max_length=20)
-    major = models.CharField(max_length=100)
-    curriculum = models.CharField(max_length=100)
-    major_class = models.CharField(max_length=100)  
+    program_session = models.CharField(max_length=10)
+    major = models.CharField(max_length=50)
+    curriculum = models.CharField(max_length=50)
+    major_class = models.CharField(max_length=100)
     subject = models.CharField(max_length=100)
     credit = models.DecimalField(max_digits=4, decimal_places=2)
     lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
@@ -70,7 +70,7 @@ class semester20253(models.Model):
         return f"{self.program_session} - {self.subject}"
 
     class Meta:
-        db_table = 'form20253'
+        db_table = 'semester_20253'
         managed = False 
 
 class semester20243(models.Model):
