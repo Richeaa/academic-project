@@ -8,6 +8,7 @@ from django.contrib import messages
 from collections import defaultdict
 from django.http import JsonResponse
 import json
+from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
@@ -797,7 +798,7 @@ def add_academic_module(request, semester_url):
         if not semester_model:
             return JsonResponse({'success': False, 'error': 'Semester tidak ditemukan'}, status=404)
 
-        # Ambil data dari form
+       
         program_session = request.POST.get('program_session')
         major = request.POST.get('major')
         curriculum = request.POST.get('curriculum')
@@ -810,7 +811,7 @@ def add_academic_module(request, semester_url):
 
         try:
             if semester_url == '20253':
-                # Buat dua entri
+              
                 for _ in range(2):
                     semester_model.objects.create(
                         program_session=program_session,
@@ -851,33 +852,136 @@ def edit_academic_module(request, semester_url):
         if not semester_model:
             return JsonResponse({'success': False, 'error': 'Semester not found'}, status=404)
 
+       
         record_id = request.POST.get('record_id')
-        if not record_id:
-            return JsonResponse({'success': False, 'error': 'Record ID is required'}, status=400)
+        program_session = request.POST.get('program_session')
+        major = request.POST.get('major')
+        curriculum = request.POST.get('curriculum')
+        major_class = request.POST.get('major_class')
+        subject = request.POST.get('subject')
+        credit = request.POST.get('credit')
+        lecturer_1 = request.POST.get('lecturer_1')
+        lecturer_2 = request.POST.get('lecturer_2')
+        lecturer_3 = request.POST.get('lecturer_3')
 
-        try:
-            record = semester_model.objects.get(semester_id=record_id)
-        except semester_model.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Record not found'}, status=404)
+        if semester_url == '20253':
+            
+            if not record_id:
+                return JsonResponse({'success': False, 'error': 'Record ID is required'}, status=400)
+                
+            try:
+             
+                clicked_record = semester_model.objects.get(semester_id=record_id)
+                print(f"Clicked record ID: {record_id}")
+                print(f"Clicked record data: {clicked_record}")
+            except semester_model.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Clicked record not found'}, status=404)
+       
+            filter_conditions = []
+            
+         
+            if clicked_record.program_session:
+                filter_conditions.append(Q(program_session=clicked_record.program_session))
+            else:
+                filter_conditions.append(Q(program_session__isnull=True) | Q(program_session=''))
+            
+         
+            if clicked_record.major:
+                filter_conditions.append(Q(major=clicked_record.major))
+            else:
+                filter_conditions.append(Q(major__isnull=True) | Q(major=''))
+            
+            
+            if clicked_record.curriculum:
+                filter_conditions.append(Q(curriculum=clicked_record.curriculum))
+            else:
+                filter_conditions.append(Q(curriculum__isnull=True) | Q(curriculum=''))
+            
+          
+            if clicked_record.major_class:
+                filter_conditions.append(Q(major_class=clicked_record.major_class))
+            else:
+                filter_conditions.append(Q(major_class__isnull=True) | Q(major_class=''))
+            
+            
+            if clicked_record.subject:
+                filter_conditions.append(Q(subject=clicked_record.subject))
+            else:
+                filter_conditions.append(Q(subject__isnull=True) | Q(subject=''))
+            
+            
+            if clicked_record.credit:
+                filter_conditions.append(Q(credit=clicked_record.credit))
+            else:
+                filter_conditions.append(Q(credit__isnull=True) | Q(credit=''))
+            
+            combined_filter = Q()
+            for condition in filter_conditions:
+                combined_filter &= condition
+            
+            records = semester_model.objects.filter(combined_filter)
+            
+            print(f"Filter conditions: {filter_conditions}")
+            print(f"Found {records.count()} matching records")
+            print(f"Record IDs: {[r.semester_id for r in records]}")
+            
+            if not records.exists():
+                return JsonResponse({
+                    'success': False, 
+                    'error': 'No matching records found',
+                    'details': f'Looking for records matching clicked record {record_id}'
+                }, status=404)
 
-        record.program_session = request.POST.get('program_session', record.program_session)
-        record.major = request.POST.get('major', record.major)
-        record.curriculum = request.POST.get('curriculum', record.curriculum)
-        record.major_class = request.POST.get('major_class', record.major_class)
-        record.subject = request.POST.get('subject', record.subject)
-        record.credit = request.POST.get('credit', record.credit)
-        record.lecturer_1 = request.POST.get('lecturer_1', record.lecturer_1)
-        record.lecturer_2 = request.POST.get('lecturer_2', record.lecturer_2)
-        record.lecturer_3 = request.POST.get('lecturer_3', record.lecturer_3)
+           
+            updated_count = 0
+            updated_ids = []
+            for record in records:
+                record.program_session = program_session
+                record.major = major
+                record.curriculum = curriculum
+                record.major_class = major_class
+                record.subject = subject
+                record.credit = credit
+                record.lecturer_1 = lecturer_1
+                record.lecturer_2 = lecturer_2
+                record.lecturer_3 = lecturer_3
+                record.save()
+                updated_count += 1
+                updated_ids.append(record.semester_id)
+                
+            print(f"Updated record IDs: {updated_ids}")
+                
+            return JsonResponse({
+                'success': True, 
+                'message': f'Successfully updated {updated_count} academic module record(s)',
+                'updated_ids': updated_ids
+            })
+            
+        else:
+           
+            if not record_id:
+                return JsonResponse({'success': False, 'error': 'Record ID is required'}, status=400)
 
-        record.save()
-        
-        return JsonResponse({
-            'success': True, 
-            'message': 'Academic module updated successfully'
-        })
+            try:
+                record = semester_model.objects.get(semester_id=record_id)
+            except semester_model.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Record not found'}, status=404)
+
+            record.program_session = program_session
+            record.major = major
+            record.curriculum = curriculum
+            record.major_class = major_class
+            record.subject = subject
+            record.credit = credit
+            record.lecturer_1 = lecturer_1
+            record.lecturer_2 = lecturer_2
+            record.lecturer_3 = lecturer_3
+            record.save()
+            
+            return JsonResponse({'success': True, 'message': 'Academic module updated successfully'})
 
     except Exception as e:
+        print(f"Exception in edit_academic_module: {str(e)}")
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
@@ -889,9 +993,24 @@ def delete_academic_module(request, semester_url, semester_id):
             return JsonResponse({'success': False, 'error': 'Invalid semester.'})
 
         try:
-            obj = model.objects.get(pk=semester_id)
-            obj.delete()
-            return JsonResponse({'success': True, 'message': 'Record deleted successfully.'})
+            if semester_url == '20253':
+              
+                reference = model.objects.get(pk=semester_id)
+
+               
+                deleted, _ = model.objects.filter(
+                    program_session=reference.program_session,
+                    major=reference.major,
+                    curriculum=reference.curriculum,
+                    major_class=reference.major_class,
+                    subject=reference.subject,
+                    credit=reference.credit
+                ).delete()
+                return JsonResponse({'success': True, 'message': f'{deleted} record(s) deleted successfully.'})
+            else:
+                obj = model.objects.get(pk=semester_id)
+                obj.delete()
+                return JsonResponse({'success': True, 'message': 'Record deleted successfully.'})
         except model.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Record not found.'})
     else:

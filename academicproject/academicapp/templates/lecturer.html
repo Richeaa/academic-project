@@ -4,136 +4,158 @@
 {% block title %}Lecturer{% endblock %}
 
 {% block content %}
+<style>
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    .printable-area, .printable-area * {
+      visibility: visible;
+    }
+
+    .printable-area {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+
+    .no-print {
+      display: none !important;
+    }
+
+    table {
+      page-break-inside: auto;
+    }
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+  }
+</style>
+
 <div id="main-content" class="w-full p-12 select-none">
-
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-800">Lecturer Information</h1>
-      <a href="{% url 'addLecturer' %}" class="bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
-        <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
-      </a>
-    </div>
-
-    <form method="GET" class="flex flex-wrap items-center gap-4 mb-8">
-
- 
-  <div class="relative w-60">
-    <i data-lucide="search"
-       class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
-    <input type="text" name="lecturer_name" placeholder="Enter lecturer name..."
-           value="{{ request.GET.lecturer_name }}"
-           class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+  <div class="flex justify-between items-center mb-8 no-print">
+    <h1 class="text-3xl font-bold text-gray-800">Lecturer Information</h1>
+    <a href="{% url 'addLecturer' %}" class="bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
+      <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
+    </a>
   </div>
 
+  <form method="GET" class="flex flex-wrap items-center gap-4 mb-8 no-print">
+    <div class="relative w-60">
+      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
+      <input type="text" name="lecturer_name" placeholder="Enter lecturer name..."
+             value="{{ request.GET.lecturer_name }}"
+             class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    </div>
 
-  <div class="relative w-60">
-    <i data-lucide="search"
-       class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
-    <select name="job"
-            class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
-      <option value="" disabled selected hidden>Enter lecturer job...</option>
-      {% for job_title in job_choices %}
-        <option value="{{ job_title }}" {% if request.GET.job == job_title %}selected{% endif %}>
-          {{ job_title }}
-        </option>
-      {% endfor %}
-    </select>
+    <div class="relative w-60">
+      <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none"></i>
+      <select name="job"
+              class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <option value="" disabled selected hidden>Enter lecturer job...</option>
+        {% for job_title in job_choices %}
+          <option value="{{ job_title }}" {% if request.GET.job == job_title %}selected{% endif %}>
+            {{ job_title }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit"
+            class="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg transition-colors">
+      <img src="{% static 'svg/search.svg' %}" alt="Search Icon" class="w-5 h-5">
+    </button>
+  </form>
+
+  <!-- Printable Table Area -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden printable-area">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-200 border-b border-gray-300 sticky top-0 z-10">
+          <tr>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[150px]">Lecturer Name</th>
+            <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Lecturer Type</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Job</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[140px]">Current Working Days</th>
+            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px] no-print">Action</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div class="overflow-x-auto overflow-y-auto max-h-96 print:overflow-visible print:max-h-full">
+      <table class="w-full">
+        <tbody class="divide-y divide-gray-200">
+          {% for lecturer in lecturers %}
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-900 min-w-[150px]">{{ lecturer.lecturer_name }}</td>
+            <td class="px-6 py-4 text-sm text-gray-600 min-w-[120px]">{{ lecturer.lecturer_type }}</td>
+            <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[100px]">{{ lecturer.job|default:"-" }}</td>
+            <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[140px]">{{ lecturer.current_working_day|default:"-" }}</td>
+            <td class="px-6 py-4 text-center min-w-[100px] no-print">
+              <div class="flex justify-center items-center gap-2">
+                <a href="{% url 'editLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors">
+                  <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
+                </a>
+                <a href="{% url 'deleteLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-blue-200 transition-colors">
+                  <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-400">No lecturers found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <button type="submit"
-          class="w-12 h-12 flex items-center justify-center bg-blue-500 text-white rounded-lg transition-colors">
-    <img src="{% static 'svg/search.svg' %}" alt="Search Icon" class="w-5 h-5">
-  </button>
-</form>
+  <div class="flex justify-end p-4 no-print">
+    <button onclick="window.print()" class="flex items-center gap-1 bg-red-400 text-white px-3 py-2 rounded hover:bg-red-400 transition">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v7H6v-7zm0 0V9h12v5" />
+      </svg>
+      <span class="text-sm">Print</span>
+    </button>
+  </div>
 
-
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-200 border-b border-gray-300 sticky top-0 z-10">
-            <tr>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[150px]">Lecturer Name</th>
-              <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Lecturer Type</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Job</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[140px]">Current Working Days</th>
-              <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Action</th>
-            </tr>
-          </thead>
-        </table>
+  <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 no-print">
+    <div class="flex items-center justify-between">
+      <div class="text-sm text-gray-700">
+        Page {{ lecturers.number }} of {{ lecturers.paginator.num_pages }} (Total {{ lecturers.paginator.count }} data)
       </div>
-      
-     
-      <div class="overflow-x-auto overflow-y-auto max-h-96">
-        <table class="w-full">
-          <tbody class="divide-y divide-gray-200">
-            {% for lecturer in lecturers %}
-            <tr class="hover:bg-gray-50">
-              <td class="px-6 py-4 text-sm text-gray-900 min-w-[150px]">{{ lecturer.lecturer_name }}</td>
-              <td class="px-6 py-4 text-sm text-gray-600 min-w-[120px]">{{ lecturer.lecturer_type }}</td>
-              <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[100px]">{{ lecturer.job|default:"-" }}</td>
-              <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[140px]">{{ lecturer.current_working_day|default:"-" }}</td>
-              <td class="px-6 py-4 text-center min-w-[100px]">
-                <div class="flex justify-center items-center gap-2">
-                  <a href="{% url 'editLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors">
-                    <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
-                  </a>
-                  <a href="{% url 'deleteLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-blue-200 transition-colors">
-                    <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
-                  </a>
-                </div>
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-400">No lecturers found.</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-<div class="flex justify-end p-4">
-  <button onclick="window.print()" class="flex items-center gap-1 bg-red-400 text-white px-3 py-2 rounded hover:bg-red-400 transition">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V4h12v5M6 14h12v7H6v-7zm0 0V9h12v5" />
-    </svg>
-    <span class="text-sm">Print</span>
-  </button>
-</div>
-
-<div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
-  <div class="flex items-center justify-between">
-    <div class="text-sm text-gray-700">
-      Page {{ lecturers.number }} of {{ lecturers.paginator.num_pages }} (Total {{ lecturers.paginator.count }} data)
-    </div>
-
-    <div class="flex space-x-1">
-      {% if page_range.0 > 1 %}
-        <a href="?page={{ page_range.0|add:"-1" }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Previous</a>
-      {% else %}
-        <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Previous</span>
-      {% endif %}
-
-      {% for num in page_range %}
-        {% if num == lecturers.number %}
-          <span class="px-3 py-1 rounded bg-blue-500 text-white font-semibold">{{ num }}</span>
+      <div class="flex space-x-1">
+        {% if page_range.0 > 1 %}
+          <a href="?page={{ page_range.0|add:"-1" }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Previous</a>
         {% else %}
-          <a href="?page={{ num }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">{{ num }}</a>
+          <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Previous</span>
         {% endif %}
-      {% endfor %}
 
-      {% if page_range|last < lecturers.paginator.num_pages %}
-        <a href="?page={{ page_range|last|add:"1" }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Next</a>
-      {% else %}
-        <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Next</span>
-      {% endif %}
+        {% for num in page_range %}
+          {% if num == lecturers.number %}
+            <span class="px-3 py-1 rounded bg-blue-500 text-white font-semibold">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_range|last < lecturers.paginator.num_pages %}
+          <a href="?page={{ page_range|last|add:"1" }}" class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Next</a>
+        {% else %}
+          <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Next</span>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
-
-  </div>
-
 </div>
 {% endblock %}
 
@@ -143,5 +165,3 @@
   lucide.createIcons();
 </script>
 {% endblock %}
-
-
