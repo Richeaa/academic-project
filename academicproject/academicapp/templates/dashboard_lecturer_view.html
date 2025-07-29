@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Dashboard{% endblock %}</title>
+    <title>{% block title %}Dashboard Lecturer{% endblock %}</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="icon" href="{% static 'svg/idea.png' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -311,7 +311,7 @@
                     <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
                     <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
                 </svg>
-                <p class="text-lg">{{ no_room_distribution_warning }}</p>
+                <p class="text-lg">No schedule in this semester</p>
             </div>
         {% else %}
             <div class="h-80">
@@ -364,14 +364,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <script>
-
             const ctx1 = document.getElementById('roomChart').getContext('2d');
-        const roomChart = new Chart(ctx1, {
+            new Chart(ctx1, {
             type: 'bar',
             data: {
                 labels: {{ room_labels|safe }},
                 datasets: [{
-                    label: 'Number of Classes',
                     data: {{ room_values|safe }},
                     backgroundColor: [
                         'rgba(252, 35, 35, 1)',
@@ -444,10 +442,10 @@
                 }
             }
         });
+</script>
 
 
-
-
+<script>
 const ctx2 = document.getElementById('myDonutChart');
 
 new Chart(ctx2, {
@@ -468,11 +466,11 @@ new Chart(ctx2, {
                 'rgba(206, 28, 255, 1)'   // Purple
             ],
             hoverBackgroundColor: [
-                'rgba(252, 35, 35, 0.7)',
-                'rgba(255, 191, 0, 0.7)',
-                'rgba(35, 176, 87, 0.7)',
-                'rgba(35, 90, 252, 0.7)',
-                'rgba(206, 28, 255, 0.7)'
+                'rgba(252, 35, 35, 0.6)',
+                'rgba(255, 191, 0, 0.6)',
+                'rgba(35, 176, 87, 0.6)',
+                'rgba(35, 90, 252, 0.6)',
+                'rgba(206, 28, 255, 0.6)'
             ],
             padding: 20,
             datalabels: {

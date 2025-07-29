@@ -126,14 +126,11 @@ def dashboard_lecturer_view(request):
             except AttributeError:
                 continue
 
-    # Sort room_counts in descending order and get the top 5 rooms
-    sorted_rooms = sorted(room_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-
     # Get the top 5 room labels and values
-    room_labels = [room[0] for room in sorted_rooms]  # Room names (e.g., B401, B402, etc.)
-    room_values = [room[1] for room in sorted_rooms]
+    room_labels = [room[0] for room in room_counts.items()]  # Room names (e.g., B401, B402, etc.)
+    room_values = [room[1] for room in room_counts.items()]
 
-    room_has_data = bool(room_labels and room_values)
+    no_room_distribution_warning = not room_values  # Check if there are no rooms
   
 
     # Doughnut chart (class distribution by day)
@@ -171,6 +168,7 @@ def dashboard_lecturer_view(request):
         'labels': labels,
         'schedule_choice_doughnut': schedule_choice_doughnut,
         'no_classes_warning': no_classes_warning,
+        'no_room_distribution_warning': no_room_distribution_warning,
         'room_labels': room_labels,
         'room_values': room_values,
         'schedule_choice_bar': schedule_choice_bar,
