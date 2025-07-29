@@ -146,7 +146,7 @@
                                     <p class="text-sm font-medium text-gray-600 mb-1">Total Lecturers</p>
                                     <p class="text-3xl font-bold text-gray-900">{{ lecturer_count }}</p>
                                     <span class="text-sm text-green-600 mt-2 flex items-center">
-                                        {{ active_lecturer_count }} active
+                                        85 active
                                     </span>
                                 </div>
                                 <div class="p-3 bg-amber-100 rounded-full">
@@ -158,7 +158,7 @@
                         </div>
                         <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3">
                             <div class="flex items-center justify-between text-white">
-                                <span class="text-sm font-medium">100% active rate</span>
+                                <span class="text-sm font-medium">85% active rate</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                                 </svg>
@@ -236,7 +236,7 @@
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        Ongoing since June
+                                        Ongoing since August
                                     </p>
                                 </div>
                                 <div class="p-3 bg-blue-100 rounded-full">
@@ -299,16 +299,17 @@
                 let charts = [];
 
                 function getTop(data, key, labelKey='major') {
-    const counts = {};
-    data.forEach(item => {
-        const label = item[labelKey];
-        if (!label || label === '(Tba)' || label.trim() === '') return;
-        counts[label] = (counts[label] || 0) + (key === 'credit' ? parseFloat(item[key]) || 0 : 1);
-    });
-    return Object.entries(counts)
-        .sort((a,b) => b[1]-a[1])
-        .slice(0, 10);
-}
+                    const counts = {};
+                    data.forEach(item => {
+                        const label = item[labelKey];
+                        if (!label || label === '(Tba)' || label.trim() === '') return;
+                        counts[label] = (counts[label] || 0) + (key === 'credit' ? parseFloat(item[key]) || 0 : 1);
+                    });
+                    return Object.entries(counts)
+                        .sort((a,b) => b[1]-a[1])
+                        .slice(0, 10);
+                }
+
                 function renderCharts(data) {
                     const topMajors = getTop(data, 'subject', 'major');
                     const topCurriculum = getTop(data, 'subject', 'curriculum');
