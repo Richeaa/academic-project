@@ -4,22 +4,6 @@
 {% block title %}View Schedule 20251{% endblock %}
 
 {% block content %}
-<style>
-    @media print {
-      /* Hide everything except the printable content */
-      body * {
-        visibility: hidden;
-      }
-      .printable-content, .printable-content * {
-        visibility: visible;
-      }
-      /* Adjust page size or margins if necessary */
-      @page {
-        size: A4;
-        margin: 0;
-      }
-    }
-  </style>
 <div id="main-content" class="w-full p-12 select-none">
   <div class="flex justify-between items-center mb-5">
     <h1 class="printable-content text-3xl font-bold text-blue-900">Schedule Information</h1>
@@ -29,11 +13,11 @@
   <div class="flex gap-4 mb-4">
     <select name="day" class="bg-white px-4 py-2 border border-gray-300 rounded">
       <option value="">All Days</option>
-      <option value="Mon" {% if day == 'Mon' %}selected{% endif %}>Mon</option>
-      <option value="Tue" {% if day == 'Tue' %}selected{% endif %}>Tue</option>
-      <option value="Wed" {% if day == 'Wed' %}selected{% endif %}>Wed</option>
-      <option value="Thu" {% if day == 'Thu' %}selected{% endif %}>Thu</option>
-      <option value="Fri" {% if day == 'Fri' %}selected{% endif %}>Fri</option>
+      <option value="Mon" {% if day == 'Mon' %}selected{% endif %}>Monday</option>
+      <option value="Tue" {% if day == 'Tue' %}selected{% endif %}>Tuesday</option>
+      <option value="Wed" {% if day == 'Wed' %}selected{% endif %}>Wednesday</option>
+      <option value="Thu" {% if day == 'Thu' %}selected{% endif %}>Thursday</option>
+      <option value="Fri" {% if day == 'Fri' %}selected{% endif %}>Friday</option>
     </select>
     <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded">Search</button>
   </div>
@@ -53,28 +37,44 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          {% for schedule in schedule_data %}
-          <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 text-sm text-gray-900">{{ forloop.counter }}</td>
-            <td class="px-6 py-4 text-sm text-gray-600">
-              {% if schedule.semester.lecturer_2 and schedule.semester.lecturer_3 %}
-                {{ schedule.semester.lecturer_1 }} <br> {{ schedule.semester.lecturer_2 }} <br> {{ schedule.semester.lecturer_3 }}
-              {% elif schedule.semester.lecturer_2 %}
-                {{ schedule.semester.lecturer_1 }} <br> {{ schedule.semester.lecturer_2 }}
-              {% else %}
-                {{ schedule.semester.lecturer_1 }}
-              {% endif %}
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-600">{{ schedule.semester.subject }}</td>
-            <td class="px-6 py-4 text-sm text-gray-600">{{ schedule.semester.major_class }}</td>
-            <td class="px-6 py-4 text-center text-sm text-gray-600">
-              {{ schedule.lecturer_day }}, {{ schedule.start_time }} - {{ schedule.end_time }}
-            </td>
-            <td class="px-6 py-4 text-center text-sm text-gray-600">
-              {{ schedule.room }}
+          {% if no_schedule_warning %}
+          <tr>
+            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-600">
+              <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                    <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                </svg>
+                <p class="text-lg">No schedule</p>
+              </div>
             </td>
           </tr>
-          {% endfor %}
+          {% else %}
+            {% for schedule in schedule_data %}
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-900">{{ forloop.counter }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">
+                {% if schedule.semester.lecturer_2 and schedule.semester.lecturer_3 %}
+                  {{ schedule.semester.lecturer_1 }} <br> {{ schedule.semester.lecturer_2 }} <br> {{ schedule.semester.lecturer_3 }}
+                {% elif schedule.semester.lecturer_2 %}
+                  {{ schedule.semester.lecturer_1 }} <br> {{ schedule.semester.lecturer_2 }}
+                {% else %}
+                  {{ schedule.semester.lecturer_1 }}
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ schedule.semester.subject }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ schedule.semester.major_class }}</td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">
+                {{ schedule.lecturer_day }}, {{ schedule.start_time }} - {{ schedule.end_time }}
+              </td>
+              <td class="px-6 py-4 text-center text-sm text-gray-600">
+                {{ schedule.room }}
+              </td>
+            </tr>
+            {% endfor %}
+          {% endif %}
         </tbody>
       </table>
     </div>

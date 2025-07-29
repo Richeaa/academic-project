@@ -28,6 +28,7 @@ urlpatterns = [
     path('dashboard/lecturerview/', views.dashboard_lecturer_view, name='dashboard_lecturer_view'),
     path('viewschedule/20251/', views.viewschedule20251, name='viewschedule20251'),
     path('viewschedule/20252/', views.viewschedule20252, name='viewschedule20252'),
+    path('viewschedule/20253/', views.viewschedule20253, name='viewschedule20253'),
     path('prediction/', views.prediction_view, name='prediction'),
     path('prediction/predict/', views.predict_schedule, name='predict_schedule'),
     path('prediction/get-schedule/', views.get_schedule, name='get_schedule'),

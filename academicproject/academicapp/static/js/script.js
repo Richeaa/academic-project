@@ -46,6 +46,10 @@ document.addEventListener('DOMContentLoaded', function () {
       id: 'viewschedule20252-link',
       match: (p) => p.startsWith('/viewschedule/20252/'), 
     },
+    {
+      id: 'viewschedule20253-link',
+      match: (p) => p.startsWith('/viewschedule/20253/'), 
+    },
     
   ];
 

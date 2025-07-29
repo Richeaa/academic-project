@@ -22,7 +22,7 @@
         <div class="w-full relative h-18 flex justify-between px-6 p-2 shadow-sm" >
             <div class="md:w-96 w-24 flex items-center">
                 <img src="{% static 'svg/logo.svg' %}" alt="Logo" class="h-10 w-10 hidden md:block">
-                <h1 class="px-3 font-semibold text-gray-900 text-xl hidden md:block">Academic</h1>
+                <h1 class="px-3 font-semibold text-gray-900 text-xl hidden md:block">Lecturer</h1>
         
                 <div id="hamburger" class="button w-10 h-10 md:ml-18 hover:bg-blue-50/10 rounded-full flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-gray-900">
@@ -67,9 +67,7 @@
     </navbar>
 
     <div class="flex min-h-screen pt-18">
-        <aside id="sidebar" class="bg-white w-64 md:w-64 shadow-sm border-r border-gray-200 transform fixed h-full overflow-y-auto transition-all duration-300 ease-in-out z-20 p-2">
-
-        
+        <aside id="sidebar" class="bg-white w-64 md:w-64 shadow-sm border-r border-gray-200 transform fixed h-full transition-all duration-300 ease-in-out z-20 p-2 overflow-hidden">
             <div class="flex flex-col h-full mt-4 select-none">
                 <div class="w-full h-12">
                     <h3 class="text-xs font-semibold text-sky-700 leading-7 pl-6">ACADEMIC</h3>
@@ -120,7 +118,7 @@
                 </a>
                 <br>
 
-                <a href="#" id="viewschedule20253-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                <a href="{% url 'viewschedule20253' %}" id="viewschedule20253-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
@@ -137,7 +135,7 @@
                     <h3 class="text-xs font-normal pl-6">ACADEMIC</h3>
                 </div>
 
-                <a href="https://wa.me/6281315190980" id="whatsapp-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                <a href="https://wa.me/62895422824176" id="whatsapp-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
                     <div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="0" stroke="currentColor" class="size-7">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17.6 6.31999C16.8669 5.58141 15.9943 4.99596 15.033 4.59767C14.0716 4.19938 13.0406 3.99622 12 3.99999C10.6089 4.00135 9.24248 4.36819 8.03771 5.06377C6.83294 5.75935 5.83208 6.75926 5.13534 7.96335C4.4386 9.16745 4.07046 10.5335 4.06776 11.9246C4.06507 13.3158 4.42793 14.6832 5.12 15.89L4 20L8.2 18.9C9.35975 19.5452 10.6629 19.8891 11.99 19.9C14.0997 19.9001 16.124 19.0668 17.6222 17.5816C19.1205 16.0965 19.9715 14.0796 19.99 11.97C19.983 10.9173 19.7682 9.87634 19.3581 8.9068C18.948 7.93725 18.3505 7.05819 17.6 6.31999ZM12 18.53C10.8177 18.5308 9.65701 18.213 8.64 17.61L8.4 17.46L5.91 18.12L6.57 15.69L6.41 15.44C5.55925 14.0667 5.24174 12.429 5.51762 10.8372C5.7935 9.24545 6.64361 7.81015 7.9069 6.80322C9.1702 5.79628 10.7589 5.28765 12.3721 5.37368C13.9853 5.4597 15.511 6.13441 16.66 7.26999C17.916 8.49818 18.635 10.1735 18.66 11.93C18.6442 13.6859 17.9355 15.3645 16.6882 16.6006C15.441 17.8366 13.756 18.5301 12 18.53ZM15.61 13.59C15.41 13.49 14.44 13.01 14.26 12.95C14.08 12.89 13.94 12.85 13.81 13.05C13.6144 13.3181 13.404 13.5751 13.18 13.82C13.07 13.96 12.95 13.97 12.75 13.82C11.6097 13.3694 10.6597 12.5394 10.06 11.47C9.85 11.12 10.26 11.14 10.64 10.39C10.6681 10.3359 10.6827 10.2759 10.6827 10.215C10.6827 10.1541 10.6681 10.0941 10.64 10.04C10.64 9.93999 10.19 8.95999 10.03 8.56999C9.87 8.17999 9.71 8.23999 9.58 8.22999H9.19C9.08895 8.23154 8.9894 8.25465 8.898 8.29776C8.8066 8.34087 8.72546 8.403 8.66 8.47999C8.43562 8.69817 8.26061 8.96191 8.14676 9.25343C8.03291 9.54495 7.98287 9.85749 8 10.17C8.0627 10.9181 8.34443 11.6311 8.81 12.22C9.6622 13.4958 10.8301 14.5293 12.2 15.22C12.9185 15.6394 13.7535 15.8148 14.58 15.72C14.8552 15.6654 15.1159 15.5535 15.345 15.3915C15.5742 15.2296 15.7667 15.0212 15.91 14.78C16.0428 14.4856 16.0846 14.1583 16.03 13.84C15.94 13.74 15.81 13.69 15.61 13.59Z" />
@@ -150,7 +148,7 @@
                 </a>
                 <br>
 
-                <a href="https://mail.google.com/mail/u/0/?view=cm&tf=1&fs=1&to=mufid.rabbani@student.president.ac.id" id="email-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
+                <a href="https://mail.google.com/mail/u/0/?view=cm&tf=1&fs=1&to=academic@president.ac.id" id="email-link"><div class="group w-full h-14 hover:bg-sky-200/30 rounded-lg flex p-5 items-center hover:text-blue-700 transition-all duration-100 ease-in-out">
                     <div>
                         <svg class="size-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="style=linear"> <g id="email">
                             <path id="vector" d="M17 20.5H7C4 20.5 2 19 2 15.5V8.5C2 5 4 3.5 7 3.5H17C20 3.5 22 5 22 8.5V15.5C22 19 20 20.5 17 20.5Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -266,7 +264,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Current Semester</p>
-                                    <p class="text-3xl font-bold text-gray-900">20251</p>
+                                    <p class="text-3xl font-bold text-gray-900">20243</p>
                                     <p class="text-sm text-blue-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -293,11 +291,9 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
-    <!-- Room Distribution Bar Chart -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
         <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Number of Schedules by Room</p>
         <div class="flex items-center justify-center space-x-4 mb-4">
-            <!-- Buttons for selecting schedule -->
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20251&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20252&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20253&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
@@ -320,17 +316,14 @@
         {% endif %}
     </div>
 
-    <!-- Classes per Day (Doughnut Chart) -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
         <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Schedules per Day</p>
         <div class="flex items-center justify-center space-x-4 mb-4">
-            <!-- Buttons for selecting schedule -->
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20251&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20252&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
             <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20253&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
         </div>
 
-        <!-- Warning for no classes -->
         {% if no_classes_warning %}
             <div class="h-40 flex flex-col items-center justify-center text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
@@ -342,9 +335,8 @@
                 <p class="text-lg">No schedule in this semester</p>
             </div>
         {% else %}
-            <!-- Display the chart if there are classes -->
             <div class="h-80">
-                <canvas id="myDonutChart" class="w-full h-full"></canvas>
+                <canvas id="schedulesChart" class="w-full h-full"></canvas>
             </div>
         {% endif %}
     </div>
@@ -364,92 +356,172 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
     <script>
-            const ctx1 = document.getElementById('roomChart').getContext('2d');
-            new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: {{ room_labels|safe }},
-                datasets: [{
-                    data: {{ room_values|safe }},
-                    backgroundColor: [
-                        'rgba(252, 35, 35, 1)',
-                        'rgba(255, 191, 0, 1)',
-                        'rgba(35, 176, 87, 1)',
-                        'rgba(35, 90, 252, 1)',
-                        'rgba(206, 28, 255, 1)'
-                    ],
-                    hoverBackgroundColor: [
-                        'rgba(252, 35, 35, 0.5)',
-                        'rgba(255, 191, 0, 0.5)',
-                        'rgba(35, 176, 87, 0.5)',
-                        'rgba(35, 90, 252, 0.5)',
-                        'rgba(206, 28, 255, 0.5)'
-                    ],
-                    datalabels: {
-                display: true,  // Enable data labels
-                color: '#ffffff',  // Set color of labels
-                font: {
-                    weight: 'bold',  // Make the label bold
-                    size: 14,  // Font size of the label
-                },
-                formatter: function(data, ctx1) {
-                    return data;  // Display the value inside the chart
-                },
-                anchor: 'center',  // Position the label at the center of each slice
-                align: 'center',   // Align the label to the center
-                offset: 0,         // Keep the label centered without any offset
-            },
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                    tooltip: {
-            enabled: true,
-            animation: 100,
-            displayColors: false,
-            backgroundColor: function(context) {
-            const index = context.tooltip.dataPoints[0].dataIndex;
-            const dataset = context.tooltip.dataPoints[0].dataset;
-            return dataset.backgroundColor[index];
-            },
-            borderRadius: 6,
-            padding: 10,
-            custom: function(context) {
-            if (context.tooltip && context.tooltip.opacity > 0) {
-            const tooltipEl = context.tooltip.el;
-            tooltipEl.style.boxShadow = '0px 4px 10px rgba(0, 0, 0, 0.2)';
+    function generateColors(num) {
+        const colors = [];
+        const baseColors = [
+            'rgba(54, 162, 235, 1)',  
+            'rgba(252, 35, 35, 1)',   
+            'rgba(255, 191, 0, 1)',   
+            'rgba(35, 176, 87, 1)',   
+            'rgba(35, 90, 252, 1)',   
+            'rgba(206, 28, 255, 1)',  
+            'rgba(0, 204, 255, 1)',   
+            'rgba(255, 165, 0, 1)',   
+            'rgba(128, 0, 128, 1)',   
+            'rgba(255, 99, 132, 1)', 
+        ];
+
+        function adjustColor(color, index) {
+        let rgba = color.replace('rgba(', '').replace(')', '').split(',');
+        let r = parseInt(rgba[0]);
+        let g = parseInt(rgba[1]);
+        let b = parseInt(rgba[2]);
+        let a = parseFloat(rgba[3]);
+
+            if (index >= baseColors.length) {
+                r = (r + 20 * (index % 5)) % 256;  
+                g = (g + 20 * (index % 5)) % 256;  
+                b = (b + 20 * (index % 5)) % 256;  
             }
-            },
-            callbacks: {
-            label: function(tooltipItem) {
-                const label = tooltipItem.label; 
-                const value = tooltipItem.raw; 
-                return `${value} Schedules`;  // Show value with label in tooltip
-            },
-            }
+
+            return `rgba(${r}, ${g}, ${b}, ${a})`;  
         }
+
+        for (let i = 0; i < num; i++) {
+            colors.push(adjustColor(baseColors[i % baseColors.length], i));
+        }
+        return colors;
+    }
+
+    const roomColors = generateColors({{ room_labels|length }});
+
+    const ctx1 = document.getElementById('roomChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'pie',
+        data: {
+            labels: {{ room_labels|safe }},
+            datasets: [{
+                data: {{ room_values|safe }},
+                borderColor: 'white',
+                hoverBorderColor: 'white',
+                borderWidth: 2,
+                hoverOffset: 10,
+                backgroundColor: roomColors,
+                hoverBackgroundColor: roomColors.map(color => color.replace('1)', '0.6)')),  
+                padding: 20,
+                datalabels: {
+                    display: true,  
+                    color: '#ffffff',  
+                    font: {
+                        weight: 'bold',  
+                        size: 15,  
+                    },
+                    formatter: function(data, ctx2) {
+                        if (data > 0) {
+                            return data;  
+                        } else {
+                            return '';  
+                        }
+                    },
+                    anchor: 'center',  
+                    align: 'center',   
+                    offset: 0,         
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            const dataset = data.datasets[0];
+                            const colors = dataset._originalBackgroundColor || dataset.backgroundColor;
+
+                            return data.labels.map((label, i) => ({
+                                text: label,
+                                fillStyle: colors[i],  
+                                strokeStyle: colors[i],
+                                index: i
+                            }));
+                        }
+                    },
+                    onHover: function(evt, item, legend) {
+                        const chart = legend.chart;
+                        const dataset = chart.data.datasets[0];
+                        const hoveredIndex = item.index;
+
+                        if (!dataset._originalBackgroundColor) {
+                            dataset._originalBackgroundColor = [...dataset.backgroundColor];
+                        }
+
+                        dataset.backgroundColor = dataset._originalBackgroundColor.map((color, index) => {
+                            if (index === hoveredIndex) return color;
+
+                            if (color.startsWith('rgba')) {
+                                return color.replace(/rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/, 'rgba($1,$2,$3,0.3)');
+                            }
+
+                            const rgb = hexToRgb(color);
+                            return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;
+                        });
+
+                        chart.update();
+                    },
+                    onLeave: function(evt, item, legend) {
+                        const chart = legend.chart;
+                        const dataset = chart.data.datasets[0];
+
+                        if (dataset._originalBackgroundColor) {
+                            dataset.backgroundColor = [...dataset._originalBackgroundColor];
+                        }
+
+                        chart.update();
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    animation: 100,
+                    displayColors: false,
+                    backgroundColor: function(context) {
+                        const index = context.tooltip.dataPoints[0].dataIndex;
+                        const dataset = context.tooltip.dataPoints[0].dataset;
+                        return dataset.backgroundColor[index];
+                    },
+                    borderRadius: 6,
+                    padding: 10,
+                    custom: function(context) {
+                        if (context.tooltip && context.tooltip.opacity > 0) {
+                            const tooltipEl = context.tooltip.el;
+                            tooltipEl.style.boxShadow = '0px 4px 10px rgba(0, 0, 0, 0.2)';
+                        }
+                    },
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            const value = tooltipItem.raw;
+                            return `${value} Schedules`; 
+                        },
                     }
                 }
             }
-        });
+        },
+        plugins: [ChartDataLabels],
+    });
 </script>
 
 
 <script>
-const ctx2 = document.getElementById('myDonutChart');
+const ctx2 = document.getElementById('schedulesChart');
 
 new Chart(ctx2, {
-    type: 'pie',
+    type: 'bar',
     data: {
         labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         datasets: [{
@@ -459,11 +531,11 @@ new Chart(ctx2, {
             borderWidth: 2,
             hoverOffset: 20,
             backgroundColor: [
-                'rgba(252, 35, 35, 1)',   // Red
-                'rgba(255, 191, 0, 1)',   // Yellow
-                'rgba(35, 176, 87, 1)',   // Green
-                'rgba(35, 90, 252, 1)',   // Blue
-                'rgba(206, 28, 255, 1)'   // Purple
+                'rgba(252, 35, 35, 1)',  
+                'rgba(255, 191, 0, 1)',   
+                'rgba(35, 176, 87, 1)',  
+                'rgba(35, 90, 252, 1)',   
+                'rgba(206, 28, 255, 1)'   
             ],
             hoverBackgroundColor: [
                 'rgba(252, 35, 35, 0.6)',
@@ -474,22 +546,22 @@ new Chart(ctx2, {
             ],
             padding: 20,
             datalabels: {
-                display: true,  // Ensure data labels are always visible
-                color: '#ffffff',  // Set label color to white
+                display: false,  
+                color: '#ffffff',  
                 font: {
-                    weight: 'bold',  // Make label text bold
-                    size: 20,  // Adjust font size if necessary
+                    weight: 'bold', 
+                    size: 20, 
                 },
                 formatter: function(data, ctx2) {
                     if (data > 0) {
-                        return data;  // Display raw value (or percentage)
+                        return data;  
                     } else {
-                        return '';  // No label for values less than or equal to 0
+                        return '';  
                     }
                 },
-                anchor: 'center',  // Position label at the center of each slice
-                align: 'center',   // Align label to the center
-                offset: 0,         // Keep label centered within slice
+                anchor: 'center',  
+                align: 'center',   
+                offset: 0,      
             },
         }]
     },
@@ -498,7 +570,7 @@ new Chart(ctx2, {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: true,
+                display: false,
                 position: 'bottom',
                 labels: {
                     padding: 20,
@@ -511,7 +583,7 @@ new Chart(ctx2, {
 
                         return data.labels.map((label, i) => ({
                             text: label,
-                            fillStyle: colors[i],  // Always use the original color for the legend
+                            fillStyle: colors[i],  
                             strokeStyle: colors[i],
                             index: i
                         }));
@@ -570,11 +642,20 @@ new Chart(ctx2, {
                 callbacks: {
                     label: function(tooltipItem) {
                         const value = tooltipItem.raw;
-                        return `${value} Schedules`;  // Show value with label in tooltip
+                        return `${value} Schedules`; 
                     },
                 }
             }
-        }
+        },
+        scales: {
+            y: {
+                beginAtZero: true, 
+                ticks: {
+                    stepSize: 1, 
+                    precision: 0  
+                }
+            }
+        },
     },
     plugins: [ChartDataLabels],
 });

@@ -190,6 +190,7 @@ def dashboard_lecturer_view(request):
     semester_model = {
         '20251': assignlecturer20251,
         '20252': assignlecturer20252,
+        '20253': assignlecturer20253,
     }
 
     schedule_choice_doughnut = request.GET.get('schedule_choice_doughnut', '20251')
@@ -771,6 +772,8 @@ def formstudyprogram(request, semester_url='20251'):
 def viewschedule20251(request):
     lecturer_name = request.session.get('name', '')
 
+    day = request.GET.get('day', '').strip()
+
     schedule_data = assignlecturer20251.objects.select_related('semester').all()
 
     if lecturer_name:
@@ -780,19 +783,22 @@ def viewschedule20251(request):
             Q(semester__lecturer_3__icontains=lecturer_name)
         )
 
-    day = request.GET.get('day', '').strip()
     if day:
         schedule_data = schedule_data.filter(lecturer_day__icontains=day)
 
-    # Render the schedule data in the template
+    no_schedule_warning = not schedule_data.exists()
+
     return render(request, 'viewschedule20251.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
-        'day': day
+        'day': day, 
+        'no_schedule_warning': no_schedule_warning
     })
 
 def viewschedule20252(request):
-    lecturer_name = request.session.get('name', '')  
+    lecturer_name = request.session.get('name', '')
+
+    day = request.GET.get('day', '').strip()
 
     schedule_data = assignlecturer20252.objects.select_related('semester').all()
 
@@ -803,16 +809,43 @@ def viewschedule20252(request):
             Q(semester__lecturer_3__icontains=lecturer_name)
         )
 
-    day = request.GET.get('day', '').strip()
     if day:
         schedule_data = schedule_data.filter(lecturer_day__icontains=day)
 
-    return render(request, 'viewschedule20251.html', {
+    no_schedule_warning = not schedule_data.exists()
+
+    return render(request, 'viewschedule20252.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
-        'day': day
+        'day': day, 
+        'no_schedule_warning': no_schedule_warning
     })
 
+def viewschedule20253(request):
+    lecturer_name = request.session.get('name', '')
+
+    day = request.GET.get('day', '').strip()
+
+    schedule_data = assignlecturer20253.objects.select_related('semester').all()
+
+    if lecturer_name:
+        schedule_data = schedule_data.filter(
+            Q(semester__lecturer_1__icontains=lecturer_name) | 
+            Q(semester__lecturer_2__icontains=lecturer_name) | 
+            Q(semester__lecturer_3__icontains=lecturer_name)
+        )
+
+    if day:
+        schedule_data = schedule_data.filter(lecturer_day__icontains=day)
+
+    no_schedule_warning = not schedule_data.exists()
+
+    return render(request, 'viewschedule20253.html', {
+        'schedule_data': schedule_data,
+        'lecturer_name': lecturer_name,
+        'day': day, 
+        'no_schedule_warning': no_schedule_warning
+    })
 
 
 @csrf_exempt
