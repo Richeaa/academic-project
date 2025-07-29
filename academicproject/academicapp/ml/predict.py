@@ -114,6 +114,7 @@ def run_ml_prediction(semester_choice):
         
         saved_count = save_predictions_to_db(final_schedule, semester_choice)
         
+        
         return True, f"Successfully processed {len(final_schedule)} classes, saved {saved_count} assignments", saved_count
         
     except Exception as e:

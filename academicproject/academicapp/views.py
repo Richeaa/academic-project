@@ -1058,7 +1058,7 @@ def predict_schedule(request):
                 'error': 'Semester selection is required'
             }, status=400)
         
-        if semester_choice not in ['20251', '20252']:
+        if semester_choice not in ['20251', '20252', '20253']:
             return JsonResponse({
                 'success': False,
                 'error': 'Invalid semester choice'
@@ -1110,7 +1110,7 @@ def get_schedule(request):
                 'error': 'Semester selection is required'
             }, status=400)
         
-        if semester_choice not in ['20251', '20252']:
+        if semester_choice not in ['20251', '20252','20253']:
             return JsonResponse({
                 'success': False,
                 'error': 'Invalid semester choice'
@@ -1149,7 +1149,7 @@ def clear_assignments(request):
                 'error': 'Semester selection is required'
             }, status=400)
         
-        if semester_choice not in ['20251', '20252']:
+        if semester_choice not in ['20251', '20252','20253']:
             return JsonResponse({
                 'success': False,
                 'error': 'Invalid semester choice'
@@ -1157,8 +1157,10 @@ def clear_assignments(request):
         
         if semester_choice == '20251':
             from .models import assignlecturer20251 as AssignModel
-        else:
+        elif semester_choice == '20252':
             from .models import assignlecturer20252 as AssignModel
+        else:
+            from .models import assignlecturer20253 as AssignModel
         
         # Clear all assignments
         deleted_count = AssignModel.objects.all().count()
@@ -1187,9 +1189,6 @@ def clear_assignments(request):
 @csrf_exempt
 @require_http_methods(["GET"])
 def prediction_stats(request):
-    """
-    API endpoint to get prediction statistics
-    """
     try:
         semester_choice = request.GET.get('semester')
         
@@ -1199,7 +1198,7 @@ def prediction_stats(request):
                 'error': 'Semester parameter is required'
             }, status=400)
         
-        if semester_choice not in ['20251', '20252']:
+        if semester_choice not in ['20251', '20252', '20253']:
             return JsonResponse({
                 'success': False,
                 'error': 'Invalid semester choice'
@@ -1208,9 +1207,13 @@ def prediction_stats(request):
         if semester_choice == '20251':
             from .models import semester20251 as SemesterModel
             from .models import assignlecturer20251 as AssignModel
-        else:
+        
+        elif semester_choice == '20252':
             from .models import semester20252 as SemesterModel
             from .models import assignlecturer20252 as AssignModel
+        else:
+            from .models import semester20253 as SemesterModel
+            from .models import assignlecturer20253 as AssignModel
         
         # calculate percentage
         total_classes = SemesterModel.objects.count()

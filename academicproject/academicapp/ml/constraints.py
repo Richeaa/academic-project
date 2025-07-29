@@ -28,10 +28,6 @@ EXCLUDED_ROOMS = [
 ]
 
 def is_room_eligible(room, major, subject):
-    """
-    Check if a room is eligible for a given major and subject
-    Based on your original room eligibility rules
-    """
     if room in EXCLUDED_ROOMS:
         return False
 
@@ -57,18 +53,12 @@ def is_room_eligible(room, major, subject):
     return True
 
 def get_time_block(start_time_str, credit):
-    """
-    Calculate end time based on start time and credit hours
-    """
     start_dt = datetime.strptime(start_time_str, "%a, %H:%M")
     duration = 135 if credit == 0 else credit * 45  # 45 minutes per credit
     end_dt = start_dt + timedelta(minutes=duration)
     return start_dt, end_dt
 
 def is_overlapping(start, end, existing_blocks):
-    """
-    Check if a time block overlaps with existing blocks
-    """
     return any(max(s, start) < min(e, end) for s, e in existing_blocks)
 
 def parse_day_preference(pref):
@@ -104,18 +94,11 @@ def parse_day_preference(pref):
     return result
 
 def parse_time_preference(pref):
-    """
-    Parse time preference string into list of preferred times
-    """
     if pd.isna(pref) or str(pref).strip() in ['', 'nan']:
         return []
     return [t.strip() for t in str(pref).split(',') if t.strip() and t.strip() != 'nan']
 
 def matches_room_preference(room_code, preference):
-    """
-    Check if a room matches the lecturer's room preference
-    Handles various preference formats like "Building A", "Building B (2nd Floor)", etc.
-    """
     if pd.isna(preference) or str(preference).strip() in ['', 'nan']:
         return True
     
@@ -154,10 +137,6 @@ def matches_room_preference(room_code, preference):
     return False
 
 def validate_schedule_constraints(schedule_df):
-    """
-    Validate that the generated schedule meets all constraints
-    Returns: (is_valid: bool, violations: list)
-    """
     violations = []
     
     # Check for room conflicts

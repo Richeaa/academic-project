@@ -11,6 +11,9 @@ def get_unassigned_classes(semester_choice):
     elif semester_choice == '20252':
         SemesterModel = apps.get_model('academicapp', 'semester20252')
         AssignModel = apps.get_model('academicapp', 'assignlecturer20252')
+    elif semester_choice == '20253':
+        SemesterModel = apps.get_model('academicapp', 'semester20253')
+        AssignModel = apps.get_model('academicapp', 'assignlecturer20253')
     else:
         raise ValueError(f"Invalid semester choice: {semester_choice}")
     
@@ -110,6 +113,9 @@ def save_predictions_to_db(predictions_df, semester_choice):
     elif semester_choice == '20252':
         AssignModel = apps.get_model('academicapp', 'assignlecturer20252')
         SemesterModel = apps.get_model('academicapp', 'semester20252')
+    elif semester_choice == '20253':
+        SemesterModel = apps.get_model('academicapp', 'semester20253')
+        AssignModel = apps.get_model('academicapp', 'assignlecturer20253')
     else:
         raise ValueError(f"Invalid semester choice: {semester_choice}")
     
@@ -160,6 +166,9 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10): #Display
     elif semester_choice == '20252':
         SemesterModel = apps.get_model('academicapp', 'semester20252')
         AssignModel = apps.get_model('academicapp', 'assignlecturer20252')
+    elif semester_choice == '20253':
+        SemesterModel = apps.get_model('academicapp', 'semester20253')
+        AssignModel = apps.get_model('academicapp', 'assignlecturer20253')
     else:
         raise ValueError(f"Invalid semester choice: {semester_choice}")
     
