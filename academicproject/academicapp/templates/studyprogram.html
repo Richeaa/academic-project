@@ -79,7 +79,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for item in semester_data %}
                     <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.semester_id }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 ">{{ semester_data.start_index|add:forloop.counter0 }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.program_session }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.major }}</td>
                     <td class="px-6 py-4 text-sm text-gray-900 ">{{ item.curriculum }}</td>
@@ -502,15 +502,16 @@ function updateSemesterRow(semesterId, status) {
 
 function confirmDelete(button) {
     const form = button.closest('form');
-    
+
     Swal.fire({
         title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        text: "This action cannot be undone!",
         icon: 'warning',
         showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
         confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        cancelButtonColor: '#d33'
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
@@ -518,9 +519,17 @@ function confirmDelete(button) {
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
+
                     setTimeout(() => {
                         form.submit();
-                    }, 100);
+                        Swal.fire({
+                            title: 'Deleted!',
+                            text: 'Your item has been deleted.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    }, 800); 
                 }
             });
         }
