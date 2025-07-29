@@ -6,7 +6,7 @@ import os
 
 def get_unassigned_classes(semester_choice):
     if semester_choice == '20251':
-        SemesterModel = apps.get_model('academicapp', 'semester20251')
+        SemesterModel = apps.get_model('academicapp', 'formsemester20251')
         AssignModel = apps.get_model('academicapp', 'assignlecturer20251')
     elif semester_choice == '20252':
         SemesterModel = apps.get_model('academicapp', 'semester20252')

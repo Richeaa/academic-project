@@ -120,6 +120,7 @@ class assignlecturer20252(models.Model):
     class Meta:
         db_table = 'assignlecturer20252'
         managed = True
+
         
 class assignlecturer20253(models.Model):
     assign_id = models.AutoField(primary_key=True)
@@ -150,8 +151,6 @@ class Lecturer(models.Model):
     class Meta:
         db_table = 'lecturer'
         managed = False
-
-
 
 class LecturerPreference(models.Model):
     lecturer_name = models.CharField(max_length=100)

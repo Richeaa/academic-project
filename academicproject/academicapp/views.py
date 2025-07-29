@@ -162,7 +162,7 @@ def courses_per_major_api(request, semester_code):
     elif semester_code == '20252':
         queryset = semester20252.objects
     elif semester_code == '20253':
-        queryset = formsemester20253.objects
+        queryset = semester20253.objects
     else:
         return JsonResponse({'labels': [], 'values': []})
 
@@ -192,14 +192,11 @@ def dashboard_lecturer_view(request):
         '20252': assignlecturer20252,
     }
 
-    # Get the selected schedule from the request
     schedule_choice_doughnut = request.GET.get('schedule_choice_doughnut', '20251')
     schedule_choice_bar = request.GET.get('schedule_choice_bar', '20251')
 
-    # Barchart for room distribution
     room_counts = {}
 
-    # Get the schedules for the selected semester (no lecturer filter)
     schedule_model_bar = semester_model.get(schedule_choice_bar)
 
     if schedule_model_bar:
@@ -207,28 +204,24 @@ def dashboard_lecturer_view(request):
             Q(semester__lecturer_1__icontains=lecturer_name) |
             Q(semester__lecturer_2__icontains=lecturer_name) |
             Q(semester__lecturer_3__icontains=lecturer_name)
-        )  # Get all schedules for the lecturer
+        )  
 
         for schedule in schedules:
             try:
-                # Split room if there are multiple rooms
-                rooms = schedule.room.split('/')  # Split rooms (e.g., "B401/B203")
+                
+                rooms = schedule.room.split('/')  
                 for room in rooms:
-                    room = room.strip()  # Clean the room name (remove spaces)
+                    room = room.strip()  
                     if room:
-                        # Aggregate the counts for the same room (sum them)
-                        room_counts[room] = room_counts.get(room, 0) + 1  # Sum values for the same room
+                        room_counts[room] = room_counts.get(room, 0) + 1 
             except AttributeError:
                 continue
 
-    # Get the top 5 room labels and values
-    room_labels = [room[0] for room in room_counts.items()]  # Room names (e.g., B401, B402, etc.)
+    room_labels = [room[0] for room in room_counts.items()]  
     room_values = [room[1] for room in room_counts.items()]
 
-    no_room_distribution_warning = not room_values  # Check if there are no rooms
+    no_room_distribution_warning = not room_values  
   
-
-    # Doughnut chart (class distribution by day)
     day_counts = {'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0}
 
     schedule_model_doughnut = semester_model.get(schedule_choice_doughnut)
@@ -238,25 +231,20 @@ def dashboard_lecturer_view(request):
             Q(semester__lecturer_1__icontains=lecturer_name) |
             Q(semester__lecturer_2__icontains=lecturer_name) |
             Q(semester__lecturer_3__icontains=lecturer_name)
-        )  # Get all schedules for the lecturer
-
+        )  
         for schedule in schedules:
             try:
-            # Directly use the lecturer_day field instead of schedule_time
-                day = schedule.lecturer_day.strip()  # Get the day (e.g., "Mon")
+                day = schedule.lecturer_day.strip() 
                 if day in day_counts:
-                    day_counts[day] += 1  # Increment the class count for that day
+                    day_counts[day] += 1
             except AttributeError:
                 continue
 
-# Prepare the data for the doughnut chart (count per day)
     day_counts_values = list(day_counts.values())
     labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
-# Check if there are no classes
     no_classes_warning = day_counts_values == [0, 0, 0, 0, 0]
 
-    # Update context with all the necessary data
     context.update({
         'lecturer_name': lecturer_name,
         'day_counts_values': day_counts_values,
@@ -386,7 +374,6 @@ assign_model_title = {
     '20253': assignlecturer20253,
 }
 
-
 def studyprogram(request, semester_url='20251'):
     semester_model = semester_title.get(semester_url)
     if not semester_model:
@@ -403,12 +390,12 @@ def studyprogram(request, semester_url='20251'):
         item.is_assigned = bool(assignment)
         item.assign_id = assignment.assign_id if assignment else None
 
-    paginator = Paginator(semester_data, 25)  
-    page_number = int(request.GET.get('page', 1))
+    paginator = Paginator(semester_data, 100)
+    page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     block_size = 5
-    current_block = (page_number - 1) // block_size
+    current_block = (page_obj.number - 1) // block_size
     start_block = current_block * block_size + 1
     end_block = min(start_block + block_size - 1, paginator.num_pages)
     page_range = range(start_block, end_block + 1)
@@ -447,6 +434,9 @@ def assignlecturer_create(request):
             elif semester_url == '20252':
                 semester_model = semester20252
                 assign_model = assignlecturer20252
+            elif semester_url == '20253':
+                semester_model = semester20253
+                assign_model = assignlecturer20253
             else:
                 return JsonResponse({'success': False, 'error': 'Invalid semester'}, status=400)
 
@@ -487,6 +477,8 @@ def assignlecturer_delete(request):
                 model = semester20251
             elif semester_url == '20252':
                 model = semester20252
+            elif semester_url == '20253':
+                model = semester20253
             else:
                 return JsonResponse({'success': False, 'error': 'Invalid semester'})
             
@@ -526,6 +518,9 @@ def schedulelecturer_delete(request):
         elif semester_url == '20252':
             assign_model = assignlecturer20252
             semester_model = semester20252
+        elif semester_url == '20253':
+            assign_model = assignlecturer20253
+            semester_model = semester20253
         else:
             return JsonResponse({'success': False, 'error': 'Invalid semester'}, status=400)
 
@@ -556,10 +551,10 @@ def schedule20251(request):
     for entry in schedule:
         room_schedule[entry.room][entry.lecturer_day].append(entry)
 
-        for room in room_schedule:
-            for day in room_schedule[room]:
-                daily_entries = room_schedule[room][day]
-
+    for room in room_schedule:
+        for day in room_schedule[room]:
+            daily_entries = sorted(room_schedule[room][day], key=lambda x: x.start_time)
+            
             for i in range(len(daily_entries)):
                 for j in range(i + 1, len(daily_entries)):
                     entry1 = daily_entries[i]
@@ -569,14 +564,18 @@ def schedule20251(request):
                         conflict_ids.add(entry1.assign_id)
                         conflict_ids.add(entry2.assign_id)
                         has_conflicts = True
-                        conflict_details.append({
-                            'room': room,
-                            'day': day,
-                            'subject1': entry1.semester.subject,
-                            'subject2': entry2.semester.subject,
-                            'time1': f"{entry1.start_time.strftime('%H:%M')} - {entry1.end_time.strftime('%H:%M')}",
-                            'time2': f"{entry2.start_time.strftime('%H:%M')} - {entry2.end_time.strftime('%H:%M')}",
-                        })
+                        
+                        if entry1.assign_id < entry2.assign_id:  
+                            conflict_details.append({
+                                'room': room,
+                                'day': day,
+                                'subject1': entry1.semester.subject,
+                                'subject2': entry2.semester.subject,
+                                'time1': f"{entry1.start_time.strftime('%H:%M')} - {entry1.end_time.strftime('%H:%M')}",
+                                'time2': f"{entry2.start_time.strftime('%H:%M')} - {entry2.end_time.strftime('%H:%M')}",
+                                'entry1_id': entry1.assign_id,
+                                'entry2_id': entry2.assign_id,
+                            })
 
     context = {
         'room_schedule': dict(room_schedule),
@@ -628,6 +627,52 @@ def schedule20252(request):
         'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
     }
     return render(request, 'schedule20252.html', context)
+
+def schedule20253(request):
+    schedule = assignlecturer20253.objects.select_related('semester').order_by('room', 'lecturer_day', 'start_time')
+
+    room_schedule = defaultdict(lambda: defaultdict(list))
+    conflict_ids = set() 
+    has_conflicts = False
+    conflict_details = []
+
+    for entry in schedule:
+        room_schedule[entry.room][entry.lecturer_day].append(entry)
+
+    for room in room_schedule:
+        for day in room_schedule[room]:
+            daily_entries = sorted(room_schedule[room][day], key=lambda x: x.start_time)
+            
+            for i in range(len(daily_entries)):
+                for j in range(i + 1, len(daily_entries)):
+                    entry1 = daily_entries[i]
+                    entry2 = daily_entries[j]
+                    
+                    if entry1.end_time > entry2.start_time and entry1.start_time < entry2.end_time:
+                        conflict_ids.add(entry1.assign_id)
+                        conflict_ids.add(entry2.assign_id)
+                        has_conflicts = True
+                        
+                        if entry1.assign_id < entry2.assign_id:  
+                            conflict_details.append({
+                                'room': room,
+                                'day': day,
+                                'subject1': entry1.semester.subject,
+                                'subject2': entry2.semester.subject,
+                                'time1': f"{entry1.start_time.strftime('%H:%M')} - {entry1.end_time.strftime('%H:%M')}",
+                                'time2': f"{entry2.start_time.strftime('%H:%M')} - {entry2.end_time.strftime('%H:%M')}",
+                                'entry1_id': entry1.assign_id,
+                                'entry2_id': entry2.assign_id,
+                            })
+
+    context = {
+        'room_schedule': dict(room_schedule),
+        'conflict_ids': conflict_ids,
+        'has_conflicts': has_conflicts,
+        'conflict_details': conflict_details,
+        'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+    }
+    return render(request, 'schedule20251.html', context)
 
 def lecturer(request):
     lecturer_name = request.GET.get('lecturer_name', '')
@@ -724,15 +769,10 @@ def formstudyprogram(request, semester_url='20251'):
     return render(request, 'formstudyprogram.html', context)
 
 def viewschedule20251(request):
-    # Retrieve the lecturer's name from the session
-    lecturer_name = request.session.get('name', '')  # Ensure it's set or return empty string
+    lecturer_name = request.session.get('name', '')
 
-    # Debugging: Check if lecturer_name is properly fetched fr
-
-    # Retrieve all assignment data, joining with the semester data using select_related
     schedule_data = assignlecturer20251.objects.select_related('semester').all()
 
-    # If the lecturer's name is present, filter the data based on the lecturer's name
     if lecturer_name:
         schedule_data = schedule_data.filter(
             Q(semester__lecturer_1__icontains=lecturer_name) | 
@@ -740,9 +780,6 @@ def viewschedule20251(request):
             Q(semester__lecturer_3__icontains=lecturer_name)
         )
 
-    # Debugging: Print the query that is being executed
-
-    # Get the 'day' parameter from the GET request and filter the schedule accordingly
     day = request.GET.get('day', '').strip()
     if day:
         schedule_data = schedule_data.filter(lecturer_day__icontains=day)
@@ -755,15 +792,10 @@ def viewschedule20251(request):
     })
 
 def viewschedule20252(request):
-    # Retrieve the lecturer's name from the session
-    lecturer_name = request.session.get('name', '')  # Ensure it's set or return empty string
+    lecturer_name = request.session.get('name', '')  
 
-    # Debugging: Check if lecturer_name is properly fetched from
-
-    # Retrieve all assignment data, joining with the semester data using select_related
     schedule_data = assignlecturer20252.objects.select_related('semester').all()
 
-    # If the lecturer's name is present, filter the data based on the lecturer's name
     if lecturer_name:
         schedule_data = schedule_data.filter(
             Q(semester__lecturer_1__icontains=lecturer_name) | 
@@ -771,14 +803,10 @@ def viewschedule20252(request):
             Q(semester__lecturer_3__icontains=lecturer_name)
         )
 
-    # Debugging: Print the query that is being executed
-
-    # Get the 'day' parameter from the GET request and filter the schedule accordingly
     day = request.GET.get('day', '').strip()
     if day:
         schedule_data = schedule_data.filter(lecturer_day__icontains=day)
 
-    # Render the schedule data in the template
     return render(request, 'viewschedule20251.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,

@@ -12,6 +12,17 @@
         </div>
     </div>
 
+    {% if not room_schedule %} 
+    <div class="flex items-center justify-center min-h-[60vh]">
+        <div class="text-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-sm">No room scheduled</span>
+        </div>
+    </div>
+    {% endif %}
+
     {% if has_conflicts %}
     <div class="mb-8 bg-white rounded-xl shadow-md overflow-hidden border border-red-100">
         <div class="bg-amber-50 px-6 py-4 border-b border-amber-100">
@@ -384,11 +395,9 @@ function downloadAsPDF(element, roomName) {
                     const itemStartMin = timeToMinutes(item.startTime);
                     const itemEndMin = timeToMinutes(item.endTime);
                     
-                    // Check if this slot is the first overlapping slot for this item
                     if (itemStartMin < slotEndMin && itemEndMin > slotStartMin && 
                         itemStartMin <= slotStartMin) {
                         
-                        // Find all overlapping slots
                         const overlappingSlots = [];
                         for (let i = rowIndex; i < timeSlots.length; i++) {
                             const [tsStart, tsEnd] = timeSlots[i].split('-');
@@ -418,8 +427,7 @@ function downloadAsPDF(element, roomName) {
         
         tableData.push(row);
     });
-    
-    // Generate PDF
+
     pdf.autoTable({
         startY: 20,
         head: [dayHeaders],

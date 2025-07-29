@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', function () {
       match: (p) => p.startsWith('/schedule20252/'), 
     },
     {
+      id: 'schedule20253-link',
+      match: (p) => p.startsWith('/schedule20253/'), 
+    },
+    {
       id: 'studyprogram-link',
       match: (p) => p.startsWith('/studyprogram/'), 
     },
@@ -110,14 +114,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const isHidden = sidebar.classList.contains('-translate-x-full');
 
     mainContent.classList.add('transition-all', 'duration-300', 'ease-in-out');
-    
     sidebar.classList.toggle('-translate-x-full');
 
     if (window.innerWidth >= 1024) {
       if (isHidden) {
+        mainContent.classList.remove('!ml-0');
         mainContent.classList.add('ml-64');
       } else {
         mainContent.classList.remove('ml-64');
+        mainContent.classList.add('!ml-0');
       }
     }
   });

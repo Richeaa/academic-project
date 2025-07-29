@@ -2,10 +2,10 @@ body {
   background-color: rgb(240, 242, 248);
 }
 
-
 body.sidebar-open {
     overflow: hidden;
 }
+
 
 
 .button {
