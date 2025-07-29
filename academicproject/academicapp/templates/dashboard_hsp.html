@@ -144,13 +144,10 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Total Lecturers</p>
-                                    <p class="text-3xl font-bold text-gray-900">100</p>
-                                    <p class="text-sm text-green-600 mt-2 flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
-                                        </svg>
-                                        85 active
-                                    </p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ lecturer_count }}</p>
+                                    <span class="text-sm text-green-600 mt-2 flex items-center">
+                                        {{ active_lecturer_count }} active
+                                    </span>
                                 </div>
                                 <div class="p-3 bg-amber-100 rounded-full">
                                     <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +158,7 @@
                         </div>
                         <div class="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-3">
                             <div class="flex items-center justify-between text-white">
-                                <span class="text-sm font-medium">85% active rate</span>
+                                <span class="text-sm font-medium">100% active rate</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                                 </svg>
@@ -174,12 +171,12 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Total Courses</p>
-                                    <p class="text-3xl font-bold text-gray-900">200+</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ course_count }}</p>
                                     <p class="text-sm text-blue-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                         </svg>
-                                        3 new this semester
+                                        {{ new_courses }} new this semester
                                     </p>
                                 </div>
                                 <div class="p-3 bg-emerald-100 rounded-full">
@@ -204,12 +201,12 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Total Classes</p>
-                                    <p class="text-3xl font-bold text-gray-900">64</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ class_count }}</p>
                                     <p class="text-sm text-red-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
                                         </svg>
-                                        12% fewer than 2023
+                                        {{ class_delta_percent }}% fewer than 2023
                                     </p>
                                 </div>
                                 <div class="p-3 bg-red-100 rounded-full">
@@ -234,7 +231,7 @@
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Current Semester</p>
-                                    <p class="text-3xl font-bold text-gray-900">20243</p>
+                                    <p class="text-3xl font-bold text-gray-900">20251</p>
                                     <p class="text-sm text-blue-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -260,27 +257,162 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
-                        <canvas id="myChart" class="w-full" style="height: 350px;"></canvas>
-                    </div>
-
-                
-                    <div class="rounded-xl shadow-sm border border-gray-200 lg:col-span-2">
-                        <img src="{% static 'img/dashboard2.jpg' %}" alt="Logo" class="rounded-xl">
-                    </div>
-
+                <div class="flex justify-end space-x-2 mb-4">
+                    <button class="semester-btn px-4 py-2 rounded border" data-semester="20251">20241</button>
+                    <button class="semester-btn px-4 py-2 rounded border" data-semester="20252">20242</button>
+                    <button class="semester-btn px-4 py-2 rounded border" data-semester="20253">20243</button>
                 </div>
-            </div>
-        </main>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-2 gap-5">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Courses per Major</h2>
+                        <canvas id="coursesPerMajorChart" class="max-h-[500px] "></canvas>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold mb-4">Class Proportion by Curriculum</h2>
+                        <canvas id="curriculumChart" class="max-h-[500px]"></canvas>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold mb-4">Total Credits by Major</h2>
+                        <canvas id="sksChart" class="max-h-[500px]"></canvas>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <h2 class="text-lg font-semibold mb-4">Total Class by Lecturer 1</h2>
+                        <canvas id="lecturerChart" class="max-h-[500px]"></canvas>
+                    </div>
+                </div>
+            </main>
+            {% endblock %}
 
-        {% endblock %}
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const data_20251 = {{ data_20251|safe }};
+                const data_20252 = {{ data_20252|safe }};
+                const data_20253 = {{ data_20253|safe }};
 
-        
-    </div>
+                const ctxCourses = document.getElementById('coursesPerMajorChart').getContext('2d');
+                const ctxCurriculum = document.getElementById('curriculumChart').getContext('2d');
+                const ctxSKS = document.getElementById('sksChart').getContext('2d');
+                const ctxLecturer = document.getElementById('lecturerChart').getContext('2d');
 
+                let charts = [];
+
+                function getTop(data, key, labelKey='major') {
+                    const counts = {};
+                    data.forEach(item => {
+                        const label = item[labelKey];
+                        if (!label) return;
+
+                        if (key === 'credit') {
+                            const val = parseFloat(item[key]);
+                            if (!isNaN(val)) {
+                                counts[label] = (counts[label] || 0) + val;
+                            }
+                        } else {
+                            counts[label] = (counts[label] || 0) + 1;
+                        }
+                    });
+                    return Object.entries(counts)
+                        .sort((a,b) => b[1]-a[1])
+                        .slice(0, 10);
+                }
+
+                function renderCharts(data) {
+                    const topMajors = getTop(data, 'subject', 'major');
+                    const topCurriculum = getTop(data, 'subject', 'curriculum');
+                    const topSKS = getTop(data, 'credit', 'major');
+                    const topLecturers = getTop(data, 'subject', 'lecturer_1');
+
+                    charts = [
+                        new Chart(ctxCourses, {
+                            type: 'bar',
+                            data: {
+                                labels: topMajors.map(d => d[0]),
+                                datasets: [{
+                                    label: 'Courses',
+                                    data: topMajors.map(d => d[1]),
+                                    backgroundColor: '#60a5fa'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            }
+                        }),
+                        new Chart(ctxCurriculum, {
+                            type: 'pie',
+                            data: {
+                                labels: topCurriculum.map(d => d[0]),
+                                datasets: [{ data: topCurriculum.map(d => d[1]), backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#991b1b'] }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            }
+                        }),
+                        new Chart(ctxSKS, {
+                            type: 'doughnut',
+                            data: {
+                                labels: topSKS.map(d => d[0]),
+                                datasets: [{ label: 'Total SKS', data: topSKS.map(d => d[1]), backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#991b1b'] }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            }
+                        }),
+                        new Chart(ctxLecturer, {
+                            type: 'bar',
+                            data: {
+                                labels: topLecturers.map(d => d[0]),
+                                datasets: [{ label: 'Classes', data: topLecturers.map(d => d[1]), backgroundColor: '#fbbf24' }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                            }
+                        })
+                    ];
+                }
+
+                function updateCharts(semester) {
+                    const newData = semester === "20252" ? data_20252 : semester === "20253" ? data_20253 : data_20251;
+                    const updated = [
+                        getTop(newData, 'subject', 'major'),
+                        getTop(newData, 'subject', 'curriculum'),
+                        getTop(newData, 'credit', 'major'),
+                        getTop(newData, 'subject', 'lecturer_1'),
+                    ];
+
+                    charts[0].data.labels = updated[0].map(d => d[0]);
+                    charts[0].data.datasets[0].data = updated[0].map(d => d[1]);
+
+                    charts[1].data.labels = updated[1].map(d => d[0]);
+                    charts[1].data.datasets[0].data = updated[1].map(d => d[1]);
+
+                    charts[2].data.labels = updated[2].map(d => d[0]);
+                    charts[2].data.datasets[0].data = updated[2].map(d => d[1]);
+
+                    charts[3].data.labels = updated[3].map(d => d[0]);
+                    charts[3].data.datasets[0].data = updated[3].map(d => d[1]);
+
+                    charts.forEach(chart => chart.update());
+                }
+
+                const semesterButtons = document.querySelectorAll('.semester-btn');
+                semesterButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        semesterButtons.forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
+                        btn.classList.add('bg-blue-600', 'text-white');
+                        updateCharts(btn.dataset.semester);
+                    });
+                });
+
+                renderCharts(data_20251);
+                document.querySelector('[data-semester="20251"]').classList.add('bg-blue-600', 'text-white');
+            });
+            </script>
     <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
-

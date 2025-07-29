@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.shortcuts import redirect, get_object_or_404
-from .models import profile, semester20251, semester20252, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer, LecturerPreference, Viewschedule20251, Viewschedule20252, Viewschedule20253
+from .models import profile, semester20251, semester20252, semester20243, assignlecturer20251, assignlecturer20252, formsemester20251, formsemester20252, formsemester20253, formsemester20261, Lecturer, LecturerPreference
 from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -22,6 +22,12 @@ import os
 from django.http import JsonResponse
 import traceback
 from django.db.models import Q, Count
+from django.utils import timezone
+from datetime import datetime
+from collections import Counter
+from django.db.models import Count, Sum
+import json
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from datetime import datetime
 from collections import Counter
@@ -76,12 +82,99 @@ def dashboard_hsp(request):
     
     if request.session.get('username') != 'Head of Study Program':
         return HttpResponse("Unauthorized", status=403)
+    
+    courses_per_major = (
+        semester20251.objects
+        .values('major')
+        .annotate(total_courses=Count('subject', distinct=True))
+        .order_by('-total_courses')[:10]
+    )
+
+    class_curriculum = (
+        semester20251.objects
+        .values('curriculum')
+        .annotate(total_classes=Count('subject'))
+        .order_by('-total_classes')[:10]  
+    )
+
+    sks_per_major = (
+        semester20251.objects
+        .values('major')
+        .annotate(total_sks=Sum('credit'))
+        .order_by('-total_sks')[:10]
+    )
+
+    classes_per_lecturer = (
+        semester20251.objects
+        .exclude(lecturer_1__isnull=True)
+        .exclude(lecturer_1__iexact='(Tba)')
+        .exclude(lecturer_1__exact='')
+        .values('lecturer_1')
+        .annotate(total_classes=Count('subject'))
+        .order_by('-total_classes')[:10]
+    )
+
+    total_lecturers = Lecturer.objects.count()
+    active_lecturers = Lecturer.objects.count()
+    total_courses = semester20251.objects.values('subject').distinct().count()
+    new_courses_this_semester = 3
+    total_classes = semester20251.objects.count()
+    class_delta_percent = -12
+
+    semester_20251_data = list(semester20251.objects.values('major', 'subject', 'credit', 'curriculum', 'lecturer_1'))
+    semester_20252_data = list(semester20252.objects.values('major', 'subject', 'credit', 'curriculum', 'lecturer_1'))
+    form20253_data = list(semester20243.objects.values('major', 'subject', 'credit', 'curriculum', 'lecturer_1'))
 
     
     context = {
-        "show_dashboard": True,
+        'courses_per_major_labels': json.dumps([d['major'] for d in courses_per_major]),
+        'courses_per_major_data': json.dumps([d['total_courses'] for d in courses_per_major]),
+
+        'curriculum_labels': json.dumps([d['curriculum'] for d in class_curriculum]),
+        'curriculum_data': json.dumps([d['total_classes'] for d in class_curriculum]),
+
+        'sks_labels': json.dumps([d['major'] for d in sks_per_major]),
+        'sks_data': json.dumps([float(d['total_sks']) for d in sks_per_major]),
+
+        'lecturer_labels': json.dumps([d['lecturer_1'] for d in classes_per_lecturer]),
+        'lecturer_data': json.dumps([d['total_classes'] for d in classes_per_lecturer]),
+
+        'lecturer_count': total_lecturers,
+        'active_lecturer_count': active_lecturers,
+        'course_count': total_courses,
+        'new_courses': new_courses_this_semester,
+        'class_count': total_classes,
+        'class_delta_percent': class_delta_percent,
+
+        'data_20251': json.dumps(semester_20251_data, cls=DjangoJSONEncoder),
+        'data_20252': json.dumps(semester_20252_data, cls=DjangoJSONEncoder),
+        'data_20253': json.dumps(form20253_data, cls=DjangoJSONEncoder),
     }
+
+
     return render(request, 'dashboard_hsp.html', context)
+
+def courses_per_major_api(request, semester_code):
+    if semester_code == '20251':
+        queryset = semester20251.objects
+    elif semester_code == '20252':
+        queryset = semester20252.objects
+    elif semester_code == '20253':
+        queryset = formsemester20253.objects
+    else:
+        return JsonResponse({'labels': [], 'values': []})
+
+    data = (
+        queryset.values('major')
+        .annotate(total_courses=Count('subject', distinct=True))
+        .order_by('-total_courses')[:10]
+    )
+
+    labels = [d['major'] for d in data]
+    values = [d['total_courses'] for d in data]
+
+    return JsonResponse({'labels': labels, 'values': values})
+
 
 from django.db.models import Q
 

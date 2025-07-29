@@ -22,6 +22,7 @@ urlpatterns = [
     path('schedule20252/', views.schedule20252, name='schedule20252'),
     path('dashboard/hsp/', views.dashboard_hsp, name='dashboard_hsp'),
     path('dashboard/lecturer/', views.dashboard_lecturer, name='dashboard_lecturer'),
+    path('api/courses_per_major/<str:semester_code>/', views.courses_per_major_api),
     path('subjects/', views.subject_list, name='subject-list'),
     path('dashboard/lecturerview/', views.dashboard_lecturer_view, name='dashboard_lecturer_view'),
     path('viewschedule/20251/', views.viewschedule20251, name='viewschedule20251'),

@@ -51,3 +51,23 @@ body.sidebar-open {
 .card-hover:hover { 
   transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
 }
+.semester-btn {
+  padding: 6px 12px;
+  margin-right: 8px;
+  border: none;
+  background: none;
+  font-weight: 500;
+  color: #4b5563;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.semester-btn.active {
+  color: #1d4ed8; /* blue-700 */
+  border-bottom: 2px solid #1d4ed8;
+}
+
+.semester-btn.active {
+  background-color: #2563eb; /* blue-600 */
+  color: white;
+}

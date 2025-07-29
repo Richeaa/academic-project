@@ -270,3 +270,4 @@ document.getElementById('assignForm').addEventListener('submit', function(event)
         submitBtn.disabled = false;
     });
 });
+
