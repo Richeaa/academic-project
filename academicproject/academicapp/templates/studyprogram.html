@@ -344,7 +344,7 @@
 
                         <div class="flex space-x-1">
                             {% if page_range.0 > 1 %}
-                                <a href="?page={{ page_range.0|add:"-1" }}"
+                                <a href="?page={{ page_range.0|add:"-1" }}{% if current_program_filter %}&program_session={{ current_program_filter }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}"
                                 class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Previous</a>
                             {% else %}
                                 <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Previous</span>
@@ -354,13 +354,13 @@
                                 {% if num == semester_data.number %}
                                     <span class="px-3 py-1 rounded bg-blue-500 text-white font-semibold">{{ num }}</span>
                                 {% else %}
-                                    <a href="?page={{ num }}"
+                                    <a href="?page={{ num }}{% if current_program_filter %}&program_session={{ current_program_filter }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}"
                                     class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">{{ num }}</a>
                                 {% endif %}
                             {% endfor %}
 
                             {% if page_range|last < semester_data.paginator.num_pages %}
-                                <a href="?page={{ page_range|last|add:1 }}"
+                                <a href="?page={{ page_range|last|add:1 }}{% if current_program_filter %}&program_session={{ current_program_filter }}{% endif %}{% if current_search %}&search={{ current_search }}{% endif %}"
                                 class="px-3 py-1 rounded bg-white border text-gray-700 hover:bg-gray-100">Next</a>
                             {% else %}
                                 <span class="px-3 py-1 rounded bg-gray-200 text-gray-400 cursor-not-allowed">Next</span>
@@ -384,68 +384,100 @@ function openAssign(button) {
 }
 
 function closeAssign() {
-  document.getElementById('assignMorning').classList.add('hidden');
+    document.getElementById('assignMorning').classList.add('hidden');
+}
+
+function applyFilters() {
+    const url = new URL(window.location);
+    
+    const filterM = document.getElementById('filterM');
+    const filterN = document.getElementById('filterN');
+    const filterAll = document.getElementById('filterAll');
+    const searchInput = document.getElementById('searchInput');
+    
+    url.searchParams.delete('program_session');
+    url.searchParams.delete('search');
+    url.searchParams.delete('page');
+    
+    if (filterM.classList.contains('bg-blue-100')) {
+        url.searchParams.set('program_session', 'M');
+    } else if (filterN.classList.contains('bg-blue-100')) {
+        url.searchParams.set('program_session', 'N');
+    }
+    
+    const searchValue = searchInput.value.trim();
+    if (searchValue) {
+        url.searchParams.set('search', searchValue);
+    }
+    
+    window.location.href = url.toString();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const filterAll = document.getElementById('filterAll');
     const filterM = document.getElementById('filterM');
     const filterN = document.getElementById('filterN');
-    const tableRows = document.querySelectorAll('tbody tr');
     const searchInput = document.getElementById('searchInput');
 
-    function filterRows(programSession = null) {
-        const searchTerm = searchInput.value.toLowerCase();
-        
-        tableRows.forEach(row => {
-            const programSessionCell = row.querySelector('td:nth-child(2)');
-            const programSessionValue = programSessionCell.textContent.trim();
-            const rowText = row.textContent.toLowerCase();
-            
-            const matchesProgramSession = !programSession || programSessionValue.includes(programSession);
-            const matchesSearch = !searchTerm || rowText.includes(searchTerm);
-            
-            row.style.display = (matchesProgramSession && matchesSearch) ? '' : 'none';
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentProgramFilter = urlParams.get('program_session');
+    const currentSearch = urlParams.get('search');
+    
+    function resetFilterStyles() {
+        [filterAll, filterM, filterN].forEach(btn => {
+            btn.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
+            btn.classList.add('bg-gray-100', 'text-gray-800', 'border-gray-200');
         });
     }
-
-    filterAll.addEventListener('click', () => {
-        filterAll.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterAll.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
-        filterM.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterN.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterRows();
-    });
-
-    filterM.addEventListener('click', () => {
-        filterM.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+    
+    resetFilterStyles();
+    if (currentProgramFilter === 'M') {
         filterM.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
-        filterAll.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterN.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterRows('M');
-    });
-
-    filterN.addEventListener('click', () => {
-        filterN.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        filterM.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+    } else if (currentProgramFilter === 'N') {
         filterN.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
-        filterAll.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterM.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-200');
-        filterRows('N');
+        filterN.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+    } else {
+        filterAll.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterAll.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+    }
+    
+    if (currentSearch) {
+        searchInput.value = currentSearch;
+    }
+
+    filterAll.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetFilterStyles();
+        filterAll.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterAll.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        applyFilters();
     });
 
+    filterM.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetFilterStyles();
+        filterM.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterM.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        applyFilters();
+    });
 
+    filterN.addEventListener('click', (e) => {
+        e.preventDefault();
+        resetFilterStyles();
+        filterN.classList.remove('bg-gray-100', 'text-gray-800', 'border-gray-200');
+        filterN.classList.add('bg-blue-100', 'text-blue-800', 'border-blue-200');
+        applyFilters();
+    });
+
+    let searchTimeout;
     searchInput.addEventListener('input', () => {
-        let activeFilter = null;
-        if (filterM.classList.contains('bg-blue-100')) activeFilter = 'M';
-        else if (filterN.classList.contains('bg-blue-100')) activeFilter = 'N';
-        
-        filterRows(activeFilter);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            applyFilters();
+        }, 500);
     });
-
- 
-    filterRows();
 });
-
 
 window.addEventListener('message', function(event) {
     if (event.data.type === 'UPDATE_SEMESTER_STATUS') {

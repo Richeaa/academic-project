@@ -47,6 +47,51 @@ def get_unassigned_classes(semester_choice):
     
     return unassigned_df
 
+def get_existing_assignments(semester_choice):
+    if semester_choice == '20251':
+        SemesterModel = apps.get_model('academicapp', 'semester20251')
+        AssignModel = apps.get_model('academicapp', 'assignlecturer20251')
+    elif semester_choice == '20252':
+        SemesterModel = apps.get_model('academicapp', 'semester20252')
+        AssignModel = apps.get_model('academicapp', 'assignlecturer20252')
+    elif semester_choice == '20253':
+        SemesterModel = apps.get_model('academicapp', 'semester20253')
+        AssignModel = apps.get_model('academicapp', 'assignlecturer20253')
+    else:
+        raise ValueError(f"Invalid semester choice: {semester_choice}")
+    
+    assignments = AssignModel.objects.select_related('semester').all().values(
+        'semester__semester_id',
+        'semester__curriculum', 
+        'semester__major_class',
+        'semester__subject',
+        'semester__credit',
+        'semester__lecturer_1',
+        'lecturer_day',
+        'room',
+        'start_time',
+        'end_time'
+    )
+    
+    df = pd.DataFrame(assignments)
+    
+    if df.empty:
+        return pd.DataFrame()
+    
+    df = df.rename(columns={
+        'semester__curriculum': 'Curriculum',
+        'semester__major_class': 'Class', 
+        'semester__subject': 'Subject',
+        'semester__credit': 'Cr',
+        'semester__lecturer_1': '#1',
+        'lecturer_day': 'Day',
+        'room': 'Room',
+        'start_time': 'StartTime',
+        'end_time': 'EndTime'
+    })
+    
+    return df
+
 def get_preferences_df():
     LecturerPreference = apps.get_model('academicapp', 'LecturerPreference')
     

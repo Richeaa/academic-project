@@ -30,13 +30,6 @@
             </div>
 
             <div class="md:w-1/3 w-2/5 flex md:space-x-4 p-2 md:mt-0 mt-1 justify-end">
-            <input type="text" placeholder="Search..." class="hidden lg:block w-80 pl-10 pr-4 py-2 bg-gray-100 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-            
-            <div class="button hover:bg-blue-50/10 px-4 py-2 rounded-lg ripple group">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-white">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
-                </svg>
-            </div>
 
             <div id="profile-button" class="button hover:bg-blue-50/10 px-4 py-2 rounded-lg select-none">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-white">
@@ -138,13 +131,13 @@
 
         <main id="main-content" class="w-full p-12 select-none">
            <div class="max-w-8xl">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols- gap-6 mb-8">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
                         <div class="p-7">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium text-gray-600 mb-1">Total Lecturers</p>
-                                    <p class="text-3xl font-bold text-gray-900">{{ lecturer_count }}</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{lecturer_count}}</p>
                                     <span class="text-sm text-green-600 mt-2 flex items-center">
                                         85 active
                                     </span>
@@ -166,77 +159,18 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
-                        <div class="p-7">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-600 mb-1">Total Courses</p>
-                                    <p class="text-3xl font-bold text-gray-900">{{ course_count }}</p>
-                                    <p class="text-sm text-blue-600 mt-2 flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                        </svg>
-                                        {{ new_courses }} new this semester
-                                    </p>
-                                </div>
-                                <div class="p-3 bg-emerald-100 rounded-full">
-                                    <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3">
-                            <div class="flex items-center justify-between text-white">
-                                <span class="text-sm font-medium">Growing curriculum</span>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
                         <div class="p-7">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-600 mb-1">Total Classes</p>
-                                    <p class="text-3xl font-bold text-gray-900">{{ class_count }}</p>
-                                    <p class="text-sm text-red-600 mt-2 flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-                                        </svg>
-                                        {{ class_delta_percent }}% fewer than 2023
-                                    </p>
-                                </div>
-                                <div class="p-3 bg-red-100 rounded-full">
-                                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-3">
-                            <div class="flex items-center justify-between text-white">
-                                <span class="text-sm font-medium">Optimization needed</span>
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
-                        <div class="p-7">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-600 mb-1">Current Semester</p>
+                                    <p class="text-sm font-medium text-gray-600 mb-1">Upcoming Semester</p>
                                     <p class="text-3xl font-bold text-gray-900">20251</p>
                                     <p class="text-sm text-blue-600 mt-2 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        Ongoing since August
+                                        Starting in August
                                     </p>
                                 </div>
                                 <div class="p-3 bg-blue-100 rounded-full">
@@ -248,7 +182,7 @@
                         </div>
                         <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3">
                             <div class="flex items-center justify-between text-white">
-                                <span class="text-sm font-medium">Active semester</span>
+                                <span class="text-sm font-medium">Upcoming semester</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                 </svg>
@@ -263,16 +197,16 @@
                     <button class="semester-btn px-4 py-2 rounded border" data-semester="20253">20243</button>
                 </div>
                 
-                <div class="grid grid-cols-2 lg:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <h2 class="text-lg font-semibold text-gray-800 mb-4">Courses per Major</h2>
                         <canvas id="coursesPerMajorChart" class="max-h-[500px] "></canvas>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="hidden bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <h2 class="text-lg font-semibold mb-4">Class Proportion by Curriculum</h2>
                         <canvas id="curriculumChart" class="max-h-[500px]"></canvas>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="hidden bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <h2 class="text-lg font-semibold mb-4">Total Credits by Major</h2>
                         <canvas id="sksChart" class="max-h-[500px]"></canvas>
                     </div>

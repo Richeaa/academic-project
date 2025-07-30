@@ -1,6 +1,5 @@
 from django.db import models
 from django.shortcuts import render
-from django.shortcuts import redirect
 from django.shortcuts import redirect, get_object_or_404
 from .models import profile, semester20251, semester20252, semester20253, semester20243, assignlecturer20251, assignlecturer20252, assignlecturer20253, Lecturer, LecturerPreference
 from django.http import HttpResponse
@@ -8,31 +7,20 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from collections import defaultdict
 from django.http import JsonResponse
-import json
-from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.decorators.http import require_http_methods
 from .datasubject import subjects
 from .ml.predict import run_ml_prediction
 from .ml.utils import get_combined_schedule_data
-from django.http import JsonResponse
 import traceback
 import logging
-import pickle
-import os
-from django.http import JsonResponse
-import traceback
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.utils import timezone
 from datetime import datetime
 from collections import Counter
-from django.db.models import Count, Sum
 import json
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils import timezone
-from datetime import datetime
-from collections import Counter
 
 def dashboard(request):
     if 'user_id' not in request.session:
@@ -85,6 +73,17 @@ def dashboard_hsp(request):
     if request.session.get('username') != 'Head of Study Program':
         return HttpResponse("Unauthorized", status=403)
     
+    semester_data = semester20251.objects.all()
+    
+    all_lecturers = set()
+    for item in semester_data:
+        if item.lecturer_1:
+            all_lecturers.add(item.lecturer_1)
+        if item.lecturer_2:
+            all_lecturers.add(item.lecturer_2)
+        if item.lecturer_3:
+            all_lecturers.add(item.lecturer_3)
+    
     courses_per_major = (
         semester20251.objects
         .values('major')
@@ -116,7 +115,7 @@ def dashboard_hsp(request):
         .order_by('-total_classes')[:10]
     )
 
-    total_lecturers = Lecturer.objects.count()
+    # total_lecturers = Lecturer.objects.count()
     active_lecturers = Lecturer.objects.count()
     total_courses = semester20251.objects.values('subject').distinct().count()
     new_courses_this_semester = 3
@@ -141,7 +140,7 @@ def dashboard_hsp(request):
         'lecturer_labels': json.dumps([d['lecturer_1'] for d in classes_per_lecturer]),
         'lecturer_data': json.dumps([d['total_classes'] for d in classes_per_lecturer]),
 
-        'lecturer_count': total_lecturers,
+        'lecturer_count': len(all_lecturers),
         'active_lecturer_count': active_lecturers,
         'course_count': total_courses,
         'new_courses': new_courses_this_semester,
@@ -178,7 +177,6 @@ def courses_per_major_api(request, semester_code):
     return JsonResponse({'labels': labels, 'values': values})
 
 
-from django.db.models import Q
 
 def dashboard_lecturer_view(request):
     if 'user_id' not in request.session:
@@ -332,10 +330,10 @@ def signin(request):
                     request.session['user_id'] = user.profile_id  
                     request.session['username'] = user.username
                     return redirect('dashboard_hsp')
-                elif username == 'lecturer':
-                    request.session['user_id'] = user.profile_id  
-                    request.session['username'] = user.username
-                    return redirect('dashboard_lecturer') 
+                # elif username == 'lecturer':
+                #     request.session['user_id'] = user.profile_id  
+                #     request.session['username'] = user.username
+                #     return redirect('dashboard_lecturer') 
                 else :
                     request.session['user_id'] = user.profile_id  
                     request.session['username'] = user.username
@@ -390,7 +388,28 @@ def studyprogram(request, semester_url='20251'):
     if not semester_model:
         return HttpResponse("Semester not found", status=404)
 
-    semester_data = semester_model.objects.all().order_by('semester_id')
+    program_filter = request.GET.get('program_session', '')
+    search_term = request.GET.get('search', '')
+
+    semester_queryset = semester_model.objects.all()
+
+    if program_filter and program_filter in ['M', 'N']:
+        semester_queryset = semester_queryset.filter(program_session__icontains=program_filter)
+    
+    if search_term:
+        semester_queryset = semester_queryset.filter(
+            Q(semester_id__icontains=search_term) |
+            Q(program_session__icontains=search_term) |
+            Q(major__icontains=search_term) |
+            Q(curriculum__icontains=search_term) |
+            Q(major_class__icontains=search_term) |
+            Q(subject__icontains=search_term) |
+            Q(lecturer_1__icontains=search_term) |
+            Q(lecturer_2__icontains=search_term) |
+            Q(lecturer_3__icontains=search_term)
+        )
+
+    semester_data = semester_queryset.order_by('semester_id')
 
     assign_model = assign_model_title.get(semester_url)
     assignments = assign_model.objects.select_related('semester').all()
@@ -411,7 +430,6 @@ def studyprogram(request, semester_url='20251'):
     end_block = min(start_block + block_size - 1, paginator.num_pages)
     page_range = range(start_block, end_block + 1)
 
-
     rooms1 = [f'B{str(i).zfill(3)}' for i in range(101, 109)]
     rooms2 = [f'B{str(i).zfill(3)}' for i in range(201, 212)]
     rooms3 = [f'B{str(i).zfill(3)}' for i in range(301, 312)]
@@ -429,6 +447,8 @@ def studyprogram(request, semester_url='20251'):
         'rooms3': rooms3,
         'rooms4': rooms4,
         'current_page': page_number,
+        'current_program_filter': program_filter,
+        'current_search': search_term,
     }
     return render(request, 'studyprogram.html', context)
 

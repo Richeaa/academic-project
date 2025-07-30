@@ -6,7 +6,8 @@ import random
 from collections import defaultdict
 
 from .utils import (
-    get_unassigned_classes, 
+    get_unassigned_classes,
+    get_existing_assignments, 
     get_preferences_df, 
     get_available_rooms, 
     get_available_times,
@@ -50,6 +51,9 @@ def run_ml_prediction(semester_choice):
         available_rooms = get_available_rooms()
         available_times = get_available_times()
         
+        existing_assignments = get_existing_assignments(semester_choice)
+        print(f"Found {len(existing_assignments)} existing assignments")
+
         print(f"Available rooms: {len(available_rooms)}")
         print(f"Available times: {len(available_times)}")
         
@@ -103,7 +107,7 @@ def run_ml_prediction(semester_choice):
         
         print("Starting constraint-based scheduling...")
         final_schedule = apply_constraints_scheduling(
-            final_schedule, preferences_df, available_rooms, available_times
+            final_schedule, preferences_df, available_rooms, available_times, existing_assignments
         )
         
         successful_assignments = len(final_schedule[
@@ -120,13 +124,57 @@ def run_ml_prediction(semester_choice):
     except Exception as e:
         return False, f"Prediction failed: {str(e)}", 0
 
-def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, available_times):
+def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, available_times, existing_assignments):
     room_day_time_blocks = defaultdict(lambda: defaultdict(list))
     class_day_time_blocks = defaultdict(lambda: defaultdict(list))
     class_day_subject_count = defaultdict(lambda: defaultdict(int))
     class_used_days = defaultdict(set)
     lecturer_time_blocks = defaultdict(lambda: defaultdict(list))
     lecturer_schedule = defaultdict(set)
+    
+    print("Pre-populating tracking dictionaries with existing assignments...")
+    for _, assignment in existing_assignments.iterrows():
+        try:
+            room = assignment['Room']
+            day = assignment['Day']
+            start_time = assignment['StartTime']
+            end_time = assignment['EndTime']
+            lecturer = assignment['#1']
+            curriculum = assignment['Curriculum']
+            class_name = assignment['Class']
+            
+            # Convert times to datetime objects
+            today = datetime.today().date()
+            start_dt = datetime.combine(today, start_time)
+            end_dt = datetime.combine(today, end_time)
+            
+            # Update tracking dictionaries
+            key_class = (curriculum, class_name)
+            room_day_time_blocks[room][day].append((start_dt, end_dt))
+            class_day_time_blocks[key_class][day].append((start_dt, end_dt))
+            class_day_subject_count[key_class][day] += 1
+            class_used_days[key_class].add(day)
+            
+            if lecturer and lecturer != '(Tba)' and str(lecturer).strip() != '':
+                lecturer_time_blocks[lecturer][day].append((start_dt, end_dt))
+                lecturer_schedule[lecturer].add(room)
+                
+            print(f"Pre-populated: {room} on {day} from {start_time} to {end_time}")
+            
+        except Exception as e:
+            print(f"Error pre-populating assignment: {e}")
+            continue
+    
+    print(f"Pre-populated {len(existing_assignments)} existing assignments")
+    
+    print("=== DEBUG: Checking pre-populated data ===")
+    print(f"room_day_time_blocks keys: {list(room_day_time_blocks.keys())}")
+    if 'A420' in room_day_time_blocks:
+        print(f"A420 Monday schedule: {room_day_time_blocks['A420']['Mon']}")
+        if room_day_time_blocks['A420']['Mon']:
+            for block in room_day_time_blocks['A420']['Mon']:
+                print(f"  Existing block: {block[0]} to {block[1]}")
+    print("=== END DEBUG ===")
     
     max_class_days = 5
     max_subjects_per_day = 3

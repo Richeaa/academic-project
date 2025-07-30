@@ -53,7 +53,10 @@ def is_room_eligible(room, major, subject):
 
 def get_time_block(start_time_str, credit):
     start_dt = datetime.strptime(start_time_str, "%a, %H:%M")
-    duration = 135 if credit == 0 else credit * 45  # 45 minutes per credit
+    today = datetime.today().date()
+    start_dt = start_dt.replace(year=today.year, month=today.month, day=today.day)
+    
+    duration = 135 if credit == 0 else credit * 45
     end_dt = start_dt + timedelta(minutes=duration)
     return start_dt, end_dt
 
