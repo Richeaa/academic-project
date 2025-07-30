@@ -886,7 +886,6 @@ def add_academic_module(request, semester_url):
         if not semester_model:
             return JsonResponse({'success': False, 'error': 'Semester tidak ditemukan'}, status=404)
 
-    
         try:
             max_id = semester_model.objects.all().aggregate(models.Max('semester_id'))['semester_id__max'] or 0
             new_id = max_id + 1
@@ -1079,7 +1078,6 @@ def delete_academic_module(request, semester_url, semester_id):
             if semester_url == '20253':
               
                 reference = model.objects.get(pk=semester_id)
-
                
                 deleted, _ = model.objects.filter(
                     program_session=reference.program_session,
