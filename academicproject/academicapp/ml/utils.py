@@ -127,18 +127,15 @@ def save_predictions_to_db(predictions_df, semester_choice):
             continue
             
         try:
-            # Parse schedule time
             schedule_time = row['Sched. Time']
             if ', ' in schedule_time and '-' in schedule_time:
                 day_time_part = schedule_time.split(', ')[1]
                 start_time_str, end_time_str = day_time_part.split('-')
                 day = schedule_time.split(', ')[0]
                 
-                # Convert to time objects
                 start_time = datetime.strptime(start_time_str, '%H:%M').time()
                 end_time = datetime.strptime(end_time_str, '%H:%M').time()
                 
-                # Get semester instance
                 semester_instance = SemesterModel.objects.get(
                     semester_id=row['semester_id']
                 )

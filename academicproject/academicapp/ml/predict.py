@@ -198,7 +198,7 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
         
         lecturer = lecturer_assignments.get(key_lecturer)
         
-        if not lecturer or lecturer == 'Unknown' or pd.isna(lecturer) or str(lecturer).strip() == '':
+        if not lecturer or lecturer == 'Unknown' or pd.isna(lecturer) or str(lecturer).strip() == '' or lecturer == '(Tba)':
             schedule_df.at[idx, '#1'] = '(Tba)'
             schedule_df.at[idx, 'Room'] = '-'
             schedule_df.at[idx, 'Sched. Time'] = '-'

@@ -3,7 +3,6 @@ import re
 from datetime import datetime, timedelta
 from collections import defaultdict
 
-# Room eligibility rules from your original script
 ROOM_ALLOWED_MAJORS = {
     'A423 Moot Court Room':                     ['PS_MH', 'PS_Hukum'],
     'A429 (MMTek Classroom)':                   ['PS_MMTek'],
@@ -62,22 +61,18 @@ def is_overlapping(start, end, existing_blocks):
     return any(max(s, start) < min(e, end) for s, e in existing_blocks)
 
 def parse_day_preference(pref):
-    """
-    Parse day preference string into list of days
-    Handles formats like "Monday, Tuesday-Friday", "Mon-Wed", etc.
-    """
     if pd.isna(pref) or str(pref).strip() in ['', 'nan']:
         return []
     
     pref = str(pref).strip()
     result = []
     
-    # Split by comma first to handle "Monday, Tuesday-Friday"
+    # "Monday, Tuesday-Friday"
     parts = [p.strip() for p in pref.split(',')]
     
     for part in parts:
         if '-' in part:
-            # Handle ranges like "Tuesday-Thursday"
+            # "Tuesday-Thursday"
             days = part.split('-')
             start = days[0].strip()
             end = days[1].strip()
@@ -105,7 +100,7 @@ def matches_room_preference(room_code, preference):
     room_code = room_code.strip().upper()
     preference = preference.strip()
 
-    # Split by comma to handle multiple preferences
+    # Split by comma
     preferences = [p.strip() for p in preference.split(',') if p.strip()]
     
     for pref in preferences:
@@ -113,21 +108,21 @@ def matches_room_preference(room_code, preference):
         if room_code == pref.strip().upper():
             return True
             
-        # Building + Floor match e.g., "Building B (2nd Floor)"
+        # Building + Floor "Building B (2nd Floor)"
         match = re.match(r"Building (\w) \((\d)(?:st|nd|rd|th) Floor\)", pref)
         if match:
             building, floor = match.groups()
             if room_code.startswith(building) and len(room_code) > 1 and room_code[1] == floor:
                 return True
         
-        # Handle "Building A" (any floor)
+        # "Building A" (any floor)
         match = re.match(r"Building (\w)$", pref)
         if match:
             building = match.group(1)
             if room_code.startswith(building):
                 return True
                 
-        # Handle "Building B (1st and 2nd Floor)"
+        # "Building B (1st and 2nd Floor)"
         match = re.match(r"Building (\w) \((\d)(?:st|nd|rd|th) and (\d)(?:st|nd|rd|th) Floor\)", pref)
         if match:
             building, floor1, floor2 = match.groups()
@@ -138,8 +133,6 @@ def matches_room_preference(room_code, preference):
 
 def validate_schedule_constraints(schedule_df):
     violations = []
-    
-    # Check for room conflicts
     room_time_usage = defaultdict(list)
     
     for _, row in schedule_df.iterrows():
