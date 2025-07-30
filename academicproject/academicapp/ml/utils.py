@@ -156,7 +156,7 @@ def save_predictions_to_db(predictions_df, semester_choice):
     
     return saved_count
 
-def get_combined_schedule_data(semester_choice, page=1, page_size=10): #Display
+def get_combined_schedule_data(semester_choice, page=1, page_size=10, sort_by='', filter_status='all'):
     if semester_choice == '20251':
         SemesterModel = apps.get_model('academicapp', 'semester20251')
         AssignModel = apps.get_model('academicapp', 'assignlecturer20251')
@@ -170,6 +170,23 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10): #Display
         raise ValueError(f"Invalid semester choice: {semester_choice}")
     
     semester_data = SemesterModel.objects.select_related().all()
+    
+    if filter_status == 'assigned':
+        assigned_semester_ids = AssignModel.objects.values_list('semester_id', flat=True)
+        semester_data = semester_data.filter(semester_id__in=assigned_semester_ids)
+    elif filter_status == 'unassigned':
+        assigned_semester_ids = AssignModel.objects.values_list('semester_id', flat=True)
+        semester_data = semester_data.exclude(semester_id__in=assigned_semester_ids)
+    
+    if sort_by:
+        valid_sort_fields = [
+            'program_session', 'major', 'curriculum', 'major_class', 
+            'subject', 'credit', 'lecturer_1'
+        ]
+        if sort_by in valid_sort_fields:
+            semester_data = semester_data.order_by(sort_by)
+        elif sort_by.startswith('-') and sort_by[1:] in valid_sort_fields:
+            semester_data = semester_data.order_by(sort_by)
     
     # Calculate pagination
     total_count = semester_data.count()

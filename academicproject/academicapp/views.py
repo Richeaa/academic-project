@@ -1147,6 +1147,9 @@ def get_schedule(request):
         page = int(data.get('page', 1))
         page_size = int(data.get('page_size', 10))
         
+        sort_by = data.get('sort_by', '')
+        filter_status = data.get('filter_status', 'all')  
+        
         if not semester_choice:
             return JsonResponse({
                 'success': False,
@@ -1159,8 +1162,9 @@ def get_schedule(request):
                 'error': 'Invalid semester choice'
             }, status=400)
         
-        # combined schedule data
-        schedule_data = get_combined_schedule_data(semester_choice, page, page_size)
+        schedule_data = get_combined_schedule_data(
+            semester_choice, page, page_size, sort_by, filter_status
+        )
         
         return JsonResponse({
             'success': True,

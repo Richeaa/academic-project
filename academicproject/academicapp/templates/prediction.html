@@ -29,6 +29,12 @@
                     <option value="20253">2025-3</option>
                 </select>
 
+                <select name="status_filter" id="status-filter" class="border border-gray-300 rounded-lg px-4 py-2 text-sm bg-white focus:ring-blue-500 focus:border-blue-500">
+                    <option value="all">All Status</option>
+                    <option value="assigned">Scheduled Only</option>
+                    <option value="unassigned">Unassigned Only</option>
+                </select>
+
                 <button id="predict-btn" disabled
                     class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed">
                     Predict
@@ -161,11 +167,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const refreshStatsButton = document.getElementById('refresh-stats');
     const paginationInfo = document.getElementById('pagination-info');
     const paginationControls = document.getElementById('pagination-controls');
-
+    const statusFilter = document.getElementById('status-filter');
     let currentPage = 1;
     let currentSemester = '';
     let totalPages = 1;
     let totalItems = 0;
+    let currentStatus = 'all';
     const itemsPerPage = 10;
 
     function getCSRFToken() {
@@ -351,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function populateSchedule(data, semester, page = 1) {
         scheduleBody.innerHTML = '';
-        selectedSemesterDisplay.textContent = semester === '20251' ? '2025-1' : '2025-2';
+        selectedSemesterDisplay.textContent = semester === '20251' ? '2025-1' : semester === '20252' ? '2025-2' : '2025-3';
 
         if (!data || !data.results || data.results.length === 0) {
             scheduleBody.innerHTML = `
@@ -418,6 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // MODIFIED: Updated fetchSchedule function
     async function fetchSchedule(semester, page = 1) {
         if (!semester) {
             showDefault();
@@ -437,7 +445,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ 
                     semester: semester,
                     page: page,
-                    page_size: itemsPerPage
+                    page_size: itemsPerPage,
+                    filter_status: currentStatus
                 })
             });
 
@@ -457,13 +466,20 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Failed to load schedule. Please try again.');
         }
     }
-
     semesterSelect.addEventListener('change', function() {
         const selectedSemester = this.value;
         predictButton.disabled = !selectedSemester;
         clearButton.disabled = !selectedSemester;
         currentPage = 1;
         fetchSchedule(selectedSemester, 1);
+    });
+
+    statusFilter.addEventListener('change', function() {
+        currentStatus = this.value;
+        currentPage = 1;
+        if (currentSemester) {
+            fetchSchedule(currentSemester, 1);
+        }
     });
 
     showDefault();
