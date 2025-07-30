@@ -181,6 +181,14 @@ def courses_per_major_api(request, semester_code):
 from django.db.models import Q
 
 def dashboard_lecturer_view(request):
+    if 'user_id' not in request.session:
+        return redirect('signin')
+    
+    if request.session.get('username') == 'academic':
+        return HttpResponse("Unauthorized", status=403)
+    elif request.session.get('username') == 'Head of Study Program':
+        return HttpResponse("Unauthorized", status=403)
+
     context = {
         "show_dashboard": True,
     }
@@ -329,6 +337,8 @@ def signin(request):
                     request.session['username'] = user.username
                     return redirect('dashboard_lecturer') 
                 else :
+                    request.session['user_id'] = user.profile_id  
+                    request.session['username'] = user.username
                     return redirect('dashboard_lecturer_view')
             else:
                 return render(request, 'signin.html', {
