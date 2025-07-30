@@ -1,4 +1,4 @@
-{% extends 'dashboard_hsp.html' %}
+{% extends 'dashboard.html' %}
 {% load static %}
 
 {% block title %}Lecturer{% endblock %}
@@ -41,9 +41,6 @@
 <div id="main-content" class="w-full p-12 select-none">
   <div class="flex justify-between items-center mb-8 no-print">
     <h1 class="text-3xl font-bold text-gray-800">Lecturer Information</h1>
-    <a href="{% url 'addLecturer' %}" class="bg-blue-500 text-white px-3 py-3 rounded-lg flex items-center gap-2 transition-colors">
-      <img src="{% static 'svg/add.svg' %}" alt="Add Icon" class="w-5 h-5"> Add Lecturer
-    </a>
   </div>
 
   <form method="GET" class="flex flex-wrap items-center gap-4 mb-8 no-print">
@@ -83,7 +80,6 @@
             <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 min-w-[120px]">Lecturer Type</th>
             <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px]">Job</th>
             <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[140px]">Current Working Days</th>
-            <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 min-w-[100px] no-print">Action</th>
           </tr>
         </thead>
       </table>
@@ -98,16 +94,7 @@
             <td class="px-6 py-4 text-sm text-gray-600 min-w-[120px]">{{ lecturer.lecturer_type }}</td>
             <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[100px]">{{ lecturer.job|default:"-" }}</td>
             <td class="px-6 py-4 text-center text-sm text-gray-600 min-w-[140px]">{{ lecturer.current_working_day|default:"-" }}</td>
-            <td class="px-6 py-4 text-center min-w-[100px] no-print">
-              <div class="flex justify-center items-center gap-2">
-                <a href="{% url 'editLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-green-100 rounded hover:bg-blue-200 transition-colors">
-                  <img src="{% static 'svg/edit.svg' %}" class="w-4 h-4 object-contain" alt="Edit">
-                </a>
-                <a href="{% url 'deleteLecturer' lecturer.lecturer_id %}" class="flex items-center justify-center w-8 h-8 bg-red-100 rounded hover:bg-blue-200 transition-colors">
-                  <img src="{% static 'svg/delete.svg' %}" class="w-4 h-4 object-contain" alt="Delete">
-                </a>
-              </div>
-            </td>
+            <td class="px-6 py-4 text-center min-w-[100px] no-print"></td>
           </tr>
           {% empty %}
           <tr>

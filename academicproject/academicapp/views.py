@@ -595,8 +595,11 @@ def schedule20251(request):
                         conflict_ids.add(entry1.assign_id)
                         conflict_ids.add(entry2.assign_id)
                         has_conflicts = True
+
+                        pair_id = tuple(sorted((entry1.assign_id, entry2.assign_id)))
+                        existing_conflict_ids = {tuple(sorted((d['entry1_id'], d['entry2_id']))) for d in conflict_details}
                         
-                        if entry1.assign_id < entry2.assign_id:  
+                        if pair_id not in existing_conflict_ids:
                             conflict_details.append({
                                 'room': room,
                                 'day': day,
@@ -717,7 +720,7 @@ def lecturer(request):
     if job:
         lecturers = lecturers.filter(job=job)
 
-    paginator = Paginator(lecturers, 10)  
+    paginator = Paginator(lecturers, 30)  
     page = request.GET.get('page')
     lecturers_page = paginator.get_page(page)
 
@@ -731,38 +734,6 @@ def lecturer(request):
         'job_choices': job_choices,
     })
 
-def addLecturer(request):
-    if request.method == 'POST':
-        Lecturer.objects.create(
-            lecturer_name=request.POST.get('name'),
-            lecturer_type=request.POST.get('type'),
-            job=request.POST.get('job'),
-            current_working_day=request.POST.get('working_days'),
-        )
-        return redirect('lecturer')  
-    return render(request, 'addLecturer.html')
-
-def editLecturer(request, lecturer_id):
-    lecturer = get_object_or_404(Lecturer, pk=lecturer_id)
-
-    if request.method == 'POST':
-        lecturer.lecturer_name = request.POST.get('name')
-        lecturer.lecturer_type = request.POST.get('type')
-        lecturer.job = request.POST.get('job')
-        lecturer.current_working_day = request.POST.get('working_days')
-        lecturer.save()
-        return redirect('lecturer')
-
-    return render(request, 'editLecturer.html', {'lecturer': lecturer})
-
-def deleteLecturer(request, lecturer_id):
-    lecturer = get_object_or_404(Lecturer, pk=lecturer_id)
-    
-    if request.method == 'POST':
-        lecturer.delete()
-        return redirect('lecturer')  
-
-    return render(request, 'deleteLecturer.html', {'lecturer': lecturer})
 
 def formstudyprogram(request, semester_url='20251'): 
     semester_model = semester_title.get(semester_url)
@@ -1109,7 +1080,6 @@ def prediction_view(request):
 @require_http_methods(["POST"])
 def predict_schedule(request):
     try:
-        # request data
         data = json.loads(request.body)
         semester_choice = data.get('semester')
         

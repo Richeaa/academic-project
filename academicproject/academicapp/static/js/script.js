@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
       match: (p) => p.startsWith('/prediction/'), 
     },
     {
+      id: 'lecturer-link',
+      match: (p) => p.startsWith('/lecturer/'), 
+    },
+    {
       id: 'preference-link',
       match: (p) => p.startsWith('/preference/'), 
     },
