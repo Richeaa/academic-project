@@ -1,4 +1,5 @@
 {% load static %}
+{% load get_item %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -160,14 +161,25 @@
 
         <main id="main-content" class="w-full p-12 select-none">
            <h1 class="text-4xl font-bold text-blue-900 mb-8">Hello, {{ lecturer_name }}</h1>
-           <div class="max-w-8xl">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden flex flex-col h-full">
-                        <div class="p-4 md:p-5 lg:p-6 flex-grow">
-                            <div class="flex items-start justify-between h-full">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs sm:text-sm font-medium text-gray-600 mb-4 truncate">Total Lecturers</p>
-                                    <p class="text-2xl sm:text-3xl font-bold text-gray-900">{{total_lecturers}}</p>
+           <div class="flex items-center justify-center space-x-4 mb-4">
+                <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice=20251" class="px-4 py-2 text-sm font-medium {% if schedule_choice == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
+                <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice=20252" class="px-4 py-2 text-sm font-medium {% if schedule_choice == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
+                <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice=20253" class="px-4 py-2 text-sm font-medium {% if schedule_choice == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
+            </div>
+           <div class="max-w-8xl mb-4">
+                <!-- <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 card-hover overflow-hidden">
+                        <div class="p-7">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-600 mb-1">Total Lecturers</p>
+                                    <p class="text-3xl font-bold text-gray-900">{{ total_lecturers }}</p>
+                                    <p class="text-sm text-green-600 mt-2 flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+                                        </svg>
+                                        85 active
+                                    </p>
                                 </div>
                                 <div class="p-2 sm:p-3 bg-amber-100 rounded-full ml-4 flex-shrink-0 mt-4">
                                     <svg class="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,63 +245,163 @@
                             </div>
                         </div>
                     </div>
+                </div> -->
+
+                <div class="grid grid-cols-1 lg:grid-cols-6 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
+                        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Number of Schedules by Room</p>
+
+                        {% if no_room_distribution_warning %}
+                        <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                    <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                                    <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                            </svg>
+                                <p class="text-lg">No schedule in this semester</p>
+                        </div>
+                        {% else %}
+                        <div class="h-80">
+                            <canvas id="roomChart" class="w-full h-full"></canvas>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
+                        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Schedules per Day</p>
+
+                        {% if no_classes_warning %}
+                        <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                        <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                                        <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                            </svg>
+                                <p class="text-lg">No schedule in this semester</p>
+                        </div>
+                        {% else %}
+                        <div class="h-80">
+                            <canvas id="schedulesChart" class="w-full h-full"></canvas>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-6 gap-6">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
-        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Number of Schedules by Room</p>
-        <div class="flex items-center justify-center space-x-4 mb-4">
-            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20251&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
-            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20252&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
-            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_bar=20253&schedule_choice_doughnut={{ schedule_choice_doughnut }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_bar == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
-        </div>
-
-        {% if no_room_distribution_warning %}
-            <div class="h-40 flex flex-col items-center justify-center text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                    <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
-                    <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
-                </svg>
-                <p class="text-lg">No schedule in this semester</p>
+                <div class="mb-4 bg-white rounded-xl shadow-md overflow-hidden">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            {{ lecturer_name }}'s Schedule
+                        </h3>
+                        {% if schedule_choice %}
+                            <a href="{% url 'viewschedule'|add:schedule_choice %}" 
+                            class="inline-block px-4 py-2 text-sm border font-medium text-white bg-blue-600 transition-all duration-200 hover:text-black hover:bg-white hover:border-blue-600 rounded">
+                                View Full Schedule
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-white">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <div class="flex items-center">
+                                            <span>Mon</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <div class="flex items-center">
+                                            <span>Tue</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <div class="flex items-center">
+                                            <span>Wed</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <div class="flex items-center">
+                                            <span>Thu</span>
+                                        </div>
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <div class="flex items-center">
+                                            <span>Fri</span>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                {% if no_schedule_warning %}
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-600">
+                                    <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
+                                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+                                            <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                                            <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                                            <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
+                                        </svg>
+                                        <p class="text-lg">No schedule in this semester</p>
+                                    </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr class="border border-gray-300">
+                                    {% for day in days %}
+                                    <td class="px-4 py-4 align-top min-w-[220px] ">
+                                        <div class="space-y-3 h-full">
+                                            {% for schedule in schedule_data %}
+                                                {% if schedule.lecturer_day == day %}
+                                                <div class="relative p-4 rounded-lg border transition-all duration-200 border-gray-200 bg-white hover:border-blue-200 hover:shadow-md">
+                                                    <div class="flex justify-between items-start">
+                                                        <div class="w-2/4 min-w-0">
+                                                            <h4 class="text-sm font-semibold 
+                                                                {% if schedule.assign_id in conflict_ids %}text-red-700{% else %}text-gray-800{% endif %}">
+                                                                {{ schedule.semester.subject }}
+                                                            </h4>
+                                                            <p class="text-xs text-gray-500 mt-1">{{ schedule.semester.major_class }}</p>
+                                                        </div>
+                                                        <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                                                            {{ schedule.start_time|time:"H:i" }}-{{ schedule.end_time|time:"H:i" }}
+                                                        </span>
+                                                    </div>
+                                                    <div class="mt-2 text-xs text-gray-600 space-y-1">
+                                                        <p class="truncate">{{ schedule.room}}</p>
+                                                    </div> 
+                                                    <div class="absolute bottom-2 right-2">
+                                                        <button class="remove-schedule" 
+                                                                data-assign-id="{{ schedule.assign_id }}" 
+                                                                data-semester-id="{{ schedule.semester.semester_id }}"
+                                                                data-semester-url="20251">
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {% elif empty %}
+                                                <div class="h-40 flex flex-col items-center justify-center text-gray-400">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <span class="text-sm">No classes scheduled</span>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        {% else %}
-            <div class="h-80">
-                <canvas id="roomChart" class="w-full h-full"></canvas>
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-3">
-        <p class="text-lg text-center font-family-poppins font-bold text-gray-600 mb-4">Schedules per Day</p>
-        <div class="flex items-center justify-center space-x-4 mb-4">
-            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20251&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20251' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20251</a>
-            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20252&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20252' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20252</a>
-            <a href="{% url 'dashboard_lecturer_view' %}?schedule_choice_doughnut=20253&schedule_choice_bar={{ schedule_choice_bar }}" class="px-4 py-2 text-sm font-medium {% if schedule_choice_doughnut == '20253' %}text-blue-600 border-b-2 border-blue-600{% else %}text-gray-500{% endif %}">20253</a>
-        </div>
-
-        {% if no_classes_warning %}
-            <div class="h-40 flex flex-col items-center justify-center text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" width="50" height="50">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
-                    <path d="M9 17C9.85038 16.3697 10.8846 16 12 16C13.1154 16 14.1496 16.3697 15 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-                    <ellipse cx="15" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
-                    <ellipse cx="9" cy="10.5" rx="1" ry="1.5" fill="currentColor"></ellipse>
-                </svg>
-                <p class="text-lg">No schedule in this semester</p>
-            </div>
-        {% else %}
-            <div class="h-80">
-                <canvas id="schedulesChart" class="w-full h-full"></canvas>
-            </div>
-        {% endif %}
-    </div>
-</div>
         </main>
-        {% endblock %}
-
-        
+        {% endblock %}  
     </div>
 
     <script src="{% static 'js/script.js' %}">
@@ -605,6 +717,177 @@ new Chart(ctx2, {
     plugins: [ChartDataLabels],
 });
 
+    </script>
+
+    <script>
+    const { jsPDF } = window.jspdf;
+
+    document.querySelectorAll('.print-room').forEach(button => {
+        button.addEventListener('click', function() {
+            const roomName = this.getAttribute('data-room');
+            const roomElement = document.getElementById(`room-${roomName.toLowerCase().replace(/ /g, '-')}`);
+            
+            Swal.fire({
+                title: 'Export Room Schedule',
+                text: 'Choose export option for ' + roomName,
+                showCancelButton: true,
+                confirmButtonText: 'Download PDF',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+            if (result.isConfirmed) {
+                    downloadAsPDF(roomElement, roomName);
+                }
+            });
+        });
+    });
+
+    function downloadAsPDF(element, roomName) {
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    
+    pdf.setFontSize(14);
+    pdf.text(`Schedule Report 20251 by : ${roomName}`, 148, 15, { align: 'center' });
+    
+    const timeSlots = [
+        '07:00-07:50', '07:50-08:40', '08:40-09:30', '09:30-10:20', '10:20-11:10', 
+        '11:10-12:00', '12:00-12:50', '12:50-13:40', '13:40-14:30', '14:30-15:20',
+        '15:20-16:10', '16:10-17:00', '17:00-17:50', '17:50-18:40', '18:40-19:30',
+        '19:30-20:20', '20:20-21:10', '21:10-22:00', '22:00-22:50', '22:50-23:40'
+    ];
+    
+    const dayHeaders = ['Time', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    
+    function timeToMinutes(time) {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    }
+    
+    const scheduleData = {};
+    const tds = element.querySelectorAll('tbody td');
+    const uniqueSchedules = new Set();
+
+    tds.forEach((td, dayIndex) => {
+        const dayName = dayHeaders[dayIndex + 1];
+        if (!dayName) return;
+        
+        scheduleData[dayName] = [];
+        
+        td.querySelectorAll('.relative').forEach(scheduleItem => {
+            const subject = scheduleItem.querySelector('h4')?.innerText.trim() || '';
+            const classInfo = scheduleItem.querySelector('p.text-xs')?.innerText.trim() || '';
+            const timeSpan = scheduleItem.querySelector('span.text-xs')?.innerText.trim() || '';
+            const lecturer = scheduleItem.querySelector('.mt-2 p.font-medium')?.innerText.trim() || '';
+            
+            const timeMatch = timeSpan.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
+            if (timeMatch) {
+                const scheduleKey = `${dayName}-${timeMatch[1]}-${timeMatch[2]}-${subject}-${lecturer}`;
+                
+                if (!uniqueSchedules.has(scheduleKey)) {
+                    uniqueSchedules.add(scheduleKey);
+                    scheduleData[dayName].push({
+                        subject,
+                        classInfo,
+                        startTime: timeMatch[1],
+                        endTime: timeMatch[2],
+                        lecturer,
+                        fullText: `${subject}\n${classInfo}\n${lecturer}`
+                    });
+                }
+            }
+        });
+    });
+
+    const tableData = [];
+    const mergedCells = {};
+    
+    timeSlots.forEach((timeSlot, rowIndex) => {
+        const row = [timeSlot];
+        const [slotStart, slotEnd] = timeSlot.split('-');
+        const slotStartMin = timeToMinutes(slotStart);
+        const slotEndMin = timeToMinutes(slotEnd);
+        
+        dayHeaders.slice(1).forEach((day, dayIndex) => {
+            const cellKey = `${rowIndex}-${dayIndex}`;
+            
+            if (mergedCells[cellKey]) {
+                row.push('');
+                return;
+            }
+            
+            let cellContent = '';
+            let spanRows = 1;
+            
+            if (scheduleData[day]) {
+                for (const item of scheduleData[day]) {
+                    const itemStartMin = timeToMinutes(item.startTime);
+                    const itemEndMin = timeToMinutes(item.endTime);
+                    
+                    if (itemStartMin < slotEndMin && itemEndMin > slotStartMin && 
+                        itemStartMin <= slotStartMin) {
+                        
+                        const overlappingSlots = [];
+                        for (let i = rowIndex; i < timeSlots.length; i++) {
+                            const [tsStart, tsEnd] = timeSlots[i].split('-');
+                            const tsStartMin = timeToMinutes(tsStart);
+                            const tsEndMin = timeToMinutes(tsEnd);
+                            
+                            if (itemStartMin < tsEndMin && itemEndMin > tsStartMin) {
+                                overlappingSlots.push(i);
+                            } else {
+                                break;
+                            }
+                        }
+                        
+                        spanRows = overlappingSlots.length;
+                        cellContent = `${item.startTime}-${item.endTime}\n${item.fullText}`;
+                        
+                        for (let i = 1; i < spanRows; i++) {
+                            mergedCells[`${rowIndex + i}-${dayIndex}`] = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            row.push(cellContent);
+        });
+        
+        tableData.push(row);
+    });
+
+    pdf.autoTable({
+        startY: 20,
+        head: [dayHeaders],
+        body: tableData,
+        styles: {
+            fontSize: 8,
+            cellPadding: 3,
+            valign: 'middle',
+            halign: 'center',
+            overflow: 'linebreak',
+            lineWidth: 0.1,
+            fillColor: false
+        },
+        columnStyles: {
+            0: { cellWidth: 22, fontStyle: 'bold' },
+            1: { cellWidth: 50 },
+            2: { cellWidth: 50 },
+            3: { cellWidth: 50 },
+            4: { cellWidth: 50 },
+            5: { cellWidth: 50 }
+        },
+        theme: 'plain',
+        didDrawCell: function(data) {
+            if (data.column.index > 0 && mergedCells[`${data.row.index}-${data.column.index - 1}`]) {
+                pdf.setDrawColor(255, 255, 255);
+                pdf.line(data.cell.x, data.cell.y, data.cell.x + data.cell.width, data.cell.y);
+                pdf.line(data.cell.x, data.cell.y + data.cell.height, 
+                        data.cell.x + data.cell.width, data.cell.y + data.cell.height);
+            }
+        }
+    });
+    
+    pdf.save(`Schedule_${roomName.replace(/ /g, '_')}.pdf`);
+}
     </script>
 
 </body>

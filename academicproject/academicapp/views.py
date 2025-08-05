@@ -191,6 +191,10 @@ def dashboard_lecturer_view(request):
         "show_dashboard": True,
     }
     lecturer_name = request.session.get('name', '')
+    from collections import defaultdict
+
+# Group schedule by day
+
 
 
     semester_model = {
@@ -199,15 +203,30 @@ def dashboard_lecturer_view(request):
         '20253': assignlecturer20253,
     }
 
-    schedule_choice_doughnut = request.GET.get('schedule_choice_doughnut', '20251')
-    schedule_choice_bar = request.GET.get('schedule_choice_bar', '20251')
+    schedule_choice = request.GET.get('schedule_choice', '20251')
 
     room_counts = {}
 
-    schedule_model_bar = semester_model.get(schedule_choice_bar)
+    schedule_model = semester_model.get(schedule_choice)
 
-    if schedule_model_bar:
-        schedules = schedule_model_bar.objects.filter(
+    day = request.GET.get('day', '').strip()
+
+    schedule_data = schedule_model.objects.select_related('semester').order_by('lecturer_day', 'start_time')
+
+    if lecturer_name:
+        schedule_data = schedule_data.filter(
+            Q(semester__lecturer_1__icontains=lecturer_name) | 
+            Q(semester__lecturer_2__icontains=lecturer_name) | 
+            Q(semester__lecturer_3__icontains=lecturer_name)
+        )
+
+    if day:
+        schedule_data = schedule_data.filter(lecturer_day__icontains=day)
+
+    no_schedule_warning = not schedule_data.exists()
+
+    if schedule_model:
+        schedules = schedule_model.objects.filter(
             Q(semester__lecturer_1__icontains=lecturer_name) |
             Q(semester__lecturer_2__icontains=lecturer_name) |
             Q(semester__lecturer_3__icontains=lecturer_name)
@@ -231,10 +250,8 @@ def dashboard_lecturer_view(request):
   
     day_counts = {'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0}
 
-    schedule_model_doughnut = semester_model.get(schedule_choice_doughnut)
-
-    if schedule_model_doughnut:
-        schedules = schedule_model_doughnut.objects.filter(
+    if schedule_model:
+        schedules = schedule_model.objects.filter(
             Q(semester__lecturer_1__icontains=lecturer_name) |
             Q(semester__lecturer_2__icontains=lecturer_name) |
             Q(semester__lecturer_3__icontains=lecturer_name)
@@ -256,12 +273,13 @@ def dashboard_lecturer_view(request):
         'lecturer_name': lecturer_name,
         'day_counts_values': day_counts_values,
         'labels': labels,
-        'schedule_choice_doughnut': schedule_choice_doughnut,
+        'schedule_choice': schedule_choice,
         'no_classes_warning': no_classes_warning,
         'no_room_distribution_warning': no_room_distribution_warning,
         'room_labels': room_labels,
         'room_values': room_values,
-        'schedule_choice_bar': schedule_choice_bar,
+        'schedule_data': schedule_data,
+        'no_schedule_warning': no_schedule_warning,
     })
 
     semester_data = semester20251.objects.all()
@@ -296,11 +314,11 @@ def dashboard_lecturer_view(request):
         'lecturer_name': lecturer_name,
         'day_counts_values': day_counts_values,
         'labels': labels,
-        'schedule_choice_doughnut': schedule_choice_doughnut,
+        'schedule_choice': schedule_choice,
         'no_classes_warning': no_classes_warning,
         'room_labels': room_labels,
         'room_values': room_values,
-        'schedule_choice_bar': schedule_choice_bar,
+        'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
         'total_lecturers': total_lecturers,
         'total_classes': total_classes,
         'total_subjects': total_subjects
@@ -774,8 +792,9 @@ def viewschedule20251(request):
     lecturer_name = request.session.get('name', '')
 
     day = request.GET.get('day', '').strip()
+    room_schedule = defaultdict(lambda: defaultdict(list))
 
-    schedule_data = assignlecturer20251.objects.select_related('semester').all()
+    schedule_data = assignlecturer20251.objects.select_related('semester').order_by('lecturer_day', 'start_time')
 
     if lecturer_name:
         schedule_data = schedule_data.filter(
@@ -789,7 +808,12 @@ def viewschedule20251(request):
 
     no_schedule_warning = not schedule_data.exists()
 
+    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+
+
     return render(request, 'viewschedule20251.html', {
+        'days': days,
+        'room_schedule': dict(room_schedule),
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
         'day': day, 
@@ -801,7 +825,7 @@ def viewschedule20252(request):
 
     day = request.GET.get('day', '').strip()
 
-    schedule_data = assignlecturer20252.objects.select_related('semester').all()
+    schedule_data = assignlecturer20252.objects.select_related('semester').order_by('lecturer_day', 'start_time')
 
     if lecturer_name:
         schedule_data = schedule_data.filter(
@@ -815,10 +839,13 @@ def viewschedule20252(request):
 
     no_schedule_warning = not schedule_data.exists()
 
+    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+
     return render(request, 'viewschedule20252.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
         'day': day, 
+        'days': days,
         'no_schedule_warning': no_schedule_warning
     })
 
@@ -827,7 +854,7 @@ def viewschedule20253(request):
 
     day = request.GET.get('day', '').strip()
 
-    schedule_data = assignlecturer20253.objects.select_related('semester').all()
+    schedule_data = assignlecturer20253.objects.select_related('semester').order_by('lecturer_day', 'start_time')
 
     if lecturer_name:
         schedule_data = schedule_data.filter(
@@ -841,12 +868,17 @@ def viewschedule20253(request):
 
     no_schedule_warning = not schedule_data.exists()
 
+    days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+
     return render(request, 'viewschedule20253.html', {
         'schedule_data': schedule_data,
         'lecturer_name': lecturer_name,
+        'days': days,
         'day': day, 
         'no_schedule_warning': no_schedule_warning
     })
+
+
 
 
 @csrf_exempt
