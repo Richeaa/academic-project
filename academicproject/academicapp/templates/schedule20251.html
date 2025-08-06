@@ -6,10 +6,28 @@
 {% block content %}
 <main id="main-content" class="w-full p-8 lg:ml-64">
     <div class="flex justify-between items-center mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Schedule per Room</h2>
-        <div class="flex items-center space-x-2">
-            <input type="text" id="roomSearch" placeholder="Search Room..." class="hidden lg:block w-80 pl-10 pr-4 py-3 bg-gray-200 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-        </div>
+    <h2 class="text-2xl font-bold text-gray-800">Schedule per Room</h2>
+    <div class="flex items-center space-x-2">
+        <select id="dayFilter" class="hidden lg:block w-42 pl-3 pr-4 py-3 bg-gray-200 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+            <option value="">All Days</option>
+            <option value="Mon">Monday</option>
+            <option value="Tue">Tuesday</option>
+            <option value="Wed">Wednesday</option>
+            <option value="Thu">Thursday</option>
+            <option value="Fri">Friday</option>
+        </select>
+
+        <input type="text" id="lecturerFilter" placeholder="Find Lecturer" class="hidden lg:block w-42 pl-10 pr-4 py-3 bg-gray-200 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+
+        <select id="majorFilter" class="hidden lg:block w-42 pl-3 pr-4 py-3 bg-gray-200 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+            <option value="">All Majors</option>
+            {% for major in unique_majors %}
+                <option value="{{ major }}">{{ major }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" id="roomSearch" placeholder="Search Room" class="hidden lg:block w-42 pl-10 pr-4 py-3 bg-gray-200 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+    </div>
     </div>
 
     {% if not room_schedule %} 
@@ -189,20 +207,53 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const dayFilter = document.getElementById('dayFilter');
+    const lecturerFilter = document.getElementById('lecturerFilter');
+    const majorFilter = document.getElementById('majorFilter');
     const roomSearch = document.getElementById('roomSearch');
-    const roomCards = document.querySelectorAll('[class*="mb-12 bg-white rounded-xl"]'); 
-    
-    roomSearch.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has('day')) {
+        dayFilter.value = urlParams.get('day');
+    }
+    if (urlParams.has('lecturer')) {
+        lecturerFilter.value = urlParams.get('lecturer');
+    }
+    if (urlParams.has('major')) {
+        majorFilter.value = urlParams.get('major');
+    }
+    if (urlParams.has('room')) {
+        roomSearch.value = urlParams.get('room');
+    }
+
+    function applyFilters() {
+        const params = new URLSearchParams();
         
-        roomCards.forEach(card => {
-            const roomTitle = card.querySelector('h3').textContent.toLowerCase();
-            if (roomTitle.includes(searchTerm)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
+        if (dayFilter.value) {
+            params.set('day', dayFilter.value);
+        }
+        if (lecturerFilter.value) {
+            params.set('lecturer', lecturerFilter.value);
+        }
+        if (majorFilter.value) {
+            params.set('major', majorFilter.value);
+        }
+        if (roomSearch.value) {
+            params.set('room', roomSearch.value);
+        }
+        
+        window.location.search = params.toString();
+    }
+
+    dayFilter.addEventListener('change', applyFilters);
+    lecturerFilter.addEventListener('input', function() {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(applyFilters, 500);
+    });
+    majorFilter.addEventListener('change', applyFilters);
+    roomSearch.addEventListener('input', function() {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(applyFilters, 500);
     });
 });
 

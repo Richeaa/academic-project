@@ -590,7 +590,27 @@ def schedulelecturer_delete(request):
     
 
 def schedule20251(request):
+    day_filter = request.GET.get('day')
+    lecturer_filter = request.GET.get('lecturer')
+    major_filter = request.GET.get('major')
+    room_filter = request.GET.get('room')
+
     schedule = assignlecturer20251.objects.select_related('semester').order_by('room', 'lecturer_day', 'start_time')
+
+    if day_filter:
+        schedule = schedule.filter(lecturer_day=day_filter)
+    if lecturer_filter:
+        schedule = schedule.filter(
+            Q(semester__lecturer_1__icontains=lecturer_filter) |
+            Q(semester__lecturer_2__icontains=lecturer_filter)
+        )
+    if major_filter:
+        schedule = schedule.filter(semester__major=major_filter)
+    if room_filter:
+        schedule = schedule.filter(room__icontains=room_filter)
+
+    unique_majors = assignlecturer20251.objects.order_by('semester__major')\
+                              .values_list('semester__major', flat=True).distinct()
 
     room_schedule = defaultdict(lambda: defaultdict(list))
     conflict_ids = set() 
@@ -635,6 +655,13 @@ def schedule20251(request):
         'has_conflicts': has_conflicts,
         'conflict_details': conflict_details,
         'days': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        'unique_majors': unique_majors,
+        'applied_filters': {
+            'day': day_filter,
+            'lecturer': lecturer_filter,
+            'major': major_filter,
+            'room': room_filter,
+        }
     }
     return render(request, 'schedule20251.html', context)
 
