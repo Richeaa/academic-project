@@ -101,6 +101,7 @@ class assignlecturer20251(models.Model):
     room = models.CharField(max_length=50)
     start_time = models.TimeField()
     end_time = models.TimeField()
+    is_manual = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Assignment {self.assign_id} for {self.semester_id} on {self.lecturer_day} from {self.start_time} to {self.end_time} in {self.room}"
@@ -116,6 +117,7 @@ class assignlecturer20252(models.Model):
     room = models.CharField(max_length=50)
     start_time = models.TimeField()
     end_time = models.TimeField()
+    is_manual = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Assignment {self.assign_id} for {self.semester_id} on {self.lecturer_day} from {self.start_time} to {self.end_time} in {self.room}"
@@ -132,6 +134,7 @@ class assignlecturer20253(models.Model):
     room = models.CharField(max_length=50)
     start_time = models.TimeField()
     end_time = models.TimeField()
+    is_manual = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Assignment {self.assign_id} for {self.semester_id} on {self.lecturer_day} from {self.start_time} to {self.end_time} in {self.room}"

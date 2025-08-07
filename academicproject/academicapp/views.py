@@ -494,6 +494,7 @@ def assignlecturer_create(request):
                 assign_obj.room = request.POST.get('room')
                 assign_obj.start_time = request.POST.get('time')
                 assign_obj.end_time = request.POST.get('time2')
+                assign_obj.is_manual = True  
                 assign_obj.save()
                 return JsonResponse({'success': True, 'message': 'Assignment updated successfully'})
             else:
@@ -502,7 +503,8 @@ def assignlecturer_create(request):
                     lecturer_day=request.POST.get('day'),
                     room=request.POST.get('room'),
                     start_time=request.POST.get('time'),
-                    end_time=request.POST.get('time2')
+                    end_time=request.POST.get('time2'),
+                    is_manual=True  
                 )
                 return JsonResponse({'success': True, 'message': 'Assignment created successfully'})
         else:
@@ -1146,8 +1148,8 @@ def predict_schedule(request):
                 'error': 'Invalid semester choice'
             }, status=400)
         
-        # Run ML
         logger.info(f"Starting ML prediction for semester {semester_choice}")
+        
         success, message, saved_count = run_ml_prediction(semester_choice)
         
         if success:
@@ -1184,7 +1186,6 @@ def get_schedule(request):
         semester_choice = data.get('semester')
         page = int(data.get('page', 1))
         page_size = int(data.get('page_size', 10))
-        
         sort_by = data.get('sort_by', '')
         filter_status = data.get('filter_status', 'all')  
         
@@ -1200,6 +1201,7 @@ def get_schedule(request):
                 'error': 'Invalid semester choice'
             }, status=400)
         
+        # Panggil fungsi yang sudah dimodifikasi
         schedule_data = get_combined_schedule_data(
             semester_choice, page, page_size, sort_by, filter_status
         )

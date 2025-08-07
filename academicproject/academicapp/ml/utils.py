@@ -70,7 +70,8 @@ def get_existing_assignments(semester_choice):
         'lecturer_day',
         'room',
         'start_time',
-        'end_time'
+        'end_time',
+        'is_manual'
     )
     
     df = pd.DataFrame(assignments)
@@ -87,7 +88,8 @@ def get_existing_assignments(semester_choice):
         'lecturer_day': 'Day',
         'room': 'Room',
         'start_time': 'StartTime',
-        'end_time': 'EndTime'
+        'end_time': 'EndTime',
+        'is_manual': 'IsManual'
     })
     
     return df
@@ -164,6 +166,8 @@ def save_predictions_to_db(predictions_df, semester_choice):
     else:
         raise ValueError(f"Invalid semester choice: {semester_choice}")
     
+    AssignModel.objects.filter(is_manual=False).delete()
+    
     saved_count = 0
     
     for _, row in predictions_df.iterrows():
@@ -191,7 +195,8 @@ def save_predictions_to_db(predictions_df, semester_choice):
                         lecturer_day=day,
                         room=row['Room'],
                         start_time=start_time,
-                        end_time=end_time
+                        end_time=end_time,
+                        is_manual=False  
                     )
                     saved_count += 1
                 
@@ -222,6 +227,12 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10, sort_by=''
     elif filter_status == 'unassigned':
         assigned_semester_ids = AssignModel.objects.values_list('semester_id', flat=True)
         semester_data = semester_data.exclude(semester_id__in=assigned_semester_ids)
+    elif filter_status == 'manual':
+        manual_assignment_ids = AssignModel.objects.filter(is_manual=True).values_list('semester_id', flat=True)
+        semester_data = semester_data.filter(semester_id__in=manual_assignment_ids)
+    elif filter_status == 'prediction':
+        prediction_assignment_ids = AssignModel.objects.filter(is_manual=False).values_list('semester_id', flat=True)
+        semester_data = semester_data.filter(semester_id__in=prediction_assignment_ids)
     
     if sort_by:
         valid_sort_fields = [
@@ -233,7 +244,6 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10, sort_by=''
         elif sort_by.startswith('-') and sort_by[1:] in valid_sort_fields:
             semester_data = semester_data.order_by(sort_by)
     
-    # Calculate pagination
     total_count = semester_data.count()
     total_pages = (total_count + page_size - 1) // page_size
     start_idx = (page - 1) * page_size
@@ -247,9 +257,11 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10, sort_by=''
             assignment = AssignModel.objects.get(semester=semester_item)
             room = assignment.room
             schedule_time = f"{assignment.lecturer_day}, {assignment.start_time.strftime('%H:%M')}-{assignment.end_time.strftime('%H:%M')}"
+            is_manual = assignment.is_manual
         except AssignModel.DoesNotExist:
             room = None
             schedule_time = None
+            is_manual = None
         
         results.append({
             'semester_id': semester_item.semester_id,
@@ -264,6 +276,7 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10, sort_by=''
             'lecturer_3': semester_item.lecturer_3 or '-',
             'room': room,
             'schedule_time': schedule_time,
+            'is_manual': is_manual, 
             'note': semester_item.note or '-',
         })
     

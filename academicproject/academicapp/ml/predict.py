@@ -62,7 +62,6 @@ def run_ml_prediction(semester_choice):
         
         final_schedule = skeleton_df.copy()
         final_schedule['Note'] = ''
-
         
         if '#1' not in final_schedule.columns:
             print("WARNING: '#1' column not found in data!")
@@ -96,7 +95,6 @@ def run_ml_prediction(semester_choice):
             
         except Exception as e:
             print(f"ML prediction error: {e}")
-            # Fallback: assign default values
             final_schedule['Room'] = '-'
             final_schedule['Sched. Time'] = '-'
         
@@ -110,6 +108,8 @@ def run_ml_prediction(semester_choice):
             (final_schedule['Sched. Time'] != '-')
         ])
         print(f"Successful assignments after constraints: {successful_assignments}")
+        
+        final_schedule['is_manual'] = False
         
         saved_count = save_predictions_to_db(final_schedule, semester_choice)        
         
