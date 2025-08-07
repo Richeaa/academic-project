@@ -176,8 +176,6 @@ def courses_per_major_api(request, semester_code):
 
     return JsonResponse({'labels': labels, 'values': values})
 
-
-
 def dashboard_lecturer_view(request):
     if 'user_id' not in request.session:
         return redirect('signin')
@@ -326,8 +324,6 @@ def dashboard_lecturer_view(request):
 
     
     return render(request, 'dashboard_lecturer_view.html', context)
-
-
 
 def signin(request):
     users = profile.objects.all()
@@ -588,7 +584,6 @@ def schedulelecturer_delete(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
     
-
 def schedule20251(request):
     day_filter = request.GET.get('day')
     lecturer_filter = request.GET.get('lecturer')
@@ -905,9 +900,6 @@ def viewschedule20253(request):
         'no_schedule_warning': no_schedule_warning
     })
 
-
-
-
 @csrf_exempt
 @require_http_methods(["POST"])
 def add_academic_module(request, semester_url):
@@ -1188,7 +1180,6 @@ def predict_schedule(request):
 @require_http_methods(["POST"])
 def get_schedule(request):
     try:
-        # request schedule data
         data = json.loads(request.body)
         semester_choice = data.get('semester')
         page = int(data.get('page', 1))
@@ -1256,7 +1247,6 @@ def clear_assignments(request):
         else:
             from .models import assignlecturer20253 as AssignModel
         
-        # Clear all assignments
         deleted_count = AssignModel.objects.all().count()
         AssignModel.objects.all().delete()
         

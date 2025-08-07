@@ -113,6 +113,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule Time</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
                     </tr>
                 </thead>
                 
@@ -363,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!data || !data.results || data.results.length === 0) {
             scheduleBody.innerHTML = `
                 <tr>
-                    <td colspan="13" class="px-6 py-12 text-center text-gray-500">
+                    <td colspan="14" class="px-6 py-12 text-center text-gray-500">
                         No schedule data available for this semester.
                     </td>
                 </tr>
@@ -401,6 +402,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">None</span>'
                         }
                     </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                            ${item.note || '<span class="text-gray-400">-</span>'}
+                    </td>
                 `;
                 scheduleBody.appendChild(row);
             });
@@ -425,7 +429,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // MODIFIED: Updated fetchSchedule function
     async function fetchSchedule(semester, page = 1) {
         if (!semester) {
             showDefault();

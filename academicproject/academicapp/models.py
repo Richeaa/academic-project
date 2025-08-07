@@ -26,6 +26,7 @@ class semester20251(models.Model):
     lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
     lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
     lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.program_session} - {self.subject}"
@@ -46,6 +47,7 @@ class semester20252(models.Model):
     lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
     lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
     lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.program_session} - {self.subject}"
@@ -65,6 +67,7 @@ class semester20253(models.Model):
     lecturer_1 = models.CharField(max_length=100, blank=True, null=True)
     lecturer_2 = models.CharField(max_length=100, blank=True, null=True)
     lecturer_3 = models.CharField(max_length=100, blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.program_session} - {self.subject}"

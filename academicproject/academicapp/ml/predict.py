@@ -61,13 +61,8 @@ def run_ml_prediction(semester_choice):
         features = categorical_cols + ['Cr']
         
         final_schedule = skeleton_df.copy()
-        
-        # Debug:
-        # print("Data structure check:")
-        # print(f"Columns: {list(final_schedule.columns)}")
-        # print(f"First row type: {type(final_schedule.iloc[0])}")
-        # if len(final_schedule) > 0:
-        #     print(f"Sample row: {final_schedule.iloc[0].to_dict()}")
+        final_schedule['Note'] = ''
+
         
         if '#1' not in final_schedule.columns:
             print("WARNING: '#1' column not found in data!")
@@ -116,8 +111,7 @@ def run_ml_prediction(semester_choice):
         ])
         print(f"Successful assignments after constraints: {successful_assignments}")
         
-        saved_count = save_predictions_to_db(final_schedule, semester_choice)
-        
+        saved_count = save_predictions_to_db(final_schedule, semester_choice)        
         
         return True, f"Successfully processed {len(final_schedule)} classes, saved {saved_count} assignments", saved_count
         
@@ -159,22 +153,22 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
                 lecturer_time_blocks[lecturer][day].append((start_dt, end_dt))
                 lecturer_schedule[lecturer].add(room)
                 
-            print(f"Pre-populated: {room} on {day} from {start_time} to {end_time}")
+            # print(f"Pre-populated: {room} on {day} from {start_time} to {end_time}")
             
         except Exception as e:
-            print(f"Error pre-populating assignment: {e}")
+            # print(f"Error pre-populating assignment: {e}")
             continue
     
-    print(f"Pre-populated {len(existing_assignments)} existing assignments")
+    # print(f"Pre-populated {len(existing_assignments)} existing assignments")
     
-    print("=== DEBUG: Checking pre-populated data ===")
-    print(f"room_day_time_blocks keys: {list(room_day_time_blocks.keys())}")
-    if 'A420' in room_day_time_blocks:
-        print(f"A420 Monday schedule: {room_day_time_blocks['A420']['Mon']}")
-        if room_day_time_blocks['A420']['Mon']:
-            for block in room_day_time_blocks['A420']['Mon']:
-                print(f"  Existing block: {block[0]} to {block[1]}")
-    print("=== END DEBUG ===")
+    # print("=== DEBUG: Checking pre-populated data ===")
+    # print(f"room_day_time_blocks keys: {list(room_day_time_blocks.keys())}")
+    # if 'A420' in room_day_time_blocks:
+    #     print(f"A420 Monday schedule: {room_day_time_blocks['A420']['Mon']}")
+    #     if room_day_time_blocks['A420']['Mon']:
+    #         for block in room_day_time_blocks['A420']['Mon']:
+    #             print(f"  Existing block: {block[0]} to {block[1]}")
+    # print("=== END DEBUG ===")
     
     max_class_days = 5
     max_subjects_per_day = 3
@@ -206,7 +200,7 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
             key = (row['Curriculum'], row['Class'], row['Subject'])
             lecturer = row['#1'] if '#1' in row else None
             lecturer_assignments[key] = lecturer
-            if idx < 5:  # Debug first 5 rows
+            if idx < 5:
                 print(f"Row {idx}: {key} -> {lecturer}")
         except Exception as e:
             print(f"Error processing row {idx}: {e}")
@@ -234,13 +228,13 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
         
         try:
             credit_str = str(row['Cr']).strip()
-            # Handle decimal strings like '3.00' or '3.0'
+            # Handle decimal like '3.00' or '3.0'
             if '.' in credit_str:
                 credit = int(float(credit_str))
             else:
                 credit = int(credit_str)
         except (ValueError, TypeError):
-            credit = 3  # Default credit value
+            credit = 3  # Default credit
             
         key_lecturer = (row['Curriculum'], row['Class'], subject)
         
@@ -250,6 +244,7 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
             schedule_df.at[idx, '#1'] = '(Tba)'
             schedule_df.at[idx, 'Room'] = '-'
             schedule_df.at[idx, 'Sched. Time'] = '-'
+            schedule_df.at[idx, 'Note'] = 'No lecturer assigned'
             no_lecturer_count += 1
             continue
         
@@ -303,6 +298,7 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
                     schedule_df.at[idx, 'Room'] = room
                     schedule_df.at[idx, 'Sched. Time'] = f"{day}, {start_dt.strftime('%H:%M')}-{end_dt.strftime('%H:%M')}"
                     schedule_df.at[idx, '#1'] = lecturer
+                    schedule_df.at[idx, 'Note'] = ''
                     
                     room_day_time_blocks[room][day].append((start_dt, end_dt))
                     class_day_time_blocks[key_class][day].append((start_dt, end_dt))
@@ -326,6 +322,7 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
             schedule_df.at[idx, 'Room'] = '-'
             schedule_df.at[idx, 'Sched. Time'] = '-'
             schedule_df.at[idx, '#1'] = lecturer
+            schedule_df.at[idx, 'Note'] = 'No suitable room/time found'
             conflict_count += 1
     
     print(f"Constraint scheduling results:")

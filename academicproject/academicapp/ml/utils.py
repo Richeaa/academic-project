@@ -1,6 +1,6 @@
 import pandas as pd
 from django.apps import apps
-from datetime import datetime, timedelta
+from datetime import datetime
 import json
 import os
 
@@ -167,33 +167,33 @@ def save_predictions_to_db(predictions_df, semester_choice):
     saved_count = 0
     
     for _, row in predictions_df.iterrows():
-        if pd.isna(row.get('Room')) or pd.isna(row.get('Sched. Time')) or \
-           row.get('Room') == '-' or row.get('Sched. Time') == '-':
-            continue
-            
         try:
-            schedule_time = row['Sched. Time']
-            if ', ' in schedule_time and '-' in schedule_time:
-                day_time_part = schedule_time.split(', ')[1]
-                start_time_str, end_time_str = day_time_part.split('-')
-                day = schedule_time.split(', ')[0]
+            semester_instance = SemesterModel.objects.get(
+                semester_id=row['semester_id']
+            )
+            semester_instance.note = row.get('Note', '')
+            semester_instance.save()
+            
+            if not (pd.isna(row.get('Room')) or pd.isna(row.get('Sched. Time')) or 
+                   row.get('Room') == '-' or row.get('Sched. Time') == '-'):
                 
-                start_time = datetime.strptime(start_time_str, '%H:%M').time()
-                end_time = datetime.strptime(end_time_str, '%H:%M').time()
-                
-                semester_instance = SemesterModel.objects.get(
-                    semester_id=row['semester_id']
-                )
-                
-                # Create assignment
-                AssignModel.objects.create(
-                    semester=semester_instance,
-                    lecturer_day=day,
-                    room=row['Room'],
-                    start_time=start_time,
-                    end_time=end_time
-                )
-                saved_count += 1
+                schedule_time = row['Sched. Time']
+                if ', ' in schedule_time and '-' in schedule_time:
+                    day_time_part = schedule_time.split(', ')[1]
+                    start_time_str, end_time_str = day_time_part.split('-')
+                    day = schedule_time.split(', ')[0]
+                    
+                    start_time = datetime.strptime(start_time_str, '%H:%M').time()
+                    end_time = datetime.strptime(end_time_str, '%H:%M').time()
+                    
+                    AssignModel.objects.create(
+                        semester=semester_instance,
+                        lecturer_day=day,
+                        room=row['Room'],
+                        start_time=start_time,
+                        end_time=end_time
+                    )
+                    saved_count += 1
                 
         except Exception as e:
             print(f"Error saving assignment for semester_id {row.get('semester_id')}: {e}")
@@ -264,6 +264,7 @@ def get_combined_schedule_data(semester_choice, page=1, page_size=10, sort_by=''
             'lecturer_3': semester_item.lecturer_3 or '-',
             'room': room,
             'schedule_time': schedule_time,
+            'note': semester_item.note or '-',
         })
     
     return {
