@@ -1244,13 +1244,17 @@ def clear_assignments(request):
         
         if semester_choice == '20251':
             from .models import assignlecturer20251 as AssignModel
+            from .models import semester20251 as SemesterModel
         elif semester_choice == '20252':
             from .models import assignlecturer20252 as AssignModel
+            from .models import semester20252 as SemesterModel
         else:
             from .models import assignlecturer20253 as AssignModel
+            from .models import semester20253 as SemesterModel
         
         deleted_count = AssignModel.objects.all().count()
         AssignModel.objects.all().delete()
+        SemesterModel.objects.update(note='')
         
         logger.info(f"Cleared {deleted_count} assignments for semester {semester_choice}")
         

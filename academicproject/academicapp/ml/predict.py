@@ -1,7 +1,7 @@
 import pandas as pd
 import pickle
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 from collections import defaultdict
 
@@ -52,10 +52,6 @@ def run_ml_prediction(semester_choice):
         available_times = get_available_times()
         
         existing_assignments = get_existing_assignments(semester_choice)
-        print(f"Found {len(existing_assignments)} existing assignments")
-
-        print(f"Available rooms: {len(available_rooms)}")
-        print(f"Available times: {len(available_times)}")
         
         categorical_cols = ['Program Session', 'Major', 'Curriculum', 'Class', 'Subject']
         features = categorical_cols + ['Cr']
@@ -86,28 +82,14 @@ def run_ml_prediction(semester_choice):
             final_schedule['Room'] = predicted_rooms
             final_schedule['Sched. Time'] = predicted_times
             
-            print(f"ML predictions completed for {len(final_schedule)} classes")
-            
-            valid_room_predictions = sum(1 for r in predicted_rooms if r != '-' and str(r).strip() != '')
-            valid_time_predictions = sum(1 for t in predicted_times if t != '-' and str(t).strip() != '')
-            print(f"Valid room predictions: {valid_room_predictions}")
-            print(f"Valid time predictions: {valid_time_predictions}")
-            
         except Exception as e:
             print(f"ML prediction error: {e}")
             final_schedule['Room'] = '-'
             final_schedule['Sched. Time'] = '-'
         
-        print("Starting constraint-based scheduling...")
         final_schedule = apply_constraints_scheduling(
             final_schedule, preferences_df, available_rooms, available_times, existing_assignments
         )
-        
-        successful_assignments = len(final_schedule[
-            (final_schedule['Room'] != '-') & 
-            (final_schedule['Sched. Time'] != '-')
-        ])
-        print(f"Successful assignments after constraints: {successful_assignments}")
         
         final_schedule['is_manual'] = False
         
@@ -126,7 +108,6 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
     lecturer_time_blocks = defaultdict(lambda: defaultdict(list))
     lecturer_schedule = defaultdict(set)
     
-    print("Pre-populating tracking dictionaries with existing assignments...")
     for _, assignment in existing_assignments.iterrows():
         try:
             room = assignment['Room']
@@ -137,12 +118,10 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
             curriculum = assignment['Curriculum']
             class_name = assignment['Class']
             
-            # Convert times to datetime objects
             today = datetime.today().date()
             start_dt = datetime.combine(today, start_time)
             end_dt = datetime.combine(today, end_time)
             
-            # Update tracking dictionaries
             key_class = (curriculum, class_name)
             room_day_time_blocks[room][day].append((start_dt, end_dt))
             class_day_time_blocks[key_class][day].append((start_dt, end_dt))
@@ -152,23 +131,9 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
             if lecturer and lecturer != '(Tba)' and str(lecturer).strip() != '':
                 lecturer_time_blocks[lecturer][day].append((start_dt, end_dt))
                 lecturer_schedule[lecturer].add(room)
-                
-            # print(f"Pre-populated: {room} on {day} from {start_time} to {end_time}")
-            
+                            
         except Exception as e:
-            # print(f"Error pre-populating assignment: {e}")
             continue
-    
-    # print(f"Pre-populated {len(existing_assignments)} existing assignments")
-    
-    # print("=== DEBUG: Checking pre-populated data ===")
-    # print(f"room_day_time_blocks keys: {list(room_day_time_blocks.keys())}")
-    # if 'A420' in room_day_time_blocks:
-    #     print(f"A420 Monday schedule: {room_day_time_blocks['A420']['Mon']}")
-    #     if room_day_time_blocks['A420']['Mon']:
-    #         for block in room_day_time_blocks['A420']['Mon']:
-    #             print(f"  Existing block: {block[0]} to {block[1]}")
-    # print("=== END DEBUG ===")
     
     max_class_days = 5
     max_subjects_per_day = 3
@@ -193,7 +158,6 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
     ]
     
     lecturer_assignments = {}
-    print("Creating lecturer assignments lookup...")
     
     for idx, row in schedule_df.iterrows():
         try:
@@ -205,8 +169,6 @@ def apply_constraints_scheduling(schedule_df, preferences_df, available_rooms, a
         except Exception as e:
             print(f"Error processing row {idx}: {e}")
             print(f"Row data: {row}")
-    
-    print(f"Created {len(lecturer_assignments)} lecturer assignments")
     
     def check_has_pref(row):
         try:
