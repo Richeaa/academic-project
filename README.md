@@ -1,6 +1,6 @@
 ## Project Overview ##
 
 ![](academicproject/1.png)
-![](2.png)
-![](3.png)
-![](4.png)
+![](academicproject/2.png)
+![](academicproject/3.png)
+![](academicproject/4.png)
