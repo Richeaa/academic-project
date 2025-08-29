@@ -164,23 +164,3 @@ def validate_schedule_constraints(schedule_df):
                 violations.append(f"Invalid schedule format for row {row.get('semester_id', 'unknown')}: {e}")
     
     return len(violations) == 0, violations
-
-def get_constraint_summary():
-    """
-    Return a summary of all constraints used in scheduling
-    """
-    return {
-        'room_constraints': {
-            'specialized_rooms': len(ROOM_ALLOWED_MAJORS),
-            'excluded_rooms': len(EXCLUDED_ROOMS),
-        },
-        'time_constraints': {
-            'max_subjects_per_day': 3,
-            'max_class_days': 5,
-            'session_time_restrictions': True,  # Morning/Night session rules
-        },
-        'lecturer_constraints': {
-            'preference_support': True,
-            'conflict_avoidance': True,
-        }
-    }
